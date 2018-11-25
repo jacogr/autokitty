@@ -1,4 +1,4 @@
-const kittycheatCombust = function () {
+const kittycheatCombust = () => {
   if (game.time.heat > 0) {
     return;
   }
@@ -12,139 +12,139 @@ const kittycheatCombust = function () {
   });
 }
 
-const kittycheatUnicorns = function (log = false) {
+const kittycheatUnicorns = (log = false) => {
   try {
-	var validBuildings = ["unicornTomb", "ivoryTower", "ivoryCitadel", "skyPalace", "unicornUtopia", "sunspire"];
-	var unicornsPerSecond = gamePage.getEffect("unicornsPerTickBase") * gamePage.getRateUI();
-	var globalRatio = 1 + gamePage.getEffect("unicornsGlobalRatio");
-	var religionRatio = 1 + gamePage.getEffect("unicornsRatioReligion");
-	var paragonRatio = 1 + gamePage.prestige.getParagonProductionRatio();
-	var faithBonus = 1 + (gamePage.religion.getProductionBonus() / 100);
-	var cycle = 1;
+    var validBuildings = ["unicornTomb", "ivoryTower", "ivoryCitadel", "skyPalace", "unicornUtopia", "sunspire"];
+    var unicornsPerSecond = gamePage.getEffect("unicornsPerTickBase") * gamePage.getRateUI();
+    var globalRatio = 1 + gamePage.getEffect("unicornsGlobalRatio");
+    var religionRatio = 1 + gamePage.getEffect("unicornsRatioReligion");
+    var paragonRatio = 1 + gamePage.prestige.getParagonProductionRatio();
+    var faithBonus = 1 + (gamePage.religion.getProductionBonus() / 100);
+    var cycle = 1;
 
-	if (gamePage.calendar.cycles[gamePage.calendar.cycle].festivalEffects["unicorns"] != undefined) {
-		if (gamePage.prestige.getPerk("numeromancy").researched && gamePage.calendar.festivalDays) {
-			cycle=gamePage.calendar.cycles[gamePage.calendar.cycle].festivalEffects["unicorns"];
-		}
-  	}
+    if (gamePage.calendar.cycles[gamePage.calendar.cycle].festivalEffects["unicorns"] != undefined) {
+      if (gamePage.prestige.getPerk("numeromancy").researched && gamePage.calendar.festivalDays) {
+        cycle = gamePage.calendar.cycles[gamePage.calendar.cycle].festivalEffects["unicorns"];
+      }
+    }
 
-	var onZig = Math.max(gamePage.bld.getBuildingExt("ziggurat").meta.on, 1);
-	var total = unicornsPerSecond * globalRatio * religionRatio * paragonRatio * faithBonus * cycle;
-	var baseUnicornsPerRift = 500 * (1 + gamePage.getEffect("unicornsRatioReligion") * 0.1);
-	let riftChanceRatio = 1;
+    var onZig = Math.max(gamePage.bld.getBuildingExt("ziggurat").meta.on, 1);
+    var total = unicornsPerSecond * globalRatio * religionRatio * paragonRatio * faithBonus * cycle;
+    var baseUnicornsPerRift = 500 * (1 + gamePage.getEffect("unicornsRatioReligion") * 0.1);
+    let riftChanceRatio = 1;
 
-	if (gamePage.prestige.getPerk("unicornmancy").researched) {
-		riftChanceRatio *= 1.1;
-	}
+    if (gamePage.prestige.getPerk("unicornmancy").researched) {
+      riftChanceRatio *= 1.1;
+    }
 
-	var baseRift = gamePage.getEffect("riftChance") * riftChanceRatio / (10000 * 2) * baseUnicornsPerRift;
-	let bestAmoritization = Infinity;
-	let bestBuilding = "";
-	let pastureAmor = gamePage.bld.getBuildingExt("unicornPasture").meta.effects["unicornsPerTickBase"] * gamePage.getRateUI();
+    var baseRift = gamePage.getEffect("riftChance") * riftChanceRatio / (10000 * 2) * baseUnicornsPerRift;
+    let bestAmoritization = Infinity;
+    let bestBuilding = "";
+    let pastureAmor = gamePage.bld.getBuildingExt("unicornPasture").meta.effects["unicornsPerTickBase"] * gamePage.getRateUI();
 
-	pastureAmor = pastureAmor * globalRatio * religionRatio * paragonRatio * faithBonus * cycle;
+    pastureAmor = pastureAmor * globalRatio * religionRatio * paragonRatio * faithBonus * cycle;
 
-	if (log) {
-		console.log("unicornPasture");
-		console.log("\tBonus unicorns per second: "+pastureAmor);
-	}
+    if (log) {
+      console.log("unicornPasture");
+      console.log("\tBonus unicorns per second: "+pastureAmor);
+    }
 
-	const zigBtn = gamePage.tabs[0].buttons.find((btn) => btn.opts.building === 'ziggurat');
+    const zigBtn = gamePage.tabs[0].buttons.find((btn) => btn.opts.building === 'ziggurat');
 
-	pastureAmor = zigBtn.model.prices[0].val / pastureAmor;
+    pastureAmor = zigBtn.model.prices[0].val / pastureAmor;
 
-	if (log) {
-		const baseWait = zigBtn.model.prices[0].val / total;
-		const avgWait = zigBtn.model.prices[0].val / (total + baseRift);
+    if (log) {
+            const baseWait = zigBtn.model.prices[0].val / total;
+            const avgWait = zigBtn.model.prices[0].val / (total + baseRift);
 
-		console.log("\tMaximum time to build: " + gamePage.toDisplaySeconds(baseWait) + " | Average time to build: " + gamePage.toDisplaySeconds(avgWait));
-		console.log("\tPrice: "+zigBtn.model.prices[0].val+" | Amortization: "+gamePage.toDisplaySeconds(pastureAmor));
-	}
+            console.log("\tMaximum time to build: " + gamePage.toDisplaySeconds(baseWait) + " | Average time to build: " + gamePage.toDisplaySeconds(avgWait));
+            console.log("\tPrice: "+zigBtn.model.prices[0].val+" | Amortization: "+gamePage.toDisplaySeconds(pastureAmor));
+    }
 
-	if (pastureAmor < bestAmoritization) {
-		bestAmoritization = pastureAmor;
-		bestBuilding = "unicornPasture";
-	}
+    if (pastureAmor < bestAmoritization) {
+            bestAmoritization = pastureAmor;
+            bestBuilding = "unicornPasture";
+    }
 
-	if (!gamePage.tabs[5] || !gamePage.tabs[5].zgUpgradeButtons || !gamePage.tabs[5].zgUpgradeButtons.length) {
-		throw new Error('Unable to read religion tab');
-	}
+    if (!gamePage.tabs[5] || !gamePage.tabs[5].zgUpgradeButtons || !gamePage.tabs[5].zgUpgradeButtons.length) {
+            throw new Error('Unable to read religion tab');
+    }
 
-	for(var i in gamePage.tabs[5].zgUpgradeButtons) {
-		var btn = gamePage.tabs[5].zgUpgradeButtons[i];
+    for(var i in gamePage.tabs[5].zgUpgradeButtons) {
+            var btn = gamePage.tabs[5].zgUpgradeButtons[i];
 
-		if (validBuildings.indexOf(btn.id) != -1) {
-			if (btn.model.visible) {
-				unicornPrice = 0;
+            if (validBuildings.indexOf(btn.id) != -1) {
+                    if (btn.model.visible) {
+                            unicornPrice = 0;
 
-				for (var j in btn.model.prices) {
-					if (btn.model.prices[j].name == "unicorns") {
-						unicornPrice += btn.model.prices[j].val;
-					} else if (btn.model.prices[j].name == "tears") {
-						unicornPrice += btn.model.prices[j].val * 2500 / onZig;
-					}
-				}
+                            for (var j in btn.model.prices) {
+                                    if (btn.model.prices[j].name == "unicorns") {
+                                            unicornPrice += btn.model.prices[j].val;
+                                    } else if (btn.model.prices[j].name == "tears") {
+                                            unicornPrice += btn.model.prices[j].val * 2500 / onZig;
+                                    }
+                            }
 
-				var bld = gamePage.religion.getZU(btn.id);
-				let relBonus = religionRatio;
-				let riftChance = gamePage.getEffect("riftChance");
+                            var bld = gamePage.religion.getZU(btn.id);
+                            let relBonus = religionRatio;
+                            let riftChance = gamePage.getEffect("riftChance");
 
-				for (var j in bld.effects) {
-					if (j == "unicornsRatioReligion") {
-						relBonus += bld.effects[j];
-					} else if (j == "riftChance") {
-						riftChance += bld.effects[j];
-					}
-				}
+                            for (var j in bld.effects) {
+                                    if (j == "unicornsRatioReligion") {
+                                            relBonus += bld.effects[j];
+                                    } else if (j == "riftChance") {
+                                            riftChance += bld.effects[j];
+                                    }
+                            }
 
-				var unicornsPerRift = 500 * ((relBonus -1) * 0.1 + 1);
-				let riftBonus = riftChance * riftChanceRatio / (10000 * 2) * unicornsPerRift;
+                            var unicornsPerRift = 500 * ((relBonus -1) * 0.1 + 1);
+                            let riftBonus = riftChance * riftChanceRatio / (10000 * 2) * unicornsPerRift;
 
-				riftBonus -= baseRift;
+                            riftBonus -= baseRift;
 
-				let amor = unicornsPerSecond * globalRatio * relBonus * paragonRatio * faithBonus * cycle;
+                            let amor = unicornsPerSecond * globalRatio * relBonus * paragonRatio * faithBonus * cycle;
 
-				amor -= total;
-				amor = amor + riftBonus;
+                            amor -= total;
+                            amor = amor + riftBonus;
 
-				if (log) {
-					console.log(btn.id);
-					console.log("\tBonus unicorns per second: "+amor);
-				}
+                            if (log) {
+                                    console.log(btn.id);
+                                    console.log("\tBonus unicorns per second: "+amor);
+                            }
 
-				amor = unicornPrice / amor;
+                            amor = unicornPrice / amor;
 
-				if (log) {
-					const baseWait = unicornPrice / total;
-					const avgWait = unicornPrice / (total + baseRift);
-					let amorSeconds = gamePage.toDisplaySeconds(amor);
+                            if (log) {
+                                    const baseWait = unicornPrice / total;
+                                    const avgWait = unicornPrice / (total + baseRift);
+                                    let amorSeconds = gamePage.toDisplaySeconds(amor);
 
-					if (amorSeconds == "") {
-						amorSeconds = "NA";
-					}
+                                    if (amorSeconds == "") {
+                                            amorSeconds = "NA";
+                                    }
 
-					console.log("\tMaximum time to build: " + gamePage.toDisplaySeconds(baseWait) + " | Average time to build: " + gamePage.toDisplaySeconds(avgWait));
-					console.log("\tPrice: "+unicornPrice + " | Amortization: "+amorSeconds);
-				}
+                                    console.log("\tMaximum time to build: " + gamePage.toDisplaySeconds(baseWait) + " | Average time to build: " + gamePage.toDisplaySeconds(avgWait));
+                                    console.log("\tPrice: "+unicornPrice + " | Amortization: "+amorSeconds);
+                            }
 
-				if (amor < bestAmoritization) {
-					if (riftBonus > 0 || relBonus > religionRatio && unicornPrice > 0) {
-						bestAmoritization = amor;
-						bestBuilding = btn.id;
-					}
-				}
-			}
-		}
-	}
+                            if (amor < bestAmoritization) {
+                                    if (riftBonus > 0 || relBonus > religionRatio && unicornPrice > 0) {
+                                            bestAmoritization = amor;
+                                            bestBuilding = btn.id;
+                                    }
+                            }
+                    }
+            }
+    }
 
-	$('div#kittycheatUnicorn').html('Unicorns: ' + bestBuilding);
+    $('div#kittycheatUnicorn').html('Unicorns: ' + bestBuilding);
   } catch (error) {
-	  console.error(error);
-	  $('div#kittycheatUnicorn').html('Unicorns: unable to calculate');
+    console.error(error);
+    $('div#kittycheatUnicorn').html('Unicorns: unable to calculate');
   }
 }
 
-const kittycheatHasResource = function(vals, isTrade) {
+const kittycheatHasResource = (vals, isTrade) => {
   let cando = true;
 
   Object.keys(vals).forEach((name) => {
@@ -161,27 +161,26 @@ const kittycheatHasResource = function(vals, isTrade) {
   return cando;
 };
 
-const kittycheatHasTradeSpace = function (get) {
+const kittycheatHasTradeSpace = (get) => {
   if (!get) {
     return true;
   }
 
-  let res = gamePage.resPool.get(name);
+  const res = gamePage.resPool.get(name);
 
   if (res.maxValue > 0) {
-    return (res.value/res.maxValue) <= 0.99;
+    return (res.value / res.maxValue) <= 0.99;
   }
 
   return true;
 };
 
-const kittycheatTrade = function(name) {
+const kittycheatTrade = (name) => {
   if ((name === 'leviathans') && (gamePage.religion.getZU('blackPyramid').val > 0) && (gamePage.diplomacy.get('leviathans').unlocked === false)) {
     gamePage.diplomacy.unlockElders();
   }
 
   gamePage.diplomacyTab.render();
-
   gamePage.tabs.forEach((tab) => {
     if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
       tab.racePanels.forEach((panel) => {
@@ -193,7 +192,7 @@ const kittycheatTrade = function(name) {
   });
 };
 
-const kittycheatCraft = function(name) {
+const kittycheatCraft = (name) => {
   const iswood = (name === 'wood');
   const iswinter = (gamePage.calendar.season === 3);
   const isautum = (gamePage.calendar.season === 2) && (gamePage.calendar.day >= 75);
@@ -204,7 +203,7 @@ const kittycheatCraft = function(name) {
   }
 };
 
-const kittycheatExec = function(name, opts) {
+const kittycheatExec = (name, opts) => {
   const vals = opts.res || {};
 
   if (opts.active && kittycheatHasResource(vals, opts.trade)) {
@@ -224,14 +223,14 @@ const kittycheatExec = function(name, opts) {
   }
 };
 
-const kittycheatBtnStyle = function(btn, opts) {
+const kittycheatBtnStyle = (btn, opts) => {
   btn.css({
     'background': opts.active ? 'red' : 'white',
     'color': opts.active ? 'white' : 'black'
   });
 };
 
-const kittycheatBtnClick = function(btn, name, opts) {
+const kittycheatBtnClick = (btn, name, opts) => {
   opts.active = !opts.active;
 
   kittycheatBtnStyle(btn, opts);
@@ -282,22 +281,22 @@ var kittycheatOpts = {
   },
   'actions': {
     'catnip': {
-      func: function() { $('span:contains(Gather catnip)').click(); },
+      func: function () { $('span:contains(Gather catnip)').click(); },
       active: true,
       delay: 5
     },
     'observe': {
-      func: function() { $('input#observeBtn').click(); },
+      func: () => { $('input#observeBtn').click(); },
       active: true,
       delay: 1000
     },
     'praise': {
-      func: function() { gamePage.religion.praise(); },
+      func: () => { gamePage.religion.praise(); },
       active: true,
       delay: 5
     },
     'hunt': {
-      func: function() { gamePage.village.huntAll(); },
+      func: () => { gamePage.village.huntAll(); },
       active: true,
       delay: 5000
     },
@@ -318,7 +317,7 @@ var kittycheatOpts = {
       res: { 'minerals': 250 }
     },
     'steel': {
-      res: { 'coal': 100/*, 'iron': 100*/ }
+      res: { 'coal': 100 }
     },
     'plate': {
       res: { 'iron': 125 }
@@ -331,7 +330,7 @@ var kittycheatOpts = {
       active: true
     },
     'manuscript': {
-      res: { 'parchment': 25, 'culture': 400 },
+      res: { 'parchment': 25, 'culture': 400 }
     },
     'compedium': {
       res: { 'manuscript': 50, 'science': 10000 }
@@ -351,12 +350,12 @@ var kittycheatOpts = {
     'feed elders': {
       res: { 'necrocorn': 1 },
       active: true,
-      func: function () {
+      func: () => {
         gamePage.tabs.forEach((tab) => {
           if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
             tab.racePanels.forEach((panel) => {
               if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
-		panel.feedBtn.domNode.click();
+                panel.feedBtn.domNode.click();
               }
             });
           }
@@ -377,16 +376,9 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
   const kittycheatGroup = $('<div></div>').css({
     'margin-bottom': '10px'
   });
+  const kittycheatActs = $('<div></div>').css({});
 
   kittycheatCont.append(kittycheatGroup);
-
-  //kittycheatGroup.append($("<div>" + groupname + ":</div>").css({
-  //  'font-weight': 'bold'
-  //}));
-
-  const kittycheatActs = $('<div></div>').css({
-    //'text-align': 'center'
-  });
   kittycheatGroup.append(kittycheatActs);
 
   Object.keys(group).forEach((optname) => {
@@ -394,7 +386,7 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
 
     opts.active = opts.active || false;
 
-    const btn = $("<button>" + optname + "</button>").click(() => {
+    const btn = $(`<button>${optname}</button>`).click(() => {
       kittycheatBtnClick(btn, optname, opts);
     });
 
@@ -413,7 +405,7 @@ kittycheatCont.append($('<div id="kittycheatUnicorn"></div>'));
 
 setInterval(kittycheatUnicorns, 1000);
 
-setInterval(function() {
+setInterval(() => {
   Object.keys(kittycheatOpts).forEach((groupname) => {
     const group = kittycheatOpts[groupname];
 
@@ -428,8 +420,8 @@ setInterval(function() {
 let isMaxActive = false;
 
 const kittyIwGroup = $('<div></div>').css({
-  'margin-bottom': '10px'
-  'padding-top': '100px';
+  'margin-bottom': '10px',
+  'padding-top': '100px'
 });
 
 const maxbtn = $('<button>resources</button>').click(() => {
@@ -439,19 +431,19 @@ const maxbtn = $('<button>resources</button>').click(() => {
 
 kittycheatCont.append(kittyIwGroup);
 kittycheatBtnStyle(maxbtn, { active: isMaxActive });
-kittyIwGroup.append(btn);
+kittyIwGroup.append(maxbtn);
 
 setInterval(() => {
   if (!isMaxActive) {
     return;
   }
-  
-  game.resPool.resources.forEach((res) => {
-     const max = res.maxValue;
-     const isFillable = !!(max && res.visible && res.unlocked && res.value < max);
 
-     if (isFillable) {
-       res.value = max;
-     }
+  game.resPool.resources.forEach((res) => {
+    const max = res.maxValue;
+    const isFillable = !!(max && res.visible && res.unlocked && res.value < max);
+
+    if (isFillable) {
+      res.value = max;
+    }
   });
 }, 100);
