@@ -154,7 +154,7 @@ const kittycheatHasResource = (vals, isTrade) => {
       cando = cando && (res.value >= vals[name].value);
     }
     if (!isTrade && res.maxValue > 0) {
-      cando = cando && ((res.value/res.maxValue) >= 0.05);
+      cando = cando && ((res.value / res.maxValue) >= 0.05);
     }
   });
 
@@ -281,7 +281,7 @@ var kittycheatOpts = {
   },
   'actions': {
     'catnip': {
-      func: function () { $('span:contains(Gather catnip)').click(); },
+      func: () => { $('span:contains(Gather catnip)').click(); },
       active: true,
       delay: 5
     },
@@ -351,15 +351,17 @@ var kittycheatOpts = {
       res: { 'necrocorn': 1 },
       active: true,
       func: () => {
-        gamePage.tabs.forEach((tab) => {
-          if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
-            tab.racePanels.forEach((panel) => {
-              if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
-                panel.feedBtn.domNode.click();
-              }
-            });
-          }
-        });
+        if (gamePage.resPool.get('necrocorn').value > 0) {
+          gamePage.tabs.forEach((tab) => {
+            if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
+              tab.racePanels.forEach((panel) => {
+                if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
+                  panel.feedBtn.domNode.click();
+                }
+              });
+            }
+          });
+        }
       }
     }
   }
