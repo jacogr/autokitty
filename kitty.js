@@ -1,3 +1,7 @@
+const game = window.game;
+const gamePage = window.gamePage;
+const $ = window.$;
+
 const kittycheatCombust = () => {
   if (game.time.heat > 0) {
     return;
@@ -7,49 +11,51 @@ const kittycheatCombust = () => {
   gamePage.timeTab.cfPanel.children[0].children.forEach((child) => {
     if (child.x100) {
       const count = Math.floor(game.getEffect('heatMax') / 500);
-      
+
       for (let i = 0; i < count; i++) {
         child.x100.link.click();
       }
     }
   });
-}
+};
 
 const kittycheatUnicorns = (log = false) => {
-  try {
-    var validBuildings = ["unicornTomb", "ivoryTower", "ivoryCitadel", "skyPalace", "unicornUtopia", "sunspire"];
-    var unicornsPerSecond = gamePage.getEffect("unicornsPerTickBase") * gamePage.getRateUI();
-    var globalRatio = 1 + gamePage.getEffect("unicornsGlobalRatio");
-    var religionRatio = 1 + gamePage.getEffect("unicornsRatioReligion");
-    var paragonRatio = 1 + gamePage.prestige.getParagonProductionRatio();
-    var faithBonus = 1 + (gamePage.religion.getProductionBonus() / 100);
-    var cycle = 1;
+  gamePage.religionTab.render();
 
-    if (gamePage.calendar.cycles[gamePage.calendar.cycle].festivalEffects["unicorns"] != undefined) {
-      if (gamePage.prestige.getPerk("numeromancy").researched && gamePage.calendar.festivalDays) {
-        cycle = gamePage.calendar.cycles[gamePage.calendar.cycle].festivalEffects["unicorns"];
+  try {
+    const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
+    const unicornsPerSecond = gamePage.getEffect('unicornsPerTickBase') * gamePage.getRateUI();
+    const globalRatio = 1 + gamePage.getEffect('unicornsGlobalRatio');
+    const religionRatio = 1 + gamePage.getEffect('unicornsRatioReligion');
+    const paragonRatio = 1 + gamePage.prestige.getParagonProductionRatio();
+    const faithBonus = 1 + (gamePage.religion.getProductionBonus() / 100);
+    let cycle = 1;
+
+    if (gamePage.calendar.cycles[gamePage.calendar.cycle].festivalEffects['unicorns']) {
+      if (gamePage.prestige.getPerk('numeromancy').researched && gamePage.calendar.festivalDays) {
+        cycle = gamePage.calendar.cycles[gamePage.calendar.cycle].festivalEffects['unicorns'];
       }
     }
 
-    var onZig = Math.max(gamePage.bld.getBuildingExt("ziggurat").meta.on, 1);
-    var total = unicornsPerSecond * globalRatio * religionRatio * paragonRatio * faithBonus * cycle;
-    var baseUnicornsPerRift = 500 * (1 + gamePage.getEffect("unicornsRatioReligion") * 0.1);
+    const onZig = Math.max(gamePage.bld.getBuildingExt('ziggurat').meta.on, 1);
+    const total = unicornsPerSecond * globalRatio * religionRatio * paragonRatio * faithBonus * cycle;
+    const baseUnicornsPerRift = 500 * (1 + gamePage.getEffect('unicornsRatioReligion') * 0.1);
     let riftChanceRatio = 1;
 
-    if (gamePage.prestige.getPerk("unicornmancy").researched) {
+    if (gamePage.prestige.getPerk('unicornmancy').researched) {
       riftChanceRatio *= 1.1;
     }
 
-    var baseRift = gamePage.getEffect("riftChance") * riftChanceRatio / (10000 * 2) * baseUnicornsPerRift;
+    const baseRift = gamePage.getEffect('riftChance') * riftChanceRatio / (10000 * 2) * baseUnicornsPerRift;
     let bestAmoritization = Infinity;
-    let bestBuilding = "";
-    let pastureAmor = gamePage.bld.getBuildingExt("unicornPasture").meta.effects["unicornsPerTickBase"] * gamePage.getRateUI();
+    let bestBuilding = '';
+    let pastureAmor = gamePage.bld.getBuildingExt('unicornPasture').meta.effects['unicornsPerTickBase'] * gamePage.getRateUI();
 
     pastureAmor = pastureAmor * globalRatio * religionRatio * paragonRatio * faithBonus * cycle;
 
     if (log) {
-      console.log("unicornPasture");
-      console.log("\tBonus unicorns per second: "+pastureAmor);
+      console.log('unicornPasture');
+      console.log('\tBonus unicorns per second: ' + pastureAmor);
     }
 
     const zigBtn = gamePage.tabs[0].buttons.find((btn) => btn.opts.building === 'ziggurat');
@@ -57,87 +63,83 @@ const kittycheatUnicorns = (log = false) => {
     pastureAmor = zigBtn.model.prices[0].val / pastureAmor;
 
     if (log) {
-            const baseWait = zigBtn.model.prices[0].val / total;
-            const avgWait = zigBtn.model.prices[0].val / (total + baseRift);
+      const baseWait = zigBtn.model.prices[0].val / total;
+      const avgWait = zigBtn.model.prices[0].val / (total + baseRift);
 
-            console.log("\tMaximum time to build: " + gamePage.toDisplaySeconds(baseWait) + " | Average time to build: " + gamePage.toDisplaySeconds(avgWait));
-            console.log("\tPrice: "+zigBtn.model.prices[0].val+" | Amortization: "+gamePage.toDisplaySeconds(pastureAmor));
+      console.log('\tMaximum time to build: ' + gamePage.toDisplaySeconds(baseWait) + ' | Average time to build: ' + gamePage.toDisplaySeconds(avgWait));
+      console.log('\tPrice: ' + zigBtn.model.prices[0].val + ' | Amortization: ' + gamePage.toDisplaySeconds(pastureAmor));
     }
 
     if (pastureAmor < bestAmoritization) {
-            bestAmoritization = pastureAmor;
-            bestBuilding = "unicornPasture";
+      bestAmoritization = pastureAmor;
+      bestBuilding = 'unicornPasture';
     }
 
     if (!gamePage.tabs[5] || !gamePage.tabs[5].zgUpgradeButtons || !gamePage.tabs[5].zgUpgradeButtons.length) {
-            throw new Error('Unable to read religion tab');
+      throw new Error('Unable to read religion tab');
     }
 
-    for(var i in gamePage.tabs[5].zgUpgradeButtons) {
-            var btn = gamePage.tabs[5].zgUpgradeButtons[i];
+    for (let i in gamePage.tabs[5].zgUpgradeButtons) {
+      const btn = gamePage.tabs[5].zgUpgradeButtons[i];
 
-            if (validBuildings.indexOf(btn.id) != -1) {
-                    if (btn.model.visible) {
-                            unicornPrice = 0;
+      if (validBuildings.indexOf(btn.id) !== -1) {
+        if (btn.model.visible) {
+          let unicornPrice = 0;
 
-                            for (var j in btn.model.prices) {
-                                    if (btn.model.prices[j].name == "unicorns") {
-                                      unicornPrice += btn.model.prices[j].val;
-                                    } else if (btn.model.prices[j].name == "tears") {
-                                      unicornPrice += btn.model.prices[j].val * 2500 / onZig;
-                                    }
-                            }
-
-                            var bld = gamePage.religion.getZU(btn.id);
-                            let relBonus = religionRatio;
-                            let riftChance = gamePage.getEffect("riftChance");
-
-                            for (var j in bld.effects) {
-                                    if (j == "unicornsRatioReligion") {
-                                      relBonus += bld.effects[j];
-                                    } else if (j == "riftChance") {
-                                      riftChance += bld.effects[j];
-                                    }
-                            }
-
-                            var unicornsPerRift = 500 * ((relBonus -1) * 0.1 + 1);
-                            let riftBonus = riftChance * riftChanceRatio / (10000 * 2) * unicornsPerRift;
-
-                            riftBonus -= baseRift;
-
-                            let amor = unicornsPerSecond * globalRatio * relBonus * paragonRatio * faithBonus * cycle;
-
-                            amor -= total;
-                            amor = amor + riftBonus;
-
-                            if (log) {
-                              console.log(btn.id);
-                              console.log("\tBonus unicorns per second: "+amor);
-                            }
-
-                            amor = unicornPrice / amor;
-
-                            if (log) {
-                                    const baseWait = unicornPrice / total;
-                                    const avgWait = unicornPrice / (total + baseRift);
-                                    let amorSeconds = gamePage.toDisplaySeconds(amor);
-
-                                    if (amorSeconds == "") {
-                                      amorSeconds = "NA";
-                                    }
-
-                                    console.log("\tMaximum time to build: " + gamePage.toDisplaySeconds(baseWait) + " | Average time to build: " + gamePage.toDisplaySeconds(avgWait));
-                                    console.log("\tPrice: "+unicornPrice + " | Amortization: "+amorSeconds);
-                            }
-
-                            if (amor < bestAmoritization) {
-                                    if (riftBonus > 0 || relBonus > religionRatio && unicornPrice > 0) {
-                                      bestAmoritization = amor;
-                                      bestBuilding = btn.id;
-                                    }
-                            }
-                    }
+          for (let j in btn.model.prices) {
+            if (btn.model.prices[j].name === 'unicorns') {
+              unicornPrice += btn.model.prices[j].val;
+            } else if (btn.model.prices[j].name === 'tears') {
+              unicornPrice += btn.model.prices[j].val * 2500 / onZig;
             }
+          }
+
+          const bld = gamePage.religion.getZU(btn.id);
+          let relBonus = religionRatio;
+          let riftChance = gamePage.getEffect('riftChance');
+
+          for (let j in bld.effects) {
+            if (j === 'unicornsRatioReligion') {
+              relBonus += bld.effects[j];
+            } else if (j === 'riftChance') {
+              riftChance += bld.effects[j];
+            }
+          }
+
+          const unicornsPerRift = 500 * ((relBonus - 1) * 0.1 + 1);
+          let riftBonus = riftChance * riftChanceRatio / (10000 * 2) * unicornsPerRift;
+
+          riftBonus -= baseRift;
+
+          let amor = unicornsPerSecond * globalRatio * relBonus * paragonRatio * faithBonus * cycle;
+
+          amor -= total;
+          amor = amor + riftBonus;
+
+          if (log) {
+            console.log(btn.id);
+            console.log('\tBonus unicorns per second: ' + amor);
+          }
+
+          amor = unicornPrice / amor;
+
+          if (log) {
+            const baseWait = unicornPrice / total;
+            const avgWait = unicornPrice / (total + baseRift);
+            const amorSeconds = gamePage.toDisplaySeconds(amor) || 'NA';
+
+            console.log('tMaximum time to build: ' + gamePage.toDisplaySeconds(baseWait) + ' | Average time to build: ' + gamePage.toDisplaySeconds(avgWait));
+            console.log('\tPrice: ' + unicornPrice + ' | Amortization: ' + amorSeconds);
+          }
+
+          if (amor < bestAmoritization) {
+            if (riftBonus > 0 || ((relBonus > religionRatio) && (unicornPrice > 0))) {
+              bestAmoritization = amor;
+              bestBuilding = btn.id;
+            }
+          }
+        }
+      }
     }
 
     $('div#kittycheatUnicorn').html('Unicorns: ' + bestBuilding);
@@ -145,13 +147,13 @@ const kittycheatUnicorns = (log = false) => {
     console.error(error);
     $('div#kittycheatUnicorn').html('Unicorns: unable to calculate');
   }
-}
+};
 
 const kittycheatHasResource = (vals, isTrade) => {
   let cando = true;
 
   Object.keys(vals).forEach((name) => {
-    var res = gamePage.resPool.get(name);
+    const res = gamePage.resPool.get(name);
 
     if (vals[name].value) {
       cando = cando && (res.value >= vals[name].value);
@@ -169,7 +171,7 @@ const kittycheatHasTradeSpace = (get) => {
     return true;
   }
 
-  const res = gamePage.resPool.get(name);
+  const res = gamePage.resPool.get(get.name);
 
   if (res.maxValue > 0) {
     return (res.value / res.maxValue) <= 0.99;
@@ -240,7 +242,7 @@ const kittycheatBtnClick = (btn, name, opts) => {
   kittycheatExec(name, opts);
 };
 
-var kittycheatOpts = {
+const kittycheatOpts = {
   'trading': {
     'leviathans': {
       res: { 'unobtainium': 5000 },
