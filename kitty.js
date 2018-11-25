@@ -439,7 +439,7 @@ setInterval(() => {
 }, 100);
 
 setInterval(() => {
-  if (gamePage.resPool.get('necrocorn').value > 1) {
+  if (gamePage.resPool.get('necrocorn').value > 0) {
     gamePage.tabs.forEach((tab) => {
       if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
         tab.racePanels.forEach((panel) => {
