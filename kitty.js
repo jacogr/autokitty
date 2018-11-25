@@ -347,6 +347,21 @@ var kittycheatOpts = {
     },
     'thorium': {
       res: { 'uranium': 250 }
+    },
+    'feed elders': {
+      res: { 'necrocorn': 1 },
+      active: true,
+      func: function () {
+        gamePage.tabs.forEach((tab) => {
+          if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
+            tab.racePanels.forEach((panel) => {
+              if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
+		panel.feedBtn.domNode.click();
+              }
+            });
+          }
+        });
+      }
     }
   }
 };
@@ -409,3 +424,34 @@ setInterval(function() {
     });
   });
 }, 1000);
+
+let isMaxActive = false;
+
+const kittyIwGroup = $('<div></div>').css({
+  'margin-bottom': '10px'
+  'padding-top': '100px';
+});
+
+const maxbtn = $('<button>resources</button>').click(() => {
+  isMaxActive = !isMaxActive;
+  kittycheatBtnStyle(maxbtn, { active: isMaxActive });
+});
+
+kittycheatCont.append(kittyIwGroup);
+kittycheatBtnStyle(maxbtn, { active: isMaxActive });
+kittyIwGroup.append(btn);
+
+setInterval(() => {
+  if (!isMaxActive) {
+    return;
+  }
+  
+  game.resPool.resources.forEach((res) => {
+     const max = res.maxValue;
+     const isFillable = !!(max && res.visible && res.unlocked && res.value < max);
+
+     if (isFillable) {
+       res.value = max;
+     }
+  });
+}, 100);
