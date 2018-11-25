@@ -4,10 +4,13 @@ const kittycheatCombust = () => {
   }
 
   gamePage.timeTab.render();
-
   gamePage.timeTab.cfPanel.children[0].children.forEach((child) => {
     if (child.x100) {
-      child.x100.link.click();
+      const count = Math.floor(game.getEffect('heatMax') / 500);
+      
+      for (let i = 0; i < count; i++) {
+        child.x100.link.click();
+      }
     }
   });
 }
@@ -79,9 +82,9 @@ const kittycheatUnicorns = (log = false) => {
 
                             for (var j in btn.model.prices) {
                                     if (btn.model.prices[j].name == "unicorns") {
-                                            unicornPrice += btn.model.prices[j].val;
+                                      unicornPrice += btn.model.prices[j].val;
                                     } else if (btn.model.prices[j].name == "tears") {
-                                            unicornPrice += btn.model.prices[j].val * 2500 / onZig;
+                                      unicornPrice += btn.model.prices[j].val * 2500 / onZig;
                                     }
                             }
 
@@ -91,9 +94,9 @@ const kittycheatUnicorns = (log = false) => {
 
                             for (var j in bld.effects) {
                                     if (j == "unicornsRatioReligion") {
-                                            relBonus += bld.effects[j];
+                                      relBonus += bld.effects[j];
                                     } else if (j == "riftChance") {
-                                            riftChance += bld.effects[j];
+                                      riftChance += bld.effects[j];
                                     }
                             }
 
@@ -108,8 +111,8 @@ const kittycheatUnicorns = (log = false) => {
                             amor = amor + riftBonus;
 
                             if (log) {
-                                    console.log(btn.id);
-                                    console.log("\tBonus unicorns per second: "+amor);
+                              console.log(btn.id);
+                              console.log("\tBonus unicorns per second: "+amor);
                             }
 
                             amor = unicornPrice / amor;
@@ -120,7 +123,7 @@ const kittycheatUnicorns = (log = false) => {
                                     let amorSeconds = gamePage.toDisplaySeconds(amor);
 
                                     if (amorSeconds == "") {
-                                            amorSeconds = "NA";
+                                      amorSeconds = "NA";
                                     }
 
                                     console.log("\tMaximum time to build: " + gamePage.toDisplaySeconds(baseWait) + " | Average time to build: " + gamePage.toDisplaySeconds(avgWait));
@@ -129,8 +132,8 @@ const kittycheatUnicorns = (log = false) => {
 
                             if (amor < bestAmoritization) {
                                     if (riftBonus > 0 || relBonus > religionRatio && unicornPrice > 0) {
-                                            bestAmoritization = amor;
-                                            bestBuilding = btn.id;
+                                      bestAmoritization = amor;
+                                      bestBuilding = btn.id;
                                     }
                             }
                     }
