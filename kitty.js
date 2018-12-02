@@ -351,6 +351,22 @@ const kittycheatOpts = {
     },
     'thorium': {
       res: { 'uranium': 250 }
+    },
+    'feeding': {
+      res: { 'necrocorn': 1 },
+      func: () => {
+        if (gamePage.resPool.get('necrocorn').value > 0) {
+          gamePage.tabs.forEach((tab) => {
+            if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
+              tab.racePanels.forEach((panel) => {
+                if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
+                  panel.feedBtn.domNode.click();
+                }
+              });
+            }
+          });
+        }
+      }
     }
   }
 };
@@ -437,17 +453,3 @@ setInterval(() => {
     }
   });
 }, 100);
-
-setInterval(() => {
-  if (gamePage.resPool.get('necrocorn').value > 0) {
-    gamePage.tabs.forEach((tab) => {
-      if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
-        tab.racePanels.forEach((panel) => {
-          if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
-            panel.feedBtn.domNode.click();
-          }
-        });
-      }
-    });
-  }
-}, 1000);
