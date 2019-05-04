@@ -14,7 +14,7 @@ const kittycheatCombust = () => {
       const count = Math.floor(game.getEffect('heatMax') / 900);
 
       for (let i = 0; i < count; i++) {
-        child.x145.link.click();
+        child.x45.link.click();
       }
     }
   });
