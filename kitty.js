@@ -8,16 +8,12 @@ const kittycheatCombust = () => {
   }
 
   gamePage.timeTab.render();
-  gamePage.timeTab.cfPanel.children[0].children.forEach((child) => {
-    if (child.x45) {
-      // 45 * 10 * 2
-      const count = Math.floor(game.getEffect('heatMax') / 900);
+  
+  const count = Math.floor(game.getEffect('heatMax') / 450);
 
-      for (let i = 0; i < count; i++) {
-        child.x45.link.click();
-      }
-    }
-  });
+  for (let i = 0; i < count; i++) {
+    gamePage.timeTab.cfPanel.children[0].children[0].model.sameCycleRestartLink.handler();
+  }
 };
 
 const kittycheatUnicorns = (log = false) => {
