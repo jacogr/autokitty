@@ -9,11 +9,12 @@ const kittycheatCombust = () => {
 
   gamePage.timeTab.render();
   gamePage.timeTab.cfPanel.children[0].children.forEach((child) => {
-    if (child.x100) {
-      const count = Math.floor(game.getEffect('heatMax') / 500);
+    if (child.x45) {
+      // 45 * 10 * 2
+      const count = Math.floor(game.getEffect('heatMax') / 900);
 
       for (let i = 0; i < count; i++) {
-        child.x100.link.click();
+        child.x145.link.click();
       }
     }
   });
