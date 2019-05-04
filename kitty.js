@@ -9,7 +9,7 @@ const kittycheatCombust = () => {
 
   gamePage.timeTab.render();
   
-  const count = Math.floor(game.getEffect('heatMax') / 450);
+  const count = Math.floor(game.getEffect('heatMax') / (45 * 10 * 2));
 
   for (let i = 0; i < count; i++) {
     gamePage.timeTab.cfPanel.children[0].children[0].model.sameCycleRestartLink.handler();
