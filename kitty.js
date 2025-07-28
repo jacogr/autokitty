@@ -21,7 +21,7 @@ const kittycheatUnicorns = (log = false) => {
 
   try {
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
-    const unicornsPerSecond = gamePage.getEffect('unicornsPerTickBase') * gamePage.getRateUI();
+    const unicornsPerSecond = gamePage.getEffect('unicornsPerTickBase') * gamePage.getTicksPerSecondUI();
     const globalRatio = 1 + gamePage.getEffect('unicornsGlobalRatio');
     const religionRatio = 1 + gamePage.getEffect('unicornsRatioReligion');
     const paragonRatio = 1 + gamePage.prestige.getParagonProductionRatio();
@@ -46,7 +46,7 @@ const kittycheatUnicorns = (log = false) => {
     const baseRift = gamePage.getEffect('riftChance') * riftChanceRatio / (10000 * 2) * baseUnicornsPerRift;
     let bestAmoritization = Infinity;
     let bestBuilding = '';
-    let pastureAmor = gamePage.bld.getBuildingExt('unicornPasture').meta.effects['unicornsPerTickBase'] * gamePage.getRateUI();
+    let pastureAmor = gamePage.bld.getBuildingExt('unicornPasture').meta.effects['unicornsPerTickBase'] * gamePage.getTicksPerSecondUI();
 
     pastureAmor = pastureAmor * globalRatio * religionRatio * paragonRatio * faithBonus * cycle;
 
