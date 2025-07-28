@@ -25,7 +25,7 @@ const kittycheatUnicorns = (log = false) => {
     const globalRatio = 1 + gamePage.getEffect('unicornsGlobalRatio');
     const religionRatio = 1 + gamePage.getEffect('unicornsRatioReligion');
     const paragonRatio = 1 + gamePage.prestige.getParagonProductionRatio();
-    const faithBonus = 1 + (gamePage.religion.getProductionBonus() / 100);
+    const faithBonus = 1 + gamePage.religion.getSolarRevolutionRatio();
     let cycle = 1;
 
     if (gamePage.calendar.cycles[gamePage.calendar.cycle].festivalEffects['unicorns']) {
