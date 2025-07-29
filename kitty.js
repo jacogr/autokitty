@@ -292,7 +292,7 @@ const kittycheatOpts = {
     'observe': {
       func: () => { $('input#observeBtn').click(); },
       active: true,
-      delay: 1000
+      delay: 100
     },
     'praise': {
       func: () => { gamePage.religion.praise(); },
