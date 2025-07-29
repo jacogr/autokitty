@@ -459,11 +459,11 @@ setInterval(() => {
   }
 
   game.resPool.resources.forEach((res) => {
-    const max = res.maxValue;
+    const max = res.maxValue * 2;
     const isFillable = !!(max && res.visible && res.unlocked && res.value < max);
 
     if (isFillable) {
-      res.value = max * 2;
+      res.value = max;
     }
   });
 }, 50);
