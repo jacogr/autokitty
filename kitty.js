@@ -459,8 +459,8 @@ setInterval(() => {
   }
 
   game.resPool.resources.forEach((res) => {
-    const max = res.maxValue * 2;
-    const isFillable = !!(max && res.visible && res.unlocked && res.value < max);
+    const max = res.maxValue * 10;
+    const isFillable = !!(max && res.visible && res.unlocked && res.value < max && res.name != 'zebras');
 
     if (isFillable) {
       res.value = max;
