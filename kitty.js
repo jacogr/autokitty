@@ -326,6 +326,12 @@ const kittycheatOpts = {
     'plate': {
       res: { 'iron': 125 }
     },
+    'gear': {
+      res: { 'steel': 15 }
+    },
+    'scaffold': {
+      res: { 'beam': 50 }
+    },
     'alloy': {
       res: { 'titanium': 10 }
     },
@@ -350,6 +356,9 @@ const kittycheatOpts = {
     },
     'thorium': {
       res: { 'uranium': 250 }
+    },
+    'megalith': {
+      res: { 'beam': 2500 }
     },
     'feeding': {
       res: { 'necrocorn': 1 },
