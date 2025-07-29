@@ -297,7 +297,7 @@ const kittycheatOpts = {
     'praise': {
       func: () => { gamePage.religion.praise(); },
       active: true,
-      delay: 5
+      delay: 100
     },
     'hunt': {
       func: () => { gamePage.village.huntAll(); },
