@@ -308,9 +308,9 @@ const kittycheatOpts = {
     }
   },
   'crafting': {
-    'wood': {
-      res: { 'catnip': 250 }
-    },
+    //'wood': {
+    //  res: { 'catnip': 250 }
+    //},
     'beam': {
       res: { 'wood': 250 }
     },
