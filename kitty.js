@@ -242,17 +242,20 @@ const kittycheatOpts = {
   'trading': {
     'leviathans': {
       res: { 'unobtainium': 5000 },
-      trade: true
+      trade: true,
+      isactive: true
     },
     'dragons': {
       res: { 'titanium': 250 },
       get: 'uranium',
-      trade: true
+      trade: true,
+      isactive: true
     },
     'zebras': {
       res: { 'slab': 50 },
       get: 'titanium',
-      trade: true
+      trade: true,
+      isactive: true
     },
     'nagas': {
       res: { 'ivory': 500 },
@@ -419,7 +422,7 @@ setInterval(() => {
   });
 }, 1000);
 
-let isMaxActive = false;
+let isMaxActive = true;
 
 const kittyIwGroup = $('<div></div>').css({
   'margin-bottom': '10px',
