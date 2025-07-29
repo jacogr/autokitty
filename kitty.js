@@ -55,16 +55,16 @@ const kittycheatUnicorns = (log = false) => {
       console.log('\tBonus unicorns per second: ' + pastureAmor);
     }
 
-    const zigBtn = gamePage.tabs[0].buttons.find((btn) => btn.opts.building === 'ziggurat');
-
-    pastureAmor = zigBtn.model.prices[0].val / pastureAmor;
+    const zigMeta = gamePage.bld.getBuildingExt('ziggurat').meta;
+    
+    pastureAmor = zigMeta.prices[0].val / pastureAmor;
 
     if (log) {
-      const baseWait = zigBtn.model.prices[0].val / total;
-      const avgWait = zigBtn.model.prices[0].val / (total + baseRift);
+      const baseWait = zigMeta.prices[0].val / total;
+      const avgWait = zigMeta.prices[0].val / (total + baseRift);
 
       console.log('\tMaximum time to build: ' + gamePage.toDisplaySeconds(baseWait) + ' | Average time to build: ' + gamePage.toDisplaySeconds(avgWait));
-      console.log('\tPrice: ' + zigBtn.model.prices[0].val + ' | Amortization: ' + gamePage.toDisplaySeconds(pastureAmor));
+      console.log('\tPrice: ' + zigMeta.prices[0].val + ' | Amortization: ' + gamePage.toDisplaySeconds(pastureAmor));
     }
 
     if (pastureAmor < bestAmoritization) {
