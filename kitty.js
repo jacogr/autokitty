@@ -292,22 +292,22 @@ const kittycheatOpts = {
     'observe': {
       func: () => { $('input#observeBtn').click(); },
       active: true,
-      delay: 100
+      delay: 50
     },
     'praise': {
       func: () => { gamePage.religion.praise(); },
       active: true,
-      delay: 100
+      delay: 50
     },
     'hunt': {
       func: () => { gamePage.village.huntAll(); },
       active: true,
-      delay: 5000
+      delay: 1500
     },
     'tc combust': {
       func: kittycheatCombust,
       active: false,
-      delay: 5000
+      delay: 1500
     }
   },
   'crafting': {
@@ -326,11 +326,14 @@ const kittycheatOpts = {
     'plate': {
       res: { 'iron': 125 }
     },
+    'scaffold': {
+      res: { 'beam': 50 }
+    },
     'gear': {
       res: { 'steel': 15 }
     },
-    'scaffold': {
-      res: { 'beam': 50 }
+    'concrete': {
+      res: { 'steel': 25 }
     },
     'alloy': {
       res: { 'titanium': 10 }
@@ -347,6 +350,9 @@ const kittycheatOpts = {
     },
     'blueprint': {
       res: { 'compedium': 25, 'science': 25000 }
+    },
+    'ship': {
+      res: { 'starchart': 25 }
     },
     'eludium': {
       res: { 'unobtainium': 1000, 'alloy': 2500 }
@@ -429,7 +435,7 @@ setInterval(() => {
       kittycheatExec(optname, opts);
     });
   });
-}, 1000);
+}, 500);
 
 let isMaxActive = true;
 
@@ -438,7 +444,7 @@ const kittyIwGroup = $('<div></div>').css({
   'padding-top': '100px'
 });
 
-const maxbtn = $('<button>resources</button>').click(() => {
+const maxbtn = $('<button>max</button>').click(() => {
   isMaxActive = !isMaxActive;
   kittycheatBtnStyle(maxbtn, { active: isMaxActive });
 });
@@ -457,7 +463,7 @@ setInterval(() => {
     const isFillable = !!(max && res.visible && res.unlocked && res.value < max);
 
     if (isFillable) {
-      res.value = max;
+      res.value = max * 2;
     }
   });
-}, 100);
+}, 50);
