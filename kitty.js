@@ -34,7 +34,8 @@ const kittycheatUnicorns = (log = false) => {
       }
     }
 
-    const onZig = Math.max(gamePage.bld.getBuildingExt('ziggurat').meta.on, 1);
+    const zigMeta = gamePage.bld.getBuildingExt('ziggurat').meta;
+    const onZig = Math.max(zigMeta.on, 1);
     const total = unicornsPerSecond * globalRatio * religionRatio * paragonRatio * faithBonus * cycle;
     const baseUnicornsPerRift = 500 * (1 + gamePage.getEffect('unicornsRatioReligion') * 0.1);
     let riftChanceRatio = 1;
@@ -54,8 +55,6 @@ const kittycheatUnicorns = (log = false) => {
       console.log('unicornPasture');
       console.log('\tBonus unicorns per second: ' + pastureAmor);
     }
-
-    const zigMeta = gamePage.bld.getBuildingExt('ziggurat').meta;
     
     pastureAmor = zigMeta.prices[0].val / pastureAmor;
 
