@@ -332,7 +332,7 @@ const kittycheatOpts = {
     'gear': {
       res: { 'steel': 15 }
     },
-    'concrete': {
+    'concrate': {
       res: { 'steel': 25 }
     },
     'alloy': {
