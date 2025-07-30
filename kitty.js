@@ -362,7 +362,8 @@ const kittycheatOpts = {
       res: { 'unobtainium': 1000, 'alloy': 2500 }
     },
     'kerosene': {
-      res: { 'oil': 7500 }
+      res: { 'oil': 7500 },
+      active: true
     },
     'thorium': {
       res: { 'uranium': 250 }
