@@ -330,17 +330,14 @@ const kittycheatOpts = {
       res: { 'iron': 125 },
       active: true
     },
-    'scaffold': {
-      res: { 'beam': 50 }
-    },
     'gear': {
       res: { 'steel': 15 }
     },
-    'concrate': {
-      res: { 'steel': 25 }
-    },
     'alloy': {
       res: { 'titanium': 10 }
+    },
+    'concrate': {
+      res: { 'steel': 25 }
     },
     'parchment': {
       res: { 'furs': 175 },
@@ -358,18 +355,21 @@ const kittycheatOpts = {
     'ship': {
       res: { 'starchart': 25 }
     },
-    'eludium': {
-      res: { 'unobtainium': 1000, 'alloy': 2500 }
-    },
     'kerosene': {
       res: { 'oil': 7500 },
       active: true
+    }, 
+    'megalith': {
+      res: { 'beam': 2500 }
+    },
+    'scaffold': {
+      res: { 'beam': 50 }
+    },
+    'eludium': {
+      res: { 'unobtainium': 1000, 'alloy': 2500 }
     },
     'thorium': {
       res: { 'uranium': 250 }
-    },
-    'megalith': {
-      res: { 'beam': 2500 }
     },
     'feeding': {
       res: { 'necrocorn': 1 },
