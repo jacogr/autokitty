@@ -243,19 +243,19 @@ const kittycheatOpts = {
     'leviathans': {
       res: { 'unobtainium': 5000 },
       trade: true,
-      isactive: true
+      active: true
     },
     'dragons': {
       res: { 'titanium': 250 },
       get: 'uranium',
       trade: true,
-      isactive: true
+      active: true
     },
     'zebras': {
       res: { 'slab': 50 },
       get: 'titanium',
       trade: true,
-      isactive: true
+      active: true
     },
     'nagas': {
       res: { 'ivory': 500 },
