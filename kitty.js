@@ -315,16 +315,20 @@ const kittycheatOpts = {
     //  res: { 'catnip': 250 }
     //},
     'beam': {
-      res: { 'wood': 250 }
+      res: { 'wood': 250 },
+      active: true
     },
     'slab': {
-      res: { 'minerals': 250 }
+      res: { 'minerals': 250 },
+      active: true
     },
     'steel': {
-      res: { 'coal': 100 }
+      res: { 'coal': 100 },
+      active: true
     },
     'plate': {
-      res: { 'iron': 125 }
+      res: { 'iron': 125 },
+      active: true
     },
     'scaffold': {
       res: { 'beam': 50 }
