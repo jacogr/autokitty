@@ -442,6 +442,7 @@ setInterval(() => {
   });
 }, 500);
 
+const maxMult = 1;
 let isMaxActive = true;
 
 const kittyIwGroup = $('<div></div>').css({
@@ -464,7 +465,7 @@ setInterval(() => {
   }
 
   game.resPool.resources.forEach((res) => {
-    const max = res.maxValue * 10;
+    const max = res.maxValue * maxMult;
     const isFillable = !!(max && res.visible && res.unlocked && res.value < max && res.name != 'zebras');
 
     if (isFillable) {
