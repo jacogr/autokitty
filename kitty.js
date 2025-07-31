@@ -464,7 +464,7 @@ setInterval(() => {
   }
 
   game.resPool.resources.forEach((res) => {
-    const max = res.maxValue * (['faith', 'manpower'].includes(res.name) ? 10 : 1);
+    const max = res.maxValue * (['faith', 'manpower'].includes(res.name) ? 1000 : 1);
     const isFillable = !!(max && res.visible && res.unlocked && res.value < max && !['zebras'].includes(res.name));
 
     if (isFillable) {
