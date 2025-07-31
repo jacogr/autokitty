@@ -352,9 +352,6 @@ const kittycheatOpts = {
     'blueprint': {
       res: { 'compedium': 25, 'science': 25000 }
     },
-    'ship': {
-      res: { 'starchart': 25 }
-    },
     'kerosene': {
       res: { 'oil': 7500 },
       active: true
@@ -364,6 +361,9 @@ const kittycheatOpts = {
     },
     'scaffold': {
       res: { 'beam': 50 }
+    },
+    'ship': {
+      res: { 'starchart': 25 }
     },
     'eludium': {
       res: { 'unobtainium': 1000, 'alloy': 2500 }
