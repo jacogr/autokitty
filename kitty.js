@@ -369,7 +369,8 @@ const kittycheatOpts = {
       res: { 'unobtainium': 1000, 'alloy': 2500 }
     },
     'thorium': {
-      res: { 'uranium': 250 }
+      res: { 'uranium': 250 },
+      active: true
     },
     'feeding': {
       res: { 'necrocorn': 1 },
