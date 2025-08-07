@@ -448,6 +448,9 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
 //
 // setInterval(kittycheatUnicorns, 1000);
 
+// REMOVE??
+// setInterval(maxFill, 50);
+
 setInterval(() => {
   Object.keys(kittycheatOpts).forEach((groupname) => {
     const group = kittycheatOpts[groupname];
@@ -474,5 +477,3 @@ const maxbtn = $('<button>max</button>').click(() => {
 kittycheatCont.append(kittyIwGroup);
 kittycheatBtnStyle(maxbtn, { active: isMaxActive });
 kittyIwGroup.append(maxbtn);
-
-setInterval(maxFill, 50);
