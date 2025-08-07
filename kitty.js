@@ -486,17 +486,13 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
 // setInterval(kittycheatMaxFill, 50);
 
 setInterval(() => {
-  // science, workshop, space
-  [2, 3, 6].forEach((tabId) => kittycheatUnlockResouces(tabId));
+  // science, workshop, religion, space
+  [2, 3, 5, 6].forEach((tabId) => kittycheatUnlockResouces(tabId));
 }, 1000);
 
 setInterval(() => {
-  Object.keys(kittycheatOpts).forEach((groupname) => {
-    const group = kittycheatOpts[groupname];
-
-    Object.keys(group).forEach((optname) => {
-      const opts = group[optname];
-
+  Object.values(kittycheatOpts).forEach((group) => {
+    Object.entries(group).forEach(([optname, opts]) => {
       kittycheatMaxFill();
       kittycheatExec(optname, opts);
     });
