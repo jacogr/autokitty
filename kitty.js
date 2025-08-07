@@ -303,7 +303,7 @@ const kittycheatOpts = {
     'hunt': {
       func: () => { gamePage.village.huntAll(); },
       active: true,
-      delay: 1500
+      delay: 500
     },
     'tc combust': {
       func: kittycheatCombust,
@@ -437,6 +437,10 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
 
     if (opts.delay) {
       setInterval(() => {
+        if (['hunt', 'praise'].includes(optname)) {
+          maxFill();
+        }
+        
         kittycheatExec(optname, opts);
       }, opts.delay);
     }
