@@ -443,9 +443,10 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
   });
 });
 
-kittycheatCont.append($('<div id="kittycheatUnicorn"></div>'));
-
-setInterval(kittycheatUnicorns, 1000);
+// FIXME!
+// kittycheatCont.append($('<div id="kittycheatUnicorn"></div>'));
+//
+// setInterval(kittycheatUnicorns, 1000);
 
 setInterval(() => {
   Object.keys(kittycheatOpts).forEach((groupname) => {
@@ -458,7 +459,7 @@ setInterval(() => {
       kittycheatExec(optname, opts);
     });
   });
-}, 500);
+}, 250);
 
 const kittyIwGroup = $('<div></div>').css({
   'margin-bottom': '10px',
