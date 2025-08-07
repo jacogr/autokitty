@@ -256,12 +256,18 @@ const kittycheatMaxFill = () => {
 
 const kittycheatUnlockResouces = (tabId) => {
   try {
-    gamePage.tabs[tabId].buttons.forEach((btn) => {
+    const buttons =
+      // religion
+      gamePage.tabs[tabId].rUpgradeButtons ||
+      // space
+      gamePage.tabs[tabId].GCPanel?.children || 
+      // science, workshop
+      gamePage.tabs[tabId].buttons;
+
+    buttons.forEach((btn) => {
       try {
-        if (btn.model.enabled && btn.model.visible) {
-          if (btn.model.prices.filter((p) => p.name === 'void').length === 0) {
-            $(`span:contains(${btn.model.metadata.label})`).click();
-          }
+        if (btn.model.enabled && btn.model.visible && btn.model.prices.filter((p) => p.name === 'void').length === 0) {
+          $(`span:contains(${btn.model.metadata.label})`).click();
         }
       } catch {
         // ignore errors
@@ -480,8 +486,8 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
 // setInterval(kittycheatMaxFill, 50);
 
 setInterval(() => {
-  kittycheatUnlockResouces(2);
-  kittycheatUnlockResouces(3);
+  // science, workshop, space
+  [2, 3, 6].forEach((tabId) => kittycheatUnlockResouces(tabId));
 }, 1000);
 
 setInterval(() => {
