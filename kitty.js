@@ -437,11 +437,17 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
 
     if (opts.delay) {
       setInterval(() => {
-        if (['hunt', 'praise'].includes(optname)) {
+        const isFillable = ['hunt', 'praise'].includes(optname);
+        
+        if (isFillable) {
           maxFill();
         }
         
         kittycheatExec(optname, opts);
+
+        if (isFillable) {
+          maxFill();
+        }
       }, opts.delay);
     }
   });
