@@ -1,6 +1,7 @@
 const game = window.game;
 const gamePage = window.gamePage;
 const $ = window.$;
+let isMaxActive = true;
 
 const kittycheatCombust = () => {
   if (game.time.heat > 0) {
@@ -391,6 +392,21 @@ const kittycheatOpts = {
   }
 };
 
+const maxFill = () => {
+  if (!isMaxActive) {
+    return;
+  }
+
+  game.resPool.resources.forEach((res) => {
+    const max = res.maxValue * (['faith', 'manpower'].includes(res.name) ? 10 : 1);
+    const isFillable = !!(max && res.visible && res.unlocked && res.value < max && !['zebras'].includes(res.name));
+
+    if (isFillable) {
+      res.value = max;
+    }
+  });
+};
+
 const kittycheatCont = $('<div></div>').css({
   'padding-bottom': '100px'
 });
@@ -438,12 +454,11 @@ setInterval(() => {
     Object.keys(group).forEach((optname) => {
       const opts = group[optname];
 
+      maxFill();
       kittycheatExec(optname, opts);
     });
   });
 }, 500);
-
-let isMaxActive = true;
 
 const kittyIwGroup = $('<div></div>').css({
   'margin-bottom': '10px',
@@ -459,17 +474,4 @@ kittycheatCont.append(kittyIwGroup);
 kittycheatBtnStyle(maxbtn, { active: isMaxActive });
 kittyIwGroup.append(maxbtn);
 
-setInterval(() => {
-  if (!isMaxActive) {
-    return;
-  }
-
-  game.resPool.resources.forEach((res) => {
-    const max = res.maxValue * (['faith', 'manpower'].includes(res.name) ? 10 : 1);
-    const isFillable = !!(max && res.visible && res.unlocked && res.value < max && !['zebras'].includes(res.name));
-
-    if (isFillable) {
-      res.value = max;
-    }
-  });
-}, 50);
+setInterval(maxFill, 50);
