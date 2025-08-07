@@ -239,6 +239,39 @@ const kittycheatBtnClick = (btn, name, opts) => {
   kittycheatExec(name, opts);
 };
 
+const kittycheatMaxFill = () => {
+  if (!isMaxActive) {
+    return;
+  }
+
+  game.resPool.resources.forEach((res) => {
+    const max = res.maxValue * (['faith', 'manpower'].includes(res.name) ? 10 : 1);
+    const isFillable = !!(max && res.visible && res.unlocked && res.value < max && !['zebras'].includes(res.name));
+
+    if (isFillable) {
+      res.value = max;
+    }
+  });
+};
+
+const kittycheatUnlockResouces = (tabId) => {
+  try {
+    gamePage.tabs[tabId].buttons.forEach((btn) => {
+      try {
+        if (btn.model.enabled && btn.model.visible) {
+          if (btn.model.prices.filter((p) => p.name === 'void').length === 0) {
+            $(`span:contains(${btn.model.metadata.label})`).click();
+          }
+        }
+      } catch {
+        // ignore errors
+      }
+    });
+  } catch {
+    // possibly locked
+  }
+};
+
 const kittycheatOpts = {
   'trading': {
     'leviathans': {
@@ -392,21 +425,6 @@ const kittycheatOpts = {
   }
 };
 
-const maxFill = () => {
-  if (!isMaxActive) {
-    return;
-  }
-
-  game.resPool.resources.forEach((res) => {
-    const max = res.maxValue * (['faith', 'manpower'].includes(res.name) ? 10 : 1);
-    const isFillable = !!(max && res.visible && res.unlocked && res.value < max && !['zebras'].includes(res.name));
-
-    if (isFillable) {
-      res.value = max;
-    }
-  });
-};
-
 const kittycheatCont = $('<div></div>').css({
   'padding-bottom': '100px'
 });
@@ -440,13 +458,13 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
         const isFillable = ['hunt', 'praise'].includes(optname);
         
         if (isFillable) {
-          maxFill();
+          kittycheatMaxFill();
         }
         
         kittycheatExec(optname, opts);
 
         if (isFillable) {
-          maxFill();
+          kittycheatMaxFill();
         }
       }, opts.delay);
     }
@@ -459,7 +477,12 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
 // setInterval(kittycheatUnicorns, 1000);
 
 // REMOVE??
-// setInterval(maxFill, 50);
+// setInterval(kittycheatMaxFill, 50);
+
+setInterval(() => {
+  kittycheatUnlockResouces(2);
+  kittycheatUnlockResouces(3);
+}, 1000);
 
 setInterval(() => {
   Object.keys(kittycheatOpts).forEach((groupname) => {
@@ -468,12 +491,12 @@ setInterval(() => {
     Object.keys(group).forEach((optname) => {
       const opts = group[optname];
 
-      maxFill();
+      kittycheatMaxFill();
       kittycheatExec(optname, opts);
     });
   });
 
-  maxFill();
+  kittycheatMaxFill();
 }, 250);
 
 const kittyIwGroup = $('<div></div>').css({
