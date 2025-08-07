@@ -303,7 +303,7 @@ const kittycheatOpts = {
     'hunt': {
       func: () => { gamePage.village.huntAll(); },
       active: true,
-      delay: 500
+      delay: 250
     },
     'tc combust': {
       func: kittycheatCombust,
@@ -466,6 +466,8 @@ setInterval(() => {
       kittycheatExec(optname, opts);
     });
   });
+
+  maxFill();
 }, 250);
 
 const kittyIwGroup = $('<div></div>').css({
