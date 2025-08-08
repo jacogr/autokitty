@@ -1,7 +1,12 @@
 const game = window.game;
 const gamePage = window.gamePage;
 const $ = window.$;
-let isMaxActive = true;
+
+const isMax = {
+  'buildings': false,
+  'resources': true,
+  'upgrades': true
+};
 
 const kittycheatCombust = () => {
   if (game.time.heat > 0) {
@@ -240,7 +245,7 @@ const kittycheatBtnClick = (btn, name, opts) => {
 };
 
 const kittycheatMaxFill = () => {
-  if (!isMaxActive) {
+  if (!isMax.resources) {
     return;
   }
 
@@ -275,6 +280,56 @@ const kittycheatUnlockResouces = (tabId) => {
     });
   } catch {
     // possibly locked
+  }
+};
+
+const kittycheatModelHasResources = (model) => {
+  // don't buy upgradable buildings
+  if (model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
+    return false;
+  }
+
+  // ensure this is available, and limited
+  if (!model.enabled || !model.visible || model.resourceIsLimited) {
+    return false;
+  }
+  
+  kittycheatMaxFill();
+
+  return model.prices.length === model.prices.filter((p) =>
+    p.val < (game.resPool.resources.find((r) => r.name === p.name)?.value || 0);
+  ).length;
+};
+
+const kittycheatBuildButtons = (buttons) => {
+  try {
+    buttons.forEach((btn) => {
+      try {
+        while (kittycheatModelHasResources(btn.model)) {
+          $(`span:contains(${btn.model.metadata.label})`).click();
+        }
+      } catch {
+        // ignore errors
+      }
+    });
+  } catch {
+    // possibly locked
+  }
+};
+
+const kittycheatBuildAll = (tabId) => {
+  try {
+    const areas = 
+      // space
+      gamePage.tabs[tabId].planetPanels || 
+      // others
+      [gamePage.tabs[tabId].children];
+
+    areas.forEach((area) => {
+      kittycheatBuildButtons(area.children);
+    });
+  } catch {
+    // something weird, ignore
   }
 };
 
@@ -482,12 +537,16 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
 //
 // setInterval(kittycheatUnicorns, 1000);
 
-// REMOVE??
-// setInterval(kittycheatMaxFill, 50);
-
 setInterval(() => {
-  // science, workshop, religion, space
-  [2, 3, 5, 6].forEach((tabId) => kittycheatUnlockResouces(tabId));
+  // upgrades: science, workshop, religion, space
+  if (isMax.upgrades) {
+    [2, 3, 5, 6].forEach(kittycheatUnlockResouces);
+  }
+
+  // buildings
+  if (isMax.buildings) {
+    [0, 6].forEach(kittycheatBuildAll);
+  }
 }, 1000);
 
 setInterval(() => {
@@ -506,11 +565,14 @@ const kittyIwGroup = $('<div></div>').css({
   'padding-top': '100px'
 });
 
-const maxbtn = $('<button>max</button>').click(() => {
-  isMaxActive = !isMaxActive;
-  kittycheatBtnStyle(maxbtn, { active: isMaxActive });
-});
-
 kittycheatCont.append(kittyIwGroup);
-kittycheatBtnStyle(maxbtn, { active: isMaxActive });
-kittyIwGroup.append(maxbtn);
+
+Object.keys(isMax).forEach((id) => {
+  const btn = $(`<button>${id}</button>`).click(() => {
+    isMax[id] = !isMax[id];
+    kittycheatBtnStyle(btn, { active: isMax[id] });
+  });
+
+  kittycheatBtnStyle(btn, { active: isMax[id] });
+  kittyIwGroup.append(btn);
+});
