@@ -289,16 +289,26 @@ const kittycheatBuildButtonClick = (model) => {
     return false;
   }
 
-  // ensure this is available, and limited
-  if (!model.enabled || !model.visible || !model.resourceIsLimited) {
+  // ensure this is available
+  if (!model.enabled || !model.visible || model.resourceIsLimited) {
     return false;
   }
 
   // max resources
   kittycheatMaxFill();
 
+  // get all invalid prices
+  const isOut = model.prices.find((p) => {
+    const r = game.resPool.resources.get(p.name);
+
+    // special resources, allow construction
+    const isAllowed = ['alloy', 'beam', 'blueprint', 'compedium', 'eludium', 'kerosene', 'manuscript', 'parchment', 'thorium'].includes(p.name);
+    
+    return p.val > r.value || (r.maxValue === 0 && !isAllowed);
+  });
+
   // ensure we have enough of everything
-  if (model.prices.find((p) => p.val > game.resPool.resources.get(p.name).value)) {
+  if (isOut) {
     return false;
   }
 
