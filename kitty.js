@@ -299,18 +299,18 @@ const kittycheatBuildButtonClick = (model) => {
 
   // ensure we have enough of everything
   if (firstLow) {
-    console.log(`${model.metadata.label} - low on ${firstLow.name}`);
+    // console.log(`${model.metadata.label} - low on ${firstLow.name}`);
     return 0;
   }
 
   // at least something with a max
-  const firstMax = mode.prices.find((p) =>
+  const firstMax = model.prices.find((p) =>
     game.resPool.resources.find((r) => r.name === p.name).maxValue > 0
   );
 
   // something needs a max
   if (!firstMax) {
-    console.log(`${model.metadata.label} - no max, skipping`);
+    // console.log(`${model.metadata.label} - no max, skipping`);
     return 0;
   }
 
