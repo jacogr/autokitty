@@ -284,13 +284,8 @@ const kittycheatUnlockResouces = (tabId) => {
 };
 
 const kittycheatBuildButtonClick = (model) => {
-  // don't buy upgradable buildings
-  if (model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
-    return false;
-  }
-
-  // ensure this is available
-  if (!model.enabled || !model.visible || model.resourceIsLimited) {
+  // don't buy upgradable buildings or invisible
+  if (!model.visible || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
     return false;
   }
 
