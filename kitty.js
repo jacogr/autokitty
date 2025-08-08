@@ -326,7 +326,7 @@ const kittycheatBuildAll = (tabId) => {
       try {
         area.children.forEach((c) => {
           try {
-            while (kittycheatBuildButtonClick(c.model)) {
+            if (kittycheatBuildButtonClick(c.model)) {
               // all ok
             }
           } catch {
