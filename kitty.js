@@ -298,7 +298,7 @@ const kittycheatBuildButtonClick = (model) => {
   kittycheatMaxFill();
 
   // get all invalid prices
-  const isOut = model.prices.find((p) => {
+  const outOf = model.prices.filter((p) => {
     const r = game.resPool.resources.get(p.name);
 
     // special resources, allow construction
@@ -308,7 +308,8 @@ const kittycheatBuildButtonClick = (model) => {
   });
 
   // ensure we have enough of everything
-  if (isOut) {
+  if (outOf.length !== 0) {
+    console.log(`${model.metadata.label} - out of`, outOf);
     return false;
   }
 
