@@ -8,6 +8,11 @@ const isMax = {
   'upgrades': true
 };
 
+const kittycheatSpanClick = (label) => {
+  $(`span:contains(${label})`).click();
+  return 1;
+};
+
 const kittycheatCombust = () => {
   if (game.time.heat > 0) {
     return;
@@ -270,23 +275,19 @@ const kittycheatTabUnlock = (tabId) => {
       gamePage.tabs[tabId].buttons;
 
     return buttons.reduce((count, btn) => {
-      try {
-        if (btn.model.enabled && btn.model.visible && !btn.model.prices.find((p) => p.name === 'void')) {
-          $(`span:contains(${btn.model.metadata.label})`).click();
-
-          return count + 1;
+      if (btn.model.enabled && btn.model.visible && !btn.model.prices.find((p) => p.name === 'void')) {
+        try {
+          return count + kittycheatSpanClick(btn.model.metadata.label);
+        } catch {
+          // ignore
         }
-      } catch {
-        // ignore errors
       }
 
       return count;
-    });
+    }, 0);
   } catch {
-    // possibly locked
+    return 0;
   }
-
-  return 0;
 };
 
 const kittycheatBuildButtonClick = (model) => {
@@ -305,7 +306,6 @@ const kittycheatBuildButtonClick = (model) => {
 
   // ensure we have enough of everything
   if (firstLow) {
-    // console.log(`${model.metadata.label} - low on ${firstLow.name}`);
     return 0;
   }
 
@@ -316,13 +316,10 @@ const kittycheatBuildButtonClick = (model) => {
 
   // something needs a max
   if (!firstMax) {
-    // console.log(`${model.metadata.label} - no max, skipping`);
     return 0;
   }
 
-  $(`span:contains(${model.metadata.label})`).click();
-  
-  return 1;
+  return kittycheatSpanClick(model.metadata.label);
 };
 
 const kittycheatTabBuild = (tabId) => {
@@ -410,7 +407,7 @@ const kittycheatOpts = {
   },
   'actions': {
     'catnip': {
-      func: () => { $('span:contains(Gather catnip)').click(); },
+      func: () => { kittycheatSpanClick('Gather catnip'); },
       active: true,
       delay: 5
     },
