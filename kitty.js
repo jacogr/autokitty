@@ -519,7 +519,7 @@ $('div#leftColumn').append(kittycheatCont);
 Object.keys(kittycheatOpts).forEach((groupname) => {
   const group = kittycheatOpts[groupname];
   const kittycheatGroup = $('<div></div>').css({
-    'margin-bottom': '10px'
+    'margin-bottom': '20px'
   });
   const kittycheatActs = $('<div></div>').css({});
 
@@ -573,8 +573,8 @@ setInterval(() => {
 }, 250);
 
 const kittyIwGroup = $('<div></div>').css({
-  'margin-bottom': '10px',
-  'padding-top': '100px'
+  // 'padding-top': '80px',
+  'margin-bottom': '20px'
 });
 
 kittycheatCont.append(kittyIwGroup);
