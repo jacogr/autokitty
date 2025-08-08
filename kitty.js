@@ -302,6 +302,8 @@ const kittycheatBuildButtonClick = (model) => {
     return false;
   }
 
+  console.log(`Building ${model.metadata.label}`);
+
   // click
   $(`span:contains(${model.metadata.label})`).click();
 
@@ -312,7 +314,7 @@ const kittycheatBuildButtons = (buttons) => {
   try {
     buttons.forEach((btn) => {
       try {
-        if (kittycheatBuildButtons(btn.model)) {
+        while (kittycheatBuildButtonClick(btn.model)) {
           // all ok
         }
       } catch {
