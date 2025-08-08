@@ -9,8 +9,12 @@ const isMax = {
 };
 
 const kittycheatSpanClick = (label) => {
-  $(`span:contains(${label})`).click();
-  return 1;
+  try {
+    $(`span:contains(${label})`).click();
+    return 1;
+  } catch {
+    return 0;
+  }
 };
 
 const kittycheatCombust = () => {
@@ -276,11 +280,7 @@ const kittycheatTabUnlock = (tabId) => {
 
     return buttons.reduce((count, btn) => {
       if (btn.model.enabled && btn.model.visible && !btn.model.prices.find((p) => p.name === 'void')) {
-        try {
-          return count + kittycheatSpanClick(btn.model.metadata.label);
-        } catch {
-          // ignore
-        }
+        return count + kittycheatSpanClick(btn.model.metadata.label);
       }
 
       return count;
