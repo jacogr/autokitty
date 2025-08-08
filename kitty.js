@@ -313,7 +313,7 @@ const kittycheatBuildButtonClick = (model) => {
   });
 
   // ensure we have enough of everything
-  if (firstNoMax) {
+  if (!firstNoMax) {
     return 0;
   }
 
