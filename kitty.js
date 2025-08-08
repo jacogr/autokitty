@@ -286,11 +286,13 @@ const kittycheatUnlockResouces = (tabId) => {
 const kittycheatBuildButtonClick = (model) => {
   // don't buy upgradable buildings
   if (model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
+    console.log(`Skipping ${model.metadata.label} - upgradable`);
     return false;
   }
 
   // ensure this is available, and limited
   if (!model.enabled || !model.visible || model.resourceIsLimited) {
+    console.log(`Skipping ${model.metadata.label} - unlimited`);
     return false;
   }
 
@@ -299,6 +301,7 @@ const kittycheatBuildButtonClick = (model) => {
 
   // ensure we have enough of everything
   if (model.prices.find((p) => p.val > game.resPool.resources.get(p.name).value)) {
+    console.log(`Skipping ${model.metadata.label} - not enough stuff`);
     return false;
   }
 
@@ -310,22 +313,6 @@ const kittycheatBuildButtonClick = (model) => {
   return true;
 };
 
-const kittycheatBuildButtons = (buttons) => {
-  try {
-    buttons.forEach((btn) => {
-      try {
-        while (kittycheatBuildButtonClick(btn.model)) {
-          // all ok
-        }
-      } catch {
-        // ignore errors
-      }
-    });
-  } catch {
-    // possibly locked
-  }
-};
-
 const kittycheatBuildAll = (tabId) => {
   try {
     const areas =
@@ -334,7 +321,21 @@ const kittycheatBuildAll = (tabId) => {
       // others
       [gamePage.tabs[tabId]];
 
-    areas.forEach((area) =>  kittycheatBuildButtons(area.children));
+    areas.forEach((area) => {
+      try {
+        area.children.forEach((c) => {
+          try {
+            while (kittycheatBuildButtonClick(c.model)) {
+              // all ok
+            }
+          } catch {
+            // ignore errors
+          }
+        });
+      } catch {
+        // possibly locked
+      }
+    });
   } catch {
     // something weird, ignore
   }
