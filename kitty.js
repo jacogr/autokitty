@@ -286,13 +286,11 @@ const kittycheatUnlockResouces = (tabId) => {
 const kittycheatBuildButtonClick = (model) => {
   // don't buy upgradable buildings
   if (model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
-    console.log(`${model.metadata.label} - upgradable`);
     return false;
   }
 
   // ensure this is available
   if (!model.enabled || !model.visible || model.resourceIsLimited) {
-    console.log(`${model.metadata.label} - available`, !model.enabled, !model.visible, model.resourceIsLimited);
     return false;
   }
 
@@ -311,14 +309,18 @@ const kittycheatBuildButtonClick = (model) => {
 
   // ensure we have enough of everything
   if (outOf.length !== 0) {
-    console.log(`${model.metadata.label} - out of`, outOf);
     return false;
   }
 
   console.log(`Building ${model.metadata.label}`);
 
-  // click
-  $(`span:contains(${model.metadata.label})`).click();
+  try {
+    $(`span:contains(${model.metadata.label})`).click();
+  } catch (e) {
+    console.error(`Error ${model.metadata.label}`, e);
+
+    return false;
+  }
 
   return true;
 };
