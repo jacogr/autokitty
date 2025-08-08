@@ -310,7 +310,7 @@ const kittycheatBuildButtonClick = (model) => {
     const isAllowed = false; // ['alloy', 'beam', 'blueprint', 'compedium', 'eludium', 'kerosene', 'manuscript', 'parchment', 'relic', 'thorium'].includes(p.name);
                                       
     return r.maxValue === 0 || isAllowed;
-  );
+  });
 
   // ensure we have enough of everything
   if (firstNoMax) {
