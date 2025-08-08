@@ -293,26 +293,24 @@ const kittycheatBuildButtonClick = (model) => {
   kittycheatMaxFill();
 
   // get all invalid prices
-  const firstLow = model.prices.find((p) => {
-    const r = game.resPool.resources.find((r) => r.name === p.name);
-    
-    return !r || p.val > r.value;
-  });
+  const firstLow = model.prices.find((p) =>
+    game.resPool.resources.find((r) => r.name === p.name).value < p.val
+  );
 
   // ensure we have enough of everything
   if (firstLow) {
+    console.log(`${model.metadata.label} - low on ${firstLow.name}`);
     return 0;
   }
 
   // at least something with a max
-  const firstMax = mode.prices.find((p) => {
-    const r = game.resPool.resources.find((r) => r.name === p.name);
-                                      
-    return r.maxValue !== 0;
-  });
+  const firstMax = mode.prices.find((p) =>
+    game.resPool.resources.find((r) => r.name === p.name).maxValue > 0
+  );
 
   // something needs a max
   if (!firstMax) {
+    console.log(`${model.metadata.label} - no max, skipping`);
     return 0;
   }
 
