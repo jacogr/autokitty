@@ -295,11 +295,8 @@ const kittycheatBuildButtonClick = (model) => {
   // get all invalid prices
   const firstLow = model.prices.find((p) => {
     const r = game.resPool.resources.find((r) => r.name === p.name);
-
-    // special resources, allow construction
-    const isAllowed = ['alloy', 'beam', 'blueprint', 'compedium', 'eludium', 'kerosene', 'manuscript', 'parchment', 'relic', 'thorium'].includes(p.name);
     
-    return !r || p.val > r.value || (r.maxValue === 0 && !isAllowed);
+    return !r || p.val > r.value;
   });
 
   // ensure we have enough of everything
@@ -307,7 +304,18 @@ const kittycheatBuildButtonClick = (model) => {
     return 0;
   }
 
-  // console.log(`Building ${model.metadata.label}`);
+  // at least something with a max
+  const firstNoMax = mode.prices.find((p) =>
+    const r = game.resPool.resources.find((r) => r.name === p.name);
+    const isAllowed = ['alloy', 'beam', 'blueprint', 'compedium', 'eludium', 'kerosene', 'manuscript', 'parchment', 'relic', 'thorium'].includes(p.name);
+                                      
+    return isAllowed || r.maxValue === 0;
+  );
+
+  // ensure we have enough of everything
+  if (firstNoMax) {
+    return 0;
+  }
 
   $(`span:contains(${model.metadata.label})`).click();
   
