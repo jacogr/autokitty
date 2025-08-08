@@ -297,7 +297,7 @@ const kittycheatModelHasResources = (model) => {
   kittycheatMaxFill();
 
   return model.prices.length === model.prices.filter((p) =>
-    p.val < (game.resPool.resources.find((r) => r.name === p.name)?.value || 0);
+    p.val < (game.resPool.resources.find((r) => r.name === p.name)?.value || 0)
   ).length;
 };
 
