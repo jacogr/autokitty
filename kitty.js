@@ -269,18 +269,24 @@ const kittycheatTabUnlock = (tabId) => {
       // science, workshop
       gamePage.tabs[tabId].buttons;
 
-    buttons.forEach((btn) => {
+    return buttons.reduce((count, btn) => {
       try {
-        if (btn.model.enabled && btn.model.visible && btn.model.prices.filter((p) => p.name === 'void').length === 0) {
+        if (btn.model.enabled && btn.model.visible && !btn.model.prices.find((p) => p.name === 'void')) {
           $(`span:contains(${btn.model.metadata.label})`).click();
+
+          return count + 1;
         }
       } catch {
         // ignore errors
       }
+
+      return count;
     });
   } catch {
     // possibly locked
   }
+
+  return 0;
 };
 
 const kittycheatBuildButtonClick = (model) => {
@@ -346,12 +352,12 @@ const kittycheatBuildAll = () => {
   
   // upgrades: 2:science, 3:workshop, 5:religion, 6:space
   if (isMax.upgrades) {
-    [2, 3, 5, 6].forEach(kittycheatTabUnlock);
+    count += [2, 3, 5, 6].reduce((count, tabId) => count + kittycheatTabUnlock(tabId), 0);
   }
 
   // buildings: 0:bonfire, 6:space
   if (isMax.buildings) {
-    count = [0, 6].reduce((count, tabId) => count + kittycheatTabBuild(tabId), 0);
+    count += [0, 6].reduce((count, tabId) => count + kittycheatTabBuild(tabId), 0);
   }
 
   setTimeout(kittycheatBuildAll, count ? 0 : 1000);
