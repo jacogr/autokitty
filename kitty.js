@@ -285,7 +285,7 @@ const kittycheatUnlockResouces = (tabId) => {
 
 const kittycheatBuildButtonClick = (model) => {
   // don't buy upgradable buildings or invisible
-  if (!model.visible || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
+  if (!model.visible || !model.enabled || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
     return false;
   }
 
@@ -294,12 +294,12 @@ const kittycheatBuildButtonClick = (model) => {
 
   // get all invalid prices
   const outOf = model.prices.filter((p) => {
-    const r = game.resPool.resources.get(p.name);
+    const r = game.resPool.resources.find((r) => r.name === p.name);
 
     // special resources, allow construction
     const isAllowed = ['alloy', 'beam', 'blueprint', 'compedium', 'eludium', 'kerosene', 'manuscript', 'parchment', 'thorium'].includes(p.name);
     
-    return p.val > r.value || (r.maxValue === 0 && !isAllowed);
+    return !r || p.val > r.value || (r.maxValue === 0 && !isAllowed);
   });
 
   // ensure we have enough of everything
@@ -309,14 +309,8 @@ const kittycheatBuildButtonClick = (model) => {
 
   console.log(`Building ${model.metadata.label}`);
 
-  try {
-    $(`span:contains(${model.metadata.label})`).click();
-  } catch (e) {
-    console.error(`Error ${model.metadata.label}`, e);
-
-    return false;
-  }
-
+  $(`span:contains(${model.metadata.label})`).click();
+  
   return true;
 };
 
