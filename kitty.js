@@ -259,7 +259,7 @@ const kittycheatMaxFill = () => {
   });
 };
 
-const kittycheatUnlockResouces = (tabId) => {
+const kittycheatTabUnlock = (tabId) => {
   try {
     const buttons =
       // religion
@@ -314,7 +314,7 @@ const kittycheatBuildButtonClick = (model) => {
   return true;
 };
 
-const kittycheatBuildAll = (tabId) => {
+const kittycheatTabBuild = (tabId) => {
   try {
     const areas =
       // space
@@ -340,6 +340,20 @@ const kittycheatBuildAll = (tabId) => {
   } catch {
     // something weird, ignore
   }
+};
+
+const kittycheatBuildAll = () => {
+  // upgrades: science, workshop, religion, space
+  if (isMax.upgrades) {
+    [2, 3, 5, 6].forEach(kittycheatTabUnlock);
+  }
+
+  // buildings
+  if (isMax.buildings) {
+    [0, 6].forEach(kittycheatTabBuild);
+  }
+
+  setTimeout(kittycheatBuildAll, 100);
 };
 
 const kittycheatOpts = {
@@ -547,18 +561,6 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
 // setInterval(kittycheatUnicorns, 1000);
 
 setInterval(() => {
-  // upgrades: science, workshop, religion, space
-  if (isMax.upgrades) {
-    [2, 3, 5, 6].forEach(kittycheatUnlockResouces);
-  }
-
-  // buildings
-  if (isMax.buildings) {
-    [0, 6].forEach(kittycheatBuildAll);
-  }
-}, 1000);
-
-setInterval(() => {
   Object.values(kittycheatOpts).forEach((group) => {
     Object.entries(group).forEach(([optname, opts]) => {
       kittycheatMaxFill();
@@ -585,3 +587,5 @@ Object.keys(isMax).forEach((id) => {
   kittycheatBtnStyle(btn, { active: isMax[id] });
   kittyIwGroup.append(btn);
 });
+
+kittycheatBuildAll();
