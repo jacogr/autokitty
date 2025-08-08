@@ -305,15 +305,14 @@ const kittycheatBuildButtonClick = (model) => {
   }
 
   // at least something with a max
-  const firstNoMax = mode.prices.find((p) => {
+  const firstMax = mode.prices.find((p) => {
     const r = game.resPool.resources.find((r) => r.name === p.name);
-    const isAllowed = false; // ['alloy', 'beam', 'blueprint', 'compedium', 'eludium', 'kerosene', 'manuscript', 'parchment', 'relic', 'thorium'].includes(p.name);
                                       
-    return r.maxValue === 0 || isAllowed;
+    return r.maxValue !== 0;
   });
 
-  // ensure we have enough of everything
-  if (!firstNoMax) {
+  // something needs a max
+  if (!firstMax) {
     return 0;
   }
 
