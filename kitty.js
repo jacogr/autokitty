@@ -14,7 +14,7 @@ const kittycheatCombust = () => {
   }
 
   gamePage.timeTab.render();
-  
+
   const count = Math.floor(game.getEffect('heatMax') / (45 * 5));
 
   for (let i = 0; i < count; i++) {
@@ -61,7 +61,7 @@ const kittycheatUnicorns = (log = false) => {
       console.log('unicornPasture');
       console.log('\tBonus unicorns per second: ' + pastureAmor);
     }
-    
+
     pastureAmor = zigMeta.prices[0].val / pastureAmor;
 
     if (log) {
@@ -265,7 +265,7 @@ const kittycheatUnlockResouces = (tabId) => {
       // religion
       gamePage.tabs[tabId].rUpgradeButtons ||
       // space
-      gamePage.tabs[tabId].GCPanel?.children || 
+      gamePage.tabs[tabId].GCPanel?.children ||
       // science, workshop
       gamePage.tabs[tabId].buttons;
 
@@ -293,12 +293,14 @@ const kittycheatModelHasResources = (model) => {
   if (!model.enabled || !model.visible || model.resourceIsLimited) {
     return false;
   }
-  
+
   kittycheatMaxFill();
 
-  return model.prices.length === model.prices.filter((p) =>
-    p.val < (game.resPool.resources.find((r) => r.name === p.name)?.value || 0)
-  ).length;
+  return model.prices.length === model.prices.filter((p) => {
+    const r = game.resPool.resources.find((r) => r.name === p.name);
+
+    return !!r && r.value > p.val;
+  }).length;
 };
 
 const kittycheatBuildButtons = (buttons) => {
@@ -319,15 +321,13 @@ const kittycheatBuildButtons = (buttons) => {
 
 const kittycheatBuildAll = (tabId) => {
   try {
-    const areas = 
+    const areas =
       // space
-      gamePage.tabs[tabId].planetPanels || 
+      gamePage.tabs[tabId].planetPanels ||
       // others
-      [gamePage.tabs[tabId].children];
+      [gamePage.tabs[tabId]];
 
-    areas.forEach((area) => {
-      kittycheatBuildButtons(area.children);
-    });
+    areas.forEach((area) =>  kittycheatBuildButtons(area.children));
   } catch {
     // something weird, ignore
   }
@@ -450,7 +450,7 @@ const kittycheatOpts = {
     'kerosene': {
       res: { 'oil': 7500 },
       active: true
-    }, 
+    },
     'megalith': {
       res: { 'beam': 2500 }
     },
@@ -517,11 +517,11 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
     if (opts.delay) {
       setInterval(() => {
         const isFillable = ['hunt', 'praise'].includes(optname);
-        
+
         if (isFillable) {
           kittycheatMaxFill();
         }
-        
+
         kittycheatExec(optname, opts);
 
         if (isFillable) {
