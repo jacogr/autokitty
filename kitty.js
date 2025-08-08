@@ -297,7 +297,7 @@ const kittycheatBuildButtonClick = (model) => {
     const r = game.resPool.resources.find((r) => r.name === p.name);
 
     // special resources, allow construction
-    const isAllowed = ['alloy', 'beam', 'blueprint', 'compedium', 'eludium', 'kerosene', 'manuscript', 'parchment', 'thorium'].includes(p.name);
+    const isAllowed = ['alloy', 'beam', 'blueprint', 'compedium', 'eludium', 'kerosene', 'manuscript', 'parchment', 'relic', 'thorium'].includes(p.name);
     
     return !r || p.val > r.value || (r.maxValue === 0 && !isAllowed);
   });
