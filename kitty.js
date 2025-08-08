@@ -286,14 +286,14 @@ const kittycheatTabUnlock = (tabId) => {
 const kittycheatBuildButtonClick = (model) => {
   // don't buy upgradable buildings or invisible
   if (!model.visible || !model.enabled || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
-    return false;
+    return 0;
   }
 
   // max resources
   kittycheatMaxFill();
 
   // get all invalid prices
-  const outOf = model.prices.filter((p) => {
+  const firstLow = model.prices.find((p) => {
     const r = game.resPool.resources.find((r) => r.name === p.name);
 
     // special resources, allow construction
@@ -303,15 +303,15 @@ const kittycheatBuildButtonClick = (model) => {
   });
 
   // ensure we have enough of everything
-  if (outOf.length !== 0) {
-    return false;
+  if (firstLow) {
+    return 0;
   }
 
-  console.log(`Building ${model.metadata.label}`);
+  // console.log(`Building ${model.metadata.label}`);
 
   $(`span:contains(${model.metadata.label})`).click();
   
-  return true;
+  return 1;
 };
 
 const kittycheatTabBuild = (tabId) => {
@@ -322,38 +322,34 @@ const kittycheatTabBuild = (tabId) => {
       // others
       [gamePage.tabs[tabId]];
 
-    areas.forEach((area) => {
-      try {
-        area.children.forEach((c) => {
-          try {
-            if (kittycheatBuildButtonClick(c.model)) {
-              // all ok
-            }
-          } catch {
-            // ignore errors
-          }
-        });
-      } catch {
-        // possibly locked
-      }
-    });
+    return areas.reduce((count, area) => {
+      return count + area.children.reduce((count, child) => {
+        try {
+          return count + kittycheatBuildButtonClick(child.model);
+        } catch {
+          return count;
+        }
+      }, 0);
+    }, 0);
   } catch {
-    // something weird, ignore
+    return 0;
   }
 };
 
 const kittycheatBuildAll = () => {
-  // upgrades: science, workshop, religion, space
+  let count = 0;
+  
+  // upgrades: 2:science, 3:workshop, 5:religion, 6:space
   if (isMax.upgrades) {
     [2, 3, 5, 6].forEach(kittycheatTabUnlock);
   }
 
-  // buildings
+  // buildings: 0:bonfire, 6:space
   if (isMax.buildings) {
-    [0, 6].forEach(kittycheatTabBuild);
+    count = [0, 6].reduce((count, tabId) => count + kittycheatTabBuild(tabId), 0);
   }
 
-  setTimeout(kittycheatBuildAll, 100);
+  setTimeout(kittycheatBuildAll, count ? 0 : 1000);
 };
 
 const kittycheatOpts = {
