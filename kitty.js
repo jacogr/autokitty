@@ -283,7 +283,7 @@ const kittycheatUnlockResouces = (tabId) => {
   }
 };
 
-const kittycheatModelHasResources = (model) => {
+const kittycheatBuildButtonClick = (model) => {
   // don't buy upgradable buildings
   if (model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
     return false;
@@ -294,17 +294,26 @@ const kittycheatModelHasResources = (model) => {
     return false;
   }
 
+  // max resources
   kittycheatMaxFill();
 
-  return !model.prices.find((p) => p.val > game.resPool.resources.get(p.name).value);
+  // ensure we have enough of everything
+  if (model.prices.find((p) => p.val > game.resPool.resources.get(p.name).value)) {
+    return false;
+  }
+
+  // click
+  $(`span:contains(${model.metadata.label})`).click();
+
+  return true;
 };
 
 const kittycheatBuildButtons = (buttons) => {
   try {
     buttons.forEach((btn) => {
       try {
-        while (kittycheatModelHasResources(btn.model)) {
-          $(`span:contains(${btn.model.metadata.label})`).click();
+        if (kittycheatBuildButtons(btn.model)) {
+          // all ok
         }
       } catch {
         // ignore errors
