@@ -286,11 +286,13 @@ const kittycheatUnlockResouces = (tabId) => {
 const kittycheatBuildButtonClick = (model) => {
   // don't buy upgradable buildings
   if (model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
+    console.log(`${model.metadata.label} - upgradable`);
     return false;
   }
 
   // ensure this is available
   if (!model.enabled || !model.visible || model.resourceIsLimited) {
+    console.log(`${model.metadata.label} - available`, !model.enabled, !model.visible, model.resourceIsLimited);
     return false;
   }
 
