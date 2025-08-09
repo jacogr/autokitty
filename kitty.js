@@ -335,7 +335,7 @@ const kittycheatTabBuild = (tab) => {
       // space
       tab.planetPanels ||
       // trade
-      tab.racePanels?.map((r) => ({ children: [r.embassyButton] })) ||
+      tab.racePanels?.filter((r) => !!r.embassyButton).map((r) => ({ children: [r.embassyButton] })) ||
       // others
       [tab];
 
