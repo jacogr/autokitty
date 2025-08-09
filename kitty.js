@@ -281,7 +281,7 @@ const kittycheatTabUnlock = (tab) => {
 
     return buttons.reduce((count, btn) => {
       try {
-        if (btn.model.enabled && btn.model.visible && !btn.model.prices.find((p) => p.name === 'void')) {
+        if (btn && btn.model && btn.model.enabled && btn.model.visible && btn.model.metadata && !btn.model.prices.find((p) => p.name === 'void')) {
           return count + kittycheatSpanClick(btn.model.metadata.label);
         }
       } catch (e) {
@@ -291,7 +291,7 @@ const kittycheatTabUnlock = (tab) => {
       return count;
     }, 0);
   } catch (e) {
-    console.error(tab.tabName, e);
+    console.error(tab?.tabName, e);
   }
 
   return 0;
@@ -299,7 +299,7 @@ const kittycheatTabUnlock = (tab) => {
 
 const kittycheatBuildButtonClick = (model) => {
   // don't buy upgradable buildings or invisible or switched off
-  if (!model.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val) || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
+  if (!model || !model.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val) || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
     return 0;
   }
 
@@ -335,14 +335,14 @@ const kittycheatTabBuild = (tab) => {
       // space
       tab.planetPanels ||
       // trade
-      tab.racePanels?.filter((r) => !!r.embassyButton).map((r) => ({ children: [r.embassyButton] })) ||
+      tab.racePanels?.map((r) => ({ children: [r.embassyButton] })) ||
       // others
       [tab];
 
     return areas.reduce((count, area) => {
       return count + area.children.reduce((count, child) => {
         try {
-          return count + kittycheatBuildButtonClick(child.model);
+          return count + kittycheatBuildButtonClick(child?.model);
         } catch (e) {
           console.error(tab.tabName, e);
         }
@@ -351,7 +351,7 @@ const kittycheatTabBuild = (tab) => {
       }, 0);
     }, 0);
   } catch (e) {
-    console.error(tab.tabName, e);
+    console.error(tab?.tabName, e);
   }
 
   return 0;
