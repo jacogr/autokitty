@@ -361,7 +361,7 @@ const kittycheatTabBuild = (tab) => {
 const kittycheatLoopTabs = (ids, fn) => {
   return ids
     .map((i) => gamePage.tabs[i])
-    .filter((t) => t.visible)
+    .filter((t) => t.visible && game.ui.activeTabId === t.tabId)
     .reduce((count, t) => count + fn(t), 0);
 };
 
