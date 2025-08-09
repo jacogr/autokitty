@@ -270,15 +270,15 @@ const kittycheatMaxFill = () => {
   });
 };
 
-const kittycheatTabUnlock = (tabId) => {
+const kittycheatTabUnlock = (tab) => {
   try {
     const buttons =
       // religion
-      gamePage.tabs[tabId].rUpgradeButtons ||
+      tab.rUpgradeButtons ||
       // space
-      gamePage.tabs[tabId].GCPanel?.children ||
+      tab.GCPanel?.children ||
       // science, workshop
-      gamePage.tabs[tabId].buttons;
+      tab.buttons;
 
     return buttons.reduce((count, btn) => {
       try {
@@ -330,15 +330,15 @@ const kittycheatBuildButtonClick = (model) => {
   return kittycheatSpanClick(model.metadata.label);
 };
 
-const kittycheatTabBuild = (tabId) => {
+const kittycheatTabBuild = (tab) => {
   try {
     const areas =
       // space
-      gamePage.tabs[tabId].planetPanels ||
+      tab.planetPanels ||
       // trade
-      gamePage.tabs[tabId].racePanels?.map((r) => ({ children: [r.embassyButton] })) ||
+      tab.racePanels?.map((r) => ({ children: [r.embassyButton] })) ||
       // others
-      [gamePage.tabs[tabId]];
+      [tab];
 
     return areas.reduce((count, area) => {
       return count + area.children.reduce((count, child) => {
@@ -363,12 +363,12 @@ const kittycheatBuildAll = () => {
   
   // upgrades: 2:science, 3:workshop, 5:religion, 6:space
   if (isMax.upgrades) {
-    count += [2, 3, 5, 6].reduce((count, tabId) => count + kittycheatTabUnlock(tabId), 0);
+    count += [2, 3, 5, 6].reduce((count, tabId) => count + kittycheatTabUnlock(gamePage.tabs[tabId]), 0);
   }
 
   // buildings: 0:bonfire, 4:trade, 6:space
   if (isMax.buildings) {
-    count += [0, 4, 6].reduce((count, tabId) => count + kittycheatTabBuild(tabId), 0);
+    count += [0, 4, 6].reduce((count, tabId) => count + kittycheatTabBuild(gamePage.tabs[tabId]), 0);
   }
 
   setTimeout(kittycheatBuildAll, count ? 0 : 1000);
