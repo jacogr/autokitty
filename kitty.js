@@ -10,11 +10,7 @@ const isMax = {
 
 const kittycheatSpanClick = (label) => {
   try {
-    // not using $(`span:contains(${label})`) since we want an exact match
-    // see: https://forum.jquery.com/portal/en/community/topic/contains-but-i-want-exact-how
-    $('span').filter(function() {
-      return $(this).text() === text;
-    }).click();
+    $(`span:contains(${label})`).click();
     
     return 1;
   } catch {
@@ -362,17 +358,24 @@ const kittycheatTabBuild = (tab) => {
   return 0;
 };
 
+const kittycheatLoopTabs = (ids, fn) => {
+  return ids
+    .map((i) => gamePage.tabs[i])
+    .filter((t) => t.visible)
+    .reduce((count, t) => count + fn(t), 0);
+};
+
 const kittycheatBuildAll = () => {
   let count = 0;
   
   // upgrades: 2:science, 3:workshop, 5:religion, 6:space
   if (isMax.upgrades) {
-    count += [2, 3, 5, 6].reduce((count, idx) => count + kittycheatTabUnlock(gamePage.tabs[idx]), 0);
+    count += kittycheatLoopTabs([2, 3, 5, 6], kittycheatTabUnlock);
   }
 
   // buildings: 0:bonfire, 4:trade, 6:space
   if (isMax.buildings) {
-    count += [0, 4, 6].reduce((count, idx) => count + kittycheatTabBuild(gamePage.tabs[idx]), 0);
+    count += kittycheatLoopTabs([0, 4, 6], kittycheatTabBuild);
   }
 
   setTimeout(kittycheatBuildAll, count ? 0 : 1000);
