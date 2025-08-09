@@ -271,6 +271,8 @@ const kittycheatMaxFill = () => {
 
 const kittycheatTabUnlock = (tab) => {
   try {
+    tab.render();
+    
     const buttons =
       // religion
       tab.rUpgradeButtons ||
@@ -331,6 +333,8 @@ const kittycheatBuildButtonClick = (model) => {
 
 const kittycheatTabBuild = (tab) => {
   try {
+    tab.render();
+    
     const areas =
       // space
       tab.planetPanels ||
