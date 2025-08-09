@@ -363,12 +363,12 @@ const kittycheatBuildAll = () => {
   
   // upgrades: 2:science, 3:workshop, 5:religion, 6:space
   if (isMax.upgrades) {
-    count += [2, 3, 5, 6].reduce((count, tabId) => count + kittycheatTabUnlock(gamePage.tabs[tabId]), 0);
+    count += [2, 3, 5, 6].reduce((count, idx) => count + kittycheatTabUnlock(gamePage.tabs[idx]), 0);
   }
 
   // buildings: 0:bonfire, 4:trade, 6:space
   if (isMax.buildings) {
-    count += [0, 4, 6].reduce((count, tabId) => count + kittycheatTabBuild(gamePage.tabs[tabId]), 0);
+    count += [0, 4, 6].reduce((count, idx) => count + kittycheatTabBuild(gamePage.tabs[idx]), 0);
   }
 
   setTimeout(kittycheatBuildAll, count ? 0 : 1000);
