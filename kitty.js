@@ -290,9 +290,9 @@ const kittycheatTabUnlock = (tabId) => {
   }
 };
 
-const kittycheatBuildButtonClick = (model, opts) => {
+const kittycheatBuildButtonClick = (model) => {
   // don't buy upgradable buildings or invisible or switched off
-  if (!model.visible || !model.enabled || (model.metadata.on !== model.metadata.val) || (opts?.isEmbassy && !model.metadata.on) || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
+  if (!model.visible || !model.enabled || (model.metadata.on !== model.metadata.val) || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
     return 0;
   }
 
@@ -328,14 +328,14 @@ const kittycheatTabBuild = (tabId) => {
       // space
       gamePage.tabs[tabId].planetPanels ||
       // trade
-      gamePage.tabs[tabid].racePanels?.map((r) => ({ children: [r.embassyButton], kittycheatOpts: { isEmbassy: true } })) ||
+      gamePage.tabs[tabid].racePanels?.map((r) => ({ children: [r.embassyButton] })) ||
       // others
       [gamePage.tabs[tabId]];
 
     return areas.reduce((count, area) => {
       return count + area.children.reduce((count, child) => {
         try {
-          return count + kittycheatBuildButtonClick(child.model, area.kittycheatOpts);
+          return count + kittycheatBuildButtonClick(child.model);
         } catch {
           return count;
         }
