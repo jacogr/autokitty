@@ -292,7 +292,7 @@ const kittycheatTabUnlock = (tabId) => {
 
 const kittycheatBuildButtonClick = (model, opts) => {
   // don't buy upgradable buildings or invisible or switched off
-  if (!model.visible || !model.enabled || (!!model.metadata.val && model.metadata.on !== model.metadata.val) || (opts?.isEmbassy && !model.metadata.on) || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
+  if (!model.visible || !model.enabled || (model.metadata.on !== model.metadata.val) || (opts?.isEmbassy && !model.metadata.on) || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
     return 0;
   }
 
