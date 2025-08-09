@@ -13,8 +13,10 @@ const kittycheatSpanClick = (label) => {
     $(`span:contains(${label})`).click();
     return 1;
   } catch {
-    return 0;
+    // ignore
   }
+
+  return 0;
 };
 
 const kittycheatCombust = () => {
@@ -279,15 +281,21 @@ const kittycheatTabUnlock = (tabId) => {
       gamePage.tabs[tabId].buttons;
 
     return buttons.reduce((count, btn) => {
-      if (btn.model.enabled && btn.model.visible && !btn.model.prices.find((p) => p.name === 'void')) {
-        return count + kittycheatSpanClick(btn.model.metadata.label);
+      try {
+        if (btn.model.enabled && btn.model.visible && !btn.model.prices.find((p) => p.name === 'void')) {
+          return count + kittycheatSpanClick(btn.model.metadata.label);
+        }
+      } catch (e) {
+        console.error(e);
       }
 
       return count;
     }, 0);
-  } catch {
-    return 0;
+  } catch (e) {
+    console.error(e);
   }
+
+  return 0;
 };
 
 const kittycheatBuildButtonClick = (model) => {
@@ -336,14 +344,18 @@ const kittycheatTabBuild = (tabId) => {
       return count + area.children.reduce((count, child) => {
         try {
           return count + kittycheatBuildButtonClick(child.model);
-        } catch {
-          return count;
+        } catch (e) {
+          console.error(e);
         }
+
+        return count;
       }, 0);
     }, 0);
-  } catch {
-    return 0;
+  } catch (e) {
+    console.error(e);
   }
+
+  return 0;
 };
 
 const kittycheatBuildAll = () => {
