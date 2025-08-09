@@ -10,6 +10,8 @@ const isMax = {
 
 const kittycheatSpanClick = (label) => {
   try {
+    // not using $(`span:contains(${label})`) since we want an exact match
+    // see: https://forum.jquery.com/portal/en/community/topic/contains-but-i-want-exact-how
     $('span').filter(function() {
       return $(this).text() === text;
     }).click();
