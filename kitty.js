@@ -271,8 +271,6 @@ const kittycheatMaxFill = () => {
 
 const kittycheatTabUnlock = (tab) => {
   try {
-    tab.render();
-    
     const buttons =
       // religion
       tab.rUpgradeButtons ||
@@ -301,7 +299,7 @@ const kittycheatTabUnlock = (tab) => {
 
 const kittycheatBuildButtonClick = (model) => {
   // don't buy upgradable buildings or invisible or switched off
-  if (!model.visible || !model.enabled || (model.metadata.on !== model.metadata.val) || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
+  if (!model.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val) || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
     return 0;
   }
 
@@ -333,8 +331,6 @@ const kittycheatBuildButtonClick = (model) => {
 
 const kittycheatTabBuild = (tab) => {
   try {
-    tab.render();
-    
     const areas =
       // space
       tab.planetPanels ||
