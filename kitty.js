@@ -532,8 +532,7 @@ const kittycheatCont = $('<div></div>').css({
 
 $('div#leftColumn').append(kittycheatCont);
 
-Object.keys(kittycheatOpts).forEach((groupname) => {
-  const group = kittycheatOpts[groupname];
+Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
   const kittycheatGroup = $('<div></div>').css({
     'margin-bottom': '20px'
   });
@@ -542,9 +541,7 @@ Object.keys(kittycheatOpts).forEach((groupname) => {
   kittycheatCont.append(kittycheatGroup);
   kittycheatGroup.append(kittycheatActs);
 
-  Object.keys(group).forEach((optname) => {
-    const opts = group[optname];
-
+  Object.entries(group).forEach(([optname, opts]) => {
     opts.active = opts.active || false;
 
     const btn = $(`<button>${optname}</button>`).click(() => {
