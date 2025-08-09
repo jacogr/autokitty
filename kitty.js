@@ -291,8 +291,8 @@ const kittycheatTabUnlock = (tabId) => {
 };
 
 const kittycheatBuildButtonClick = (model) => {
-  // don't buy upgradable buildings or invisible
-  if (!model.visible || !model.enabled || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
+  // don't buy upgradable buildings or invisible or switched off
+  if (!model.visible || !model.enabled || model.metadata.on !== model.metadata.val || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
     return 0;
   }
 
