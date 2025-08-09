@@ -10,7 +10,10 @@ const isMax = {
 
 const kittycheatSpanClick = (label) => {
   try {
-    $(`span:contains(${label})`).click();
+    $('span').filter(function() {
+      return $(this).text() === text;
+    }).click();
+    
     return 1;
   } catch {
     // ignore
