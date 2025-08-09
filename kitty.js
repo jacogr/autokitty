@@ -156,8 +156,8 @@ const kittycheatUnicorns = (log = false) => {
     }
 
     $('div#kittycheatUnicorn').html('Unicorns: ' + bestBuilding);
-  } catch (error) {
-    console.error(error);
+  } catch (e) {
+    console.error(e);
     $('div#kittycheatUnicorn').html('Unicorns: unable to calculate');
   }
 };
@@ -216,7 +216,6 @@ const kittycheatCraft = (name) => {
   const isautum = (gamePage.calendar.season === 2) && (gamePage.calendar.day >= 75);
 
   if (!iswood || (!iswinter && !isautum)) {
-    // console.log('crafting', name);
     gamePage.craftAll(name);
   }
 };
@@ -286,13 +285,13 @@ const kittycheatTabUnlock = (tab) => {
           return count + kittycheatSpanClick(btn.model.metadata.label);
         }
       } catch (e) {
-        console.error(e);
+        console.error(tab.tabName, e);
       }
 
       return count;
     }, 0);
   } catch (e) {
-    console.error(e);
+    console.error(tab.tabName, e);
   }
 
   return 0;
@@ -345,14 +344,14 @@ const kittycheatTabBuild = (tab) => {
         try {
           return count + kittycheatBuildButtonClick(child.model);
         } catch (e) {
-          console.error(e);
+          console.error(tab.tabName, e);
         }
 
         return count;
       }, 0);
     }, 0);
   } catch (e) {
-    console.error(e);
+    console.error(tab.tabName, e);
   }
 
   return 0;
