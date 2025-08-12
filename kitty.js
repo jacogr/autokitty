@@ -343,6 +343,11 @@ const kittycheatTabBuild = (tab) => {
     return areas.reduce((count, area) => {
       return count + area.children.reduce((count, child) => {
         try {
+          // for trade, first see if we can explore
+          if (tab.exploreBtn) {
+            kittycheatSpanClick('Send explorers');
+          }
+          
           return count + kittycheatBuildButtonClick(child?.model);
         } catch (e) {
           console.error(tab.tabName, e);
