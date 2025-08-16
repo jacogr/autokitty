@@ -5,7 +5,8 @@ const $ = window.$;
 const isMax = {
   'buildings': false,
   'resources': true,
-  'upgrades': true
+  'upgrades': true,
+  'x10': false
 };
 
 const kittycheatSpanClick = (label) => {
@@ -261,7 +262,7 @@ const kittycheatMaxFill = () => {
   }
 
   game.resPool.resources.forEach((res) => {
-    const max = res.maxValue * (['faith', 'manpower'].includes(res.name) ? 10 : 1);
+    const max = res.maxValue * ((isMax.x10 || ['faith', 'manpower'].includes(res.name)) ? 10 : 1);
     const isFillable = !!(max && res.visible && res.unlocked && res.value < max && !['zebras'].includes(res.name));
 
     if (isFillable) {
