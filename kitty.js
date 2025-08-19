@@ -263,7 +263,7 @@ const kittycheatMaxFill = () => {
 
   game.resPool.resources.forEach((res) => {
     const max = res.maxValue * ((isMax.x10 || ['faith', 'manpower'].includes(res.name)) ? 10 : 1);
-    const isFillable = !!(max && res.visible && res.unlocked && res.value < max && !['zebras'].includes(res.name));
+    const isFillable = !!(max && res.visible && res.unlocked && res.value < max && !['kittens', 'zebras'].includes(res.name));
 
     if (isFillable) {
       res.value = max;
