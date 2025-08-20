@@ -521,6 +521,12 @@ const kittycheatOpts = {
       res: { 'uranium': 250 },
       active: true
     },
+    'bloodstone': {
+      res: { 'timeCrystal': 5000, 'relic': 10000 }
+    },
+    'tMythril': { 
+      res: { 'bloodstone': 5 }
+    },
     'feeding': {
       res: { 'necrocorn': 1 },
       func: () => {
