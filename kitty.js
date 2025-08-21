@@ -320,7 +320,8 @@ const kittycheatBuildButtonClick = (model) => {
 
   // at least something with a max
   const firstMax = model.prices.find((p) =>
-    game.resPool.resources.find((r) => r.name === p.name).maxValue > 0
+    // we also don't want to use zebra stuff
+    game.resPool.resources.find((r) => r.name === p.name && !['bloodstone', 'ivory', 'tMythril'].includes(r.name)).maxValue > 0
   );
 
   // something needs a max
@@ -344,12 +345,14 @@ const kittycheatTabBuild = (tab) => {
     return areas.reduce((count, area) => {
       return count + area.children.reduce((count, child) => {
         try {
+          const result = kittycheatBuildButtonClick(child?.model);
+          
           // for trade, first explore - some ui nigglies which this unlocks
-          if (tab.exploreBtn) {
+          if (result && tab.exploreBtn) {
             kittycheatSpanClick(tab.exploreBtn.model.name);
           }
           
-          return count + kittycheatBuildButtonClick(child?.model);
+          return count + result;
         } catch (e) {
           console.error(tab.tabName, e);
         }
