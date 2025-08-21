@@ -320,8 +320,8 @@ const kittycheatBuildButtonClick = (model) => {
 
   // at least something with a max
   const firstMax = model.prices.find((p) =>
-    // we also don't want to use zebra stuff
-    game.resPool.resources.find((r) => r.name === p.name && !['bloodstone', 'ivory', 'tMythril'].includes(r.name)).maxValue > 0
+    !['bloodstone', 'ivory', 'tMythril'].includes(p.name) &&
+    game.resPool.resources.find((r) => r.name === p.name).maxValue > 0
   );
 
   // something needs a max
