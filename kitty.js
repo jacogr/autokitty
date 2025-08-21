@@ -283,7 +283,7 @@ const kittycheatTabUnlock = (tab) => {
 
     return buttons.reduce((count, btn) => {
       try {
-        if (btn && btn.model && btn.model.enabled && btn.model.visible && btn.model.metadata && !btn.model.prices.find((p) => p.name === 'void')) {
+        if (btn && btn.model && btn.model.enabled && btn.model.visible && btn.model.metadata && !btn.model.prices.find((p) => ['void'].includes(p.name))) {
           return count + kittycheatSpanClick(btn.model.metadata.label);
         }
       } catch (e) {
@@ -301,7 +301,7 @@ const kittycheatTabUnlock = (tab) => {
 
 const kittycheatBuildButtonClick = (model) => {
   // don't buy upgradable buildings or invisible or switched off
-  if (!model || !model.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val) || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
+  if (!model || !model.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val) || model.stageLinks?.find((l) => l.enabled && l.title === '^') || model.prices.find((p) => ['bloodstone'].includes(p.name))) {
     return 0;
   }
 
@@ -320,7 +320,6 @@ const kittycheatBuildButtonClick = (model) => {
 
   // at least something with a max
   const firstMax = model.prices.find((p) =>
-    !['bloodstone', 'ivory', 'tMythril'].includes(p.name) &&
     game.resPool.resources.find((r) => r.name === p.name).maxValue > 0
   );
 
