@@ -304,20 +304,23 @@ const kittycheatTabUnlock = (tab) => {
 
 const kittycheatBuildButtonClick = (model) => {
   // don't buy upgradable buildings or invisible or switched off
-  if (!model || !model.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val) || model.stageLinks?.find((l) => l.enabled && l.title === '^') || model.prices.find((p) => ['bloodstone', 'ivory', 'tMythril'].includes(p.name))) {
+  if (!model || !model.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val) || model.stageLinks?.find((l) => l.enabled && l.title === '^')) {
     return 0;
   }
 
   // max resources
   kittycheatMaxFill();
 
-  // get first unaffordable price
-  const firstLow = model.prices.find((p) =>
+  // get first invalid price
+  const firstInvalid = model.prices.find((p) =>
+    // always flag zebra resources
+    ['bloodstone', 'tMythril'].includes(p.name) ||
+    // unaffordable
     game.resPool.resources.find((r) => r.name === p.name).value < p.val
   );
 
   // ensure we have enough of everything
-  if (firstLow) {
+  if (firstInvalid) {
     return 0;
   }
 
