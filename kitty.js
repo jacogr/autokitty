@@ -32,7 +32,8 @@ const kittycheatCombust = () => {
   const curCount = Math.ceil(game.time.heat / combustDiv);
   const count = maxCount - curCount;
 
-  for (let i = 0; i < count; i++) {
+  // for (let i = 0; i < count; i++) {
+  if (count > 0) {
     gamePage.timeTab.cfPanel.children[0].children[0].model[combustCycle].handler.call(gamePage.timeTab.cfPanel.children[0].children[0]);
   }
 };
