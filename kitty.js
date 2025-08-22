@@ -15,7 +15,12 @@ const combustDiv = combustCycles[combustCycle] * 10;
 
 const kittycheatSpanClick = (label) => {
   try {
-    $(`span:contains(${label})`).click();
+    // $(`span:contains(${label})`).click();
+    $('span')
+      .filter(function() { 
+        return $(this).text().indexOf(label) === 0;
+      })
+      .click();
     
     return 1;
   } catch {
