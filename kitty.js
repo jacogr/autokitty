@@ -319,8 +319,7 @@ const kittycheatBuildButtonClick = (model) => {
   // get first invalid price
   const firstInvalid = model.prices.find((p) =>
     // always flag zebra resources
-    ['bloodstone', 'tMythril'].includes(p.name) ||
-    // unaffordable
+    // ['bloodstone', 'tMythril'].includes(p.name) ||
     game.resPool.resources.find((r) => r.name === p.name).value < p.val
   );
 
