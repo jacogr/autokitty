@@ -28,10 +28,12 @@ const kittycheatCombust = () => {
 
   gamePage.timeTab.render();
 
-  const count = Math.floor(game.getEffect('heatMax') / (45 * 5));
+  const cycles = { tenErasLink: 500, previousCycleLink: 45, nextCycleLink: 5 };
+  const cycle = 'previousCycleLink';
+  const count = Math.floor(game.getEffect('heatMax') / (cycles[cycle] * 5));
 
   for (let i = 0; i < count; i++) {
-    gamePage.timeTab.cfPanel.children[0].children[0].model.nextCycleLink.handler.call(gamePage.timeTab.cfPanel.children[0].children[0]);
+    gamePage.timeTab.cfPanel.children[0].children[0].model[cycle].handler.call(gamePage.timeTab.cfPanel.children[0].children[0]);
   }
 };
 
