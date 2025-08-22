@@ -35,7 +35,7 @@ const kittycheatSpanClick = (label) => {
 const kittycheatCombust = () => {
   gamePage.timeTab.render();
 
-  const cyles = Object
+  const cycles = Object
     .entries(combustCycles)
     .map(([cycle, div]) => ({ cycle, count: Math.floor(((game.getEffect('heatMax') - game.time.heat) / div) / 10) }))
     .filter(({ count }) => count > 0)
