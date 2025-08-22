@@ -261,12 +261,12 @@ const kittycheatMaxFill = () => {
     return;
   }
 
-  game.resPool.resources.forEach((res) => {
-    const max = res.maxValue * ((isMax.x10 || ['faith', 'manpower'].includes(res.name)) ? 10 : 1);
-    const isFillable = !!(max && res.visible && res.unlocked && res.value < max && !['kittens', 'zebras'].includes(res.name));
+  game.resPool.resources.forEach((r) => {
+    const max = r.maxValue * ((isMax.x10 || ['faith', 'manpower'].includes(r.name)) ? 10 : 1);
+    const isFillable = !!(max && r.visible && r.unlocked && r.value < max && !['kittens', 'zebras'].includes(r.name));
 
     if (isFillable) {
-      res.value = max;
+      r.value = max;
     }
   });
 };
@@ -301,14 +301,14 @@ const kittycheatTabUnlock = (tab) => {
 
 const kittycheatBuildButtonClick = (model) => {
   // don't buy upgradable buildings or invisible or switched off
-  if (!model || !model.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val) || model.stageLinks?.find((l) => l.enabled && l.title === '^') || model.prices.find((p) => ['bloodstone', 'tMythril'].includes(p.name))) {
+  if (!model || !model.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val) || model.stageLinks?.find((l) => l.enabled && l.title === '^') || model.prices.find((p) => ['bloodstone', 'ivory', 'tMythril'].includes(p.name))) {
     return 0;
   }
 
   // max resources
   kittycheatMaxFill();
 
-  // get all invalid prices
+  // get first unaffordable price
   const firstLow = model.prices.find((p) =>
     game.resPool.resources.find((r) => r.name === p.name).value < p.val
   );
@@ -346,7 +346,7 @@ const kittycheatTabBuild = (tab) => {
         try {
           const result = kittycheatBuildButtonClick(child?.model);
           
-          // for trade, first explore - some ui nigglies which this unlocks
+          // for trade, explore after click - some ui nigglies which this unlocks
           if (result && tab.exploreBtn) {
             kittycheatSpanClick(tab.exploreBtn.model.name);
           }
