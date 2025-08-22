@@ -9,9 +9,11 @@ const isMax = {
   'x10': false
 };
 
-const combustCycles = { tenErasLink: 500, previousCycleLink: 45, nextCycleLink: 5 };
-const combustCycle = 'previousCycleLink';
-const combustDiv = combustCycles[combustCycle] * 10;
+const combustCycles = { 
+  tenErasLink: 500,
+  previousCycleLink: 45,
+  nextCycleLink: 5
+};
 
 const kittycheatSpanClick = (label) => {
   try {
@@ -32,14 +34,20 @@ const kittycheatSpanClick = (label) => {
 
 const kittycheatCombust = () => {
   gamePage.timeTab.render();
-  
-  const maxCount = Math.floor(game.getEffect('heatMax') / combustDiv);
-  const curCount = Math.ceil(game.time.heat / combustDiv);
-  const count = maxCount - curCount;
 
-  // for (let i = 0; i < count; i++) {
-  if (count > 0) {
-    gamePage.timeTab.cfPanel.children[0].children[0].model[combustCycle].handler.call(gamePage.timeTab.cfPanel.children[0].children[0]);
+  const cyles = Object
+    .entries(combustCycles)
+    .map(([cycle, div]) => {
+      const max = Math.floor(game.getEffect('heatMax') / (div * 10));
+      const now = Math.ceil(game.time.heat / (div * 10));
+
+      return { cycle, count: max - now };
+    })
+    .filter(({ count }) => count > 0)
+    .map(({ cycle }) => cycle);
+  
+  if (cycles.length) {
+    gamePage.timeTab.cfPanel.children[0].children[0].model[cycles[0]].handler.call(gamePage.timeTab.cfPanel.children[0].children[0]);
   }
 };
 
