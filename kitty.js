@@ -37,12 +37,7 @@ const kittycheatCombust = () => {
 
   const cyles = Object
     .entries(combustCycles)
-    .map(([cycle, div]) => {
-      const max = Math.floor(game.getEffect('heatMax') / (div * 10));
-      const now = Math.ceil(game.time.heat / (div * 10));
-
-      return { cycle, count: max - now };
-    })
+    .map(([cycle, div]) => ({ cycle, count: Math.floor(((game.getEffect('heatMax') - game.time.heat) / div) / 10) }))
     .filter(({ count }) => count > 0)
     .map(({ cycle }) => cycle);
   
