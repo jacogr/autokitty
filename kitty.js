@@ -267,14 +267,14 @@ const kittycheatBtnClick = (btn, name, opts) => {
   kittycheatExec(name, opts);
 };
 
-const kittycheatMaxFill = () => {
-  if (!isMax.resources) {
+const kittycheatMaxFill = (name = null) => {
+  if (!isMax.resources && !name) {
     return;
   }
 
   game.resPool.resources.forEach((r) => {
     const max = r.maxValue * ((isMax.x10 || ['faith', 'manpower'].includes(r.name)) ? 10 : 1);
-    const isFillable = !!(max && r.visible && r.unlocked && r.value < max && !['kittens', 'zebras'].includes(r.name));
+    const isFillable = !!max && r.visible && r.unlocked && r.value < max && !['kittens', 'zebras'].includes(r.name) && (!name || r.name === name);
 
     if (isFillable) {
       r.value = max;
@@ -449,22 +449,38 @@ const kittycheatOpts = {
   },
   'actions': {
     'catnip': {
-      func: () => { kittycheatSpanClick('Gather catnip'); },
+      func: () => { 
+        kittycheatSpanClick('Gather catnip');
+      },
       active: true,
       delay: 5
     },
+    'refine': {
+      func: () => { 
+        kittycheatMaxFill('catnip');
+        kittycheatSpanClick('Refine catnip');
+      },
+      active: true,
+      delay: 1000
+    },
     'observe': {
-      func: () => { $('input#observeBtn').click(); },
+      func: () => { 
+        $('input#observeBtn').click();
+      },
       active: true,
       delay: 50
     },
     'praise': {
-      func: () => { gamePage.religion.praise(); },
+      func: () => {
+        gamePage.religion.praise();
+      },
       active: true,
       delay: 50
     },
     'hunt': {
-      func: () => { gamePage.village.huntAll(); },
+      func: () => {
+        gamePage.village.huntAll();
+      },
       active: true,
       delay: 250
     },
@@ -542,7 +558,7 @@ const kittycheatOpts = {
     'tMythril': { 
       res: { 'bloodstone': 5 }
     },
-    'feeding': {
+    /*'feeding': {
       res: { 'necrocorn': 1 },
       func: () => {
         if (gamePage.resPool.get('necrocorn').value > 0) {
@@ -557,7 +573,7 @@ const kittycheatOpts = {
           });
         }
       }
-    }
+    }*/
   }
 };
 
