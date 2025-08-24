@@ -321,8 +321,6 @@ const kittycheatBuildButtonClick = (model) => {
 
   // get first invalid price
   const firstInvalid = model.prices.find((p) =>
-    // always flag zebra resources
-    // ['bloodstone', 'tMythril'].includes(p.name) ||
     game.resPool.resources.find((r) => r.name === p.name).value < p.val
   );
 
@@ -336,8 +334,8 @@ const kittycheatBuildButtonClick = (model) => {
     game.resPool.resources.find((r) => r.name === p.name).maxValue > 0
   );
 
-  // something needs a max
-  if (!firstMax) {
+  // without a max, we only build a single
+  if (!firstMax && model.metadata.on >= 1) {
     return 0;
   }
 
