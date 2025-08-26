@@ -34,16 +34,16 @@ const kittycheatSpanClick = (label) => {
 const kittycheatCombust = () => {
   gamePage.timeTab.render();
 
-  const cycles = Object
+  const cycle = Object
     .entries(combustCycles)
     .map(([cycle, div]) => ({ cycle, count: Math.floor(((game.getEffect('heatMax') - game.time.heat) / div) / 10) }))
     .filter(({ count }) => count > 0)
-    .map(({ cycle }) => cycle);
+    .map(({ cycle }) => cycle)[0];
   
-  if (cycles.length) {
+  if (cycle) {
     const btn = gamePage.timeTab.cfPanel.children[0].children[0];
     
-    btn.model[cycles[0]].handler.call(btn);
+    btn.model[cycle].handler.call(btn);
   }
 };
 
@@ -205,12 +205,13 @@ const kittycheatUnicorns = (log = false) => {
 const kittycheatHasResource = (vals, isTrade) => {
   let cando = true;
 
-  Object.keys(vals).forEach((name) => {
-    const res = gamePage.resPool.get(name);
+  Object.entries(vals).forEach(([key, val]) => {
+    const res = gamePage.resPool.get(key);
 
-    if (vals[name].value) {
-      cando = cando && (res.value >= vals[name].value);
+    if (val.value) {
+      cando = cando && (res.value >= val.value);
     }
+    
     if (!isTrade && res.maxValue > 0) {
       cando = cando && ((res.value / res.maxValue) >= 0.05);
     }
@@ -239,6 +240,7 @@ const kittycheatTrade = (name) => {
   }
 
   gamePage.diplomacyTab.render();
+  
   gamePage.tabs.forEach((tab) => {
     if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
       tab.racePanels.forEach((panel) => {
@@ -281,10 +283,14 @@ const kittycheatExec = (name, opts) => {
 };
 
 const kittycheatBtnStyle = (btn, opts) => {
-  btn.css({
+  return btn.css({
     'background': opts.active ? 'red' : 'white',
     'color': opts.active ? 'white' : 'black'
   });
+};
+
+const kittycheatDivStyle = (div) => {
+  return div.css({ 'margin-bottom': '20px' });
 };
 
 const kittycheatBtnClick = (btn, name, opts) => {
@@ -604,9 +610,8 @@ const kittycheatOpts = {
   }
 };
 
-const kittycheatContCss = { 'margin-bottom': '20px' };
 const kittycheatCont = $('<div></div>').css({ 'padding-bottom': '100px' });
-const kittyIwGroup = $('<div></div>').css(kittycheatContCss);
+const kittyIwGroup = kittycheatDivStyle($('<div></div>'));
 
 $('div#leftColumn').append(kittycheatCont);
 
@@ -614,8 +619,8 @@ kittycheatCont.append(kittyIwGroup);
 
 // add groups for all the options
 Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
-  const kittycheatGroup = $('<div></div>').css(kittycheatContCss);
-  const kittycheatActs = $('<div></div>').css({});
+  const kittycheatGroup = kittycheatDivStyle($('<div></div>'));
+  const kittycheatActs = $('<div></div>');
 
   kittycheatCont.append(kittycheatGroup);
   kittycheatGroup.append(kittycheatActs);
@@ -623,12 +628,12 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
   Object.entries(group).forEach(([optname, opts]) => {
     opts.active = opts.active || false;
 
-    const btn = $(`<button>${optname}</button>`).click(() => {
-      kittycheatBtnClick(btn, optname, opts);
-    });
-
-    kittycheatActs.append(btn);
-    kittycheatBtnStyle(btn, opts);
+    kittycheatActs.append(
+      kittycheatBtnStyle(
+        $(`<button>${optname}</button>`).click(() => {
+          kittycheatBtnClick(btn, optname, opts);
+        }), opts)
+    );
 
     if (opts.delay) {
       setInterval(() => {
@@ -655,11 +660,10 @@ Object.keys(isMax).forEach((id) => {
     kittycheatBtnStyle(btn, { active: isMax[id] });
   });
 
-  kittycheatBtnStyle(btn, { active: isMax[id] });
-  kittyIwGroup.append(btn);
+  kittyIwGroup.append(kittycheatBtnStyle(btn, { active: isMax[id] }));
 });
 
-kittycheatCont.append($('<div id="kittycheatUnicorn"></div>').css(kittycheatContCss));
+kittycheatCont.append(kittycheatDivStyle($('<div id="kittycheatUnicorn"></div>')));
 
 setInterval(() => {
   Object.values(kittycheatOpts).forEach((group) => {
