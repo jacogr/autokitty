@@ -51,7 +51,11 @@ const kittycheatUnicorns = (log = false) => {
   
   try {
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
-    const unicornPastureImpl = gamePage.bld.getBuildingExt('unicornPasture');
+    const pastureImpl = gamePage.bld.getBuildingExt('unicornPasture');
+
+    if (!pastureImpl) {
+      return;
+    }
 
     // How many unicorns are produced per second.
     const unicornsPerSecondBase = gamePage.getEffect('unicornsPerTickBase') * gamePage.getTicksPerSecondUI();
@@ -79,9 +83,14 @@ const kittycheatUnicorns = (log = false) => {
     }
 
     const unicornsPerSecond = unicornsPerSecondBase * globalRatio * religionRatio * paragonRatio * faithBonus * cycleBonus;
+    const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
+
+    if (!zigImpl) {
+      return;
+    }
 
     // Based on how many ziggurats we have.
-    const zigguratRatio = Math.max(gamePage.bld.getBuildingExt('ziggurat').meta.on, 1);
+    const zigguratRatio = Math.max(zigImpl.meta.on, 1);
     
     // How many unicorns do we receive in a unicorn rift?
     const baseUnicornsPerRift = 500 * (1 + gamePage.getEffect('unicornsRatioReligion') * 0.1);
@@ -100,13 +109,23 @@ const kittycheatUnicorns = (log = false) => {
     // by its effect on production of unicorns.
 
     let bestAmortization = Number.POSITIVE_INFINITY;
-    const unicornsPerTickBase = gamePage.bld.getBuildingExt('unicornPasture').meta.effects?.unicornsPerTickBase;
+    const unicornsPerTickBase = pastureImpl.meta.effects?.unicornsPerTickBase;
+
+    if (!unicornsPerTickBase) {
+      return;
+    }
+    
     const pastureProduction = unicornsPerTickBase * gamePage.getTicksPerSecondUI() * globalRatio * religionRatio * paragonRatio * faithBonus * cycleBonus;
 
     // If the unicorn pasture amortizes itself in less than infinity ticks,
     // set it as the default. This is likely to protect against cases where
     // production of unicorns is 0.
-    const pastureAmortization = unicornPastureImpl.model?.prices[0].val / pastureProduction;
+    const pastureAmortization = pastureImpl.model?.prices[0].val / pastureProduction;
+
+    if (!pastureAmortization) {
+      return;
+    }
+    
     let bestBuilding = null;
     
     if (pastureAmortization < bestAmortization) {
@@ -588,8 +607,6 @@ const kittyIwGroup = $('<div></div>').css(kittycheatContCss);
 
 $('div#leftColumn').append(kittycheatCont);
 
-kittycheatCont.append(kittyIwGroup);
-
 // add groups for all the options
 Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
   const kittycheatGroup = $('<div></div>').css(kittycheatContCss);
@@ -625,6 +642,8 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
     }
   });
 });
+
+kittycheatCont.append(kittyIwGroup);
 
 // building setup
 Object.keys(isMax).forEach((id) => {
