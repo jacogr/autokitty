@@ -443,6 +443,79 @@ const kittycheatFeed = () => {
 };
 
 const kittycheatOpts = {
+  'crafting': {
+    //'wood': {
+    //  res: { 'catnip': 250 }
+    //},
+    'beam': {
+      res: { 'wood': 250 },
+      active: true
+    },
+    'slab': {
+      res: { 'minerals': 250 },
+      active: true
+    },
+    'steel': {
+      res: { 'coal': 100 },
+      active: true
+    },
+    'plate': {
+      res: { 'iron': 125 },
+      active: true
+    },
+    'gear': {
+      res: { 'steel': 15 }
+    },
+    'concrate': {
+      res: { 'steel': 25 }
+    },
+    'alloy': {
+      res: { 'titanium': 10 }
+    },
+    'parchment': {
+      res: { 'furs': 175 },
+      active: true
+    },
+    'manuscript': {
+      res: { 'parchment': 25, 'culture': 400 }
+    },
+    'compedium': {
+      res: { 'manuscript': 50, 'science': 10000 }
+    },
+    'blueprint': {
+      res: { 'compedium': 25, 'science': 25000 }
+    },
+    'kerosene': {
+      res: { 'oil': 7500 },
+      active: true
+    },
+    'megalith': {
+      res: { 'beam': 2500 }
+    },
+    'scaffold': {
+      res: { 'beam': 50 }
+    },
+    'ship': {
+      res: { 'starchart': 25 }
+    },
+    'eludium': {
+      res: { 'unobtainium': 1000, 'alloy': 2500 }
+    },
+    'thorium': {
+      res: { 'uranium': 250 },
+      active: true
+    },
+    'bloodstone': {
+      res: { 'timeCrystal': 5000, 'relic': 10000 }
+    },
+    'tMythril': { 
+      res: { 'bloodstone': 5 }
+    },
+    /*'feeding': {
+      res: { 'necrocorn': 1 },
+      func: kittycheatFeed
+    }*/
+  },
   'trading': {
     'leviathans': {
       res: { 'unobtainium': 5000 },
@@ -529,79 +602,6 @@ const kittycheatOpts = {
       active: false,
       delay: 1500
     }
-  },
-  'crafting': {
-    //'wood': {
-    //  res: { 'catnip': 250 }
-    //},
-    'beam': {
-      res: { 'wood': 250 },
-      active: true
-    },
-    'slab': {
-      res: { 'minerals': 250 },
-      active: true
-    },
-    'steel': {
-      res: { 'coal': 100 },
-      active: true
-    },
-    'plate': {
-      res: { 'iron': 125 },
-      active: true
-    },
-    'gear': {
-      res: { 'steel': 15 }
-    },
-    'concrate': {
-      res: { 'steel': 25 }
-    },
-    'alloy': {
-      res: { 'titanium': 10 }
-    },
-    'parchment': {
-      res: { 'furs': 175 },
-      active: true
-    },
-    'manuscript': {
-      res: { 'parchment': 25, 'culture': 400 }
-    },
-    'compedium': {
-      res: { 'manuscript': 50, 'science': 10000 }
-    },
-    'blueprint': {
-      res: { 'compedium': 25, 'science': 25000 }
-    },
-    'kerosene': {
-      res: { 'oil': 7500 },
-      active: true
-    },
-    'megalith': {
-      res: { 'beam': 2500 }
-    },
-    'scaffold': {
-      res: { 'beam': 50 }
-    },
-    'ship': {
-      res: { 'starchart': 25 }
-    },
-    'eludium': {
-      res: { 'unobtainium': 1000, 'alloy': 2500 }
-    },
-    'thorium': {
-      res: { 'uranium': 250 },
-      active: true
-    },
-    'bloodstone': {
-      res: { 'timeCrystal': 5000, 'relic': 10000 }
-    },
-    'tMythril': { 
-      res: { 'bloodstone': 5 }
-    },
-    /*'feeding': {
-      res: { 'necrocorn': 1 },
-      func: kittycheatFeed
-    }*/
   }
 };
 
@@ -610,6 +610,8 @@ const kittycheatCont = $('<div></div>').css({ 'padding-bottom': '100px' });
 const kittyIwGroup = $('<div></div>').css(kittycheatContCss);
 
 $('div#leftColumn').append(kittycheatCont);
+
+kittycheatCont.append(kittyIwGroup);
 
 // add groups for all the options
 Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
@@ -646,8 +648,6 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
     }
   });
 });
-
-kittycheatCont.append(kittyIwGroup);
 
 // building setup
 Object.keys(isMax).forEach((id) => {
