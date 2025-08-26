@@ -17,7 +17,6 @@ const combustCycles = {
 
 const kittycheatSpanClick = (label) => {
   try {
-    // $(`span:contains(${label})`).click();
     $('span')
       .filter(function() { 
         return $(this).text().indexOf(label) === 0;
@@ -42,7 +41,9 @@ const kittycheatCombust = () => {
     .map(({ cycle }) => cycle);
   
   if (cycles.length) {
-    gamePage.timeTab.cfPanel.children[0].children[0].model[cycles[0]].handler.call(gamePage.timeTab.cfPanel.children[0].children[0]);
+    const btn = gamePage.timeTab.cfPanel.children[0].children[0];
+    
+    btn.model[cycles[0]].handler.call(btn);
   }
 };
 
@@ -69,8 +70,7 @@ const kittycheatUnicorns = (log = false) => {
     // Bonus from collected faith.
     const faithBonus = gamePage.religion.getSolarRevolutionRatio() + 1;
 
-    const currentCycleIndex = gamePage.calendar.cycle;
-    const currentCycle = gamePage.calendar.cycles[currentCycleIndex];
+    const currentCycle = gamePage.calendar.cycles[gamePage.calendar.cycle];
 
     // The modifier applied by the current cycle and holding a festival.
     let cycleBonus = 1;
