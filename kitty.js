@@ -591,16 +591,13 @@ const kittycheatOpts = {
   }
 };
 
-const kittycheatCont = $('<div></div>').css({
-  'padding-bottom': '100px'
-});
+const kittycheatContCss = { 'margin-bottom': '20px' };
+const kittycheatCont = $('<div></div>').css({ 'padding-bottom': '100px' });
 
 $('div#leftColumn').append(kittycheatCont);
 
 Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
-  const kittycheatGroup = $('<div></div>').css({
-    'margin-bottom': '20px'
-  });
+  const kittycheatGroup = $('<div></div>').css(kittycheatContCss);
   const kittycheatActs = $('<div></div>').css({});
 
   kittycheatCont.append(kittycheatGroup);
@@ -634,9 +631,6 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
   });
 });
 
-kittycheatCont.append($('<div id="kittycheatUnicorn"></div>'));
-setInterval(kittycheatUnicorns, 250);
-
 setInterval(() => {
   Object.values(kittycheatOpts).forEach((group) => {
     Object.entries(group).forEach(([optname, opts]) => {
@@ -648,12 +642,10 @@ setInterval(() => {
   kittycheatMaxFill();
 }, 250);
 
-const kittyIwGroup = $('<div></div>').css({
-  // 'padding-top': '80px',
-  'margin-bottom': '20px'
-});
+const kittyIwGroup = $('<div></div>').css(kittycheatContCss);
 
 kittycheatCont.append(kittyIwGroup);
+kittycheatCont.append($('<div id="kittycheatUnicorn"></div>').css(kittycheatContCss));
 
 Object.keys(isMax).forEach((id) => {
   const btn = $(`<button>${id}</button>`).click(() => {
@@ -664,5 +656,7 @@ Object.keys(isMax).forEach((id) => {
   kittycheatBtnStyle(btn, { active: isMax[id] });
   kittyIwGroup.append(btn);
 });
+
+setInterval(kittycheatUnicorns, 250);
 
 kittycheatBuildAll();
