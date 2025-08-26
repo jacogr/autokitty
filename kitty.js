@@ -110,7 +110,6 @@ const kittycheatUnicorns = (log = false) => {
     // We now want to determine how quickly the cost of given building is neutralized
     // by its effect on production of unicorns.
 
-    let bestAmortization = Number.POSITIVE_INFINITY;
     const unicornsPerTickBase = pastureImpl.meta.effects?.unicornsPerTickBase;
 
     if (!unicornsPerTickBase) {
@@ -126,15 +125,15 @@ const kittycheatUnicorns = (log = false) => {
     const pastureAmortization = pastureImpl.model?.prices[0].val / pastureProduction;
 
     if (!pastureAmortization) {
-      console.log('Unicorns: No pasture returns');
-      return;
+      console.log('Unicorns: No pasture amortization');
+      // return;
     }
-    
-    let bestBuilding = null;
+
+    let bestAmortization = Number.POSITIVE_INFINITY;
+    let bestBuilding = 'unicornPasture';
     
     if (pastureAmortization < bestAmortization) {
       bestAmortization = pastureAmortization;
-      bestBuilding = 'unicornPasture';
     }
 
     for (let i = 0; i < validBuildings.length; i++) {
@@ -196,7 +195,7 @@ const kittycheatUnicorns = (log = false) => {
       }
     }
 
-    $('div#kittycheatUnicorn').html(`Unicorns: ${bestBuilding || 'unicornPasture'}`);
+    $('div#kittycheatUnicorn').html(`Unicorns: ${bestBuilding}`);
   } catch (e) {
     console.error(e);
     $('div#kittycheatUnicorn').html('Unicorns: unable to calculate');
