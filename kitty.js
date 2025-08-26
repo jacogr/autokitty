@@ -54,6 +54,7 @@ const kittycheatUnicorns = (log = false) => {
     const pastureImpl = gamePage.bld.getBuildingExt('unicornPasture');
 
     if (!pastureImpl) {
+      console.log('Unicorns: No pastures');
       return;
     }
 
@@ -86,6 +87,7 @@ const kittycheatUnicorns = (log = false) => {
     const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
 
     if (!zigImpl) {
+      console.log('Unicorns: No ziggurats');
       return;
     }
 
@@ -112,6 +114,7 @@ const kittycheatUnicorns = (log = false) => {
     const unicornsPerTickBase = pastureImpl.meta.effects?.unicornsPerTickBase;
 
     if (!unicornsPerTickBase) {
+      console.log('Unicorns: No ticks per base');
       return;
     }
     
@@ -123,6 +126,7 @@ const kittycheatUnicorns = (log = false) => {
     const pastureAmortization = pastureImpl.model?.prices[0].val / pastureProduction;
 
     if (!pastureAmortization) {
+      console.log('Unicorns: No pasture returns');
       return;
     }
     
