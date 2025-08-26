@@ -140,7 +140,7 @@ const kittycheatUnicorns = (log = false) => {
       const building = validBuildings[i];
       const buildingImpl = gamePage.tabs[5].zgUpgradeButtons[i];
 
-      if (!buildingImpl.model.metadata.unlocked) {
+      if (!buildingImpl?.model.metadata.unlocked) {
         continue;
       }
 
