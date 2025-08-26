@@ -53,7 +53,7 @@ const kittycheatUnicorns = (log = false) => {
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
     const pastureImpl = gamePage.bld.getBuildingExt('unicornPasture');
 
-    if (!pastureImpl) {
+    if (!pastureImpl?.meta.unlocked) {
       console.log('Unicorns: No pastures');
       return;
     }
