@@ -587,8 +587,8 @@ const kittyIwGroup = $('<div></div>').css(kittycheatContCss);
 $('div#leftColumn').append(kittycheatCont);
 
 kittycheatCont.append(kittyIwGroup);
-kittycheatCont.append($('<div id="kittycheatUnicorn"></div>').css(kittycheatContCss));
 
+// add groups for all the options
 Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
   const kittycheatGroup = $('<div></div>').css(kittycheatContCss);
   const kittycheatActs = $('<div></div>').css({});
@@ -624,6 +624,19 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
   });
 });
 
+// building setup
+Object.keys(isMax).forEach((id) => {
+  const btn = $(`<button>${id}</button>`).click(() => {
+    isMax[id] = !isMax[id];
+    kittycheatBtnStyle(btn, { active: isMax[id] });
+  });
+
+  kittycheatBtnStyle(btn, { active: isMax[id] });
+  kittyIwGroup.append(btn);
+});
+
+kittycheatCont.append($('<div id="kittycheatUnicorn"></div>').css(kittycheatContCss));
+
 setInterval(() => {
   Object.values(kittycheatOpts).forEach((group) => {
     Object.entries(group).forEach(([optname, opts]) => {
@@ -636,15 +649,5 @@ setInterval(() => {
 }, 100);
 
 setInterval(kittycheatUnicorns, 250);
-
-Object.keys(isMax).forEach((id) => {
-  const btn = $(`<button>${id}</button>`).click(() => {
-    isMax[id] = !isMax[id];
-    kittycheatBtnStyle(btn, { active: isMax[id] });
-  });
-
-  kittycheatBtnStyle(btn, { active: isMax[id] });
-  kittyIwGroup.append(btn);
-});
 
 kittycheatBuildAll();
