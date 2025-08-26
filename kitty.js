@@ -628,12 +628,11 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
   Object.entries(group).forEach(([optname, opts]) => {
     opts.active = opts.active || false;
 
-    kittycheatActs.append(
-      kittycheatBtnStyle(
-        $(`<button>${optname}</button>`).click(() => {
-          kittycheatBtnClick(btn, optname, opts);
-        }), opts)
-    );
+    const btn = $(`<button>${optname}</button>`).click(() => {
+      kittycheatBtnClick(btn, optname, opts);
+    });
+    
+    kittycheatActs.append(kittycheatBtnStyle(btn, opts));
 
     if (opts.delay) {
       setInterval(() => {
