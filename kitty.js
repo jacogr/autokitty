@@ -405,6 +405,20 @@ const kittycheatBuildAll = () => {
   setTimeout(kittycheatBuildAll, count ? 0 : 1000);
 };
 
+const kittycheatFeed = () => {
+  if (gamePage.resPool.get('necrocorn').value > 1) {
+    gamePage.tabs.forEach((tab) => {
+      if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
+        tab.racePanels.forEach((panel) => {
+          if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
+            panel.feedBtn.domNode.click();
+          }
+        });
+      }
+    });
+  }
+};
+
 const kittycheatOpts = {
   'trading': {
     'leviathans': {
@@ -563,19 +577,7 @@ const kittycheatOpts = {
     },
     /*'feeding': {
       res: { 'necrocorn': 1 },
-      func: () => {
-        if (gamePage.resPool.get('necrocorn').value > 0) {
-          gamePage.tabs.forEach((tab) => {
-            if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
-              tab.racePanels.forEach((panel) => {
-                if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
-                  panel.feedBtn.domNode.click();
-                }
-              });
-            }
-          });
-        }
-      }
+      func: kittycheatFeed
     }*/
   }
 };
