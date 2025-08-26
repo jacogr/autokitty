@@ -635,7 +635,7 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
 });
 
 kittycheatCont.append($('<div id="kittycheatUnicorn"></div>'));
-setInterval(kittycheatUnicorns, 1000);
+setInterval(kittycheatUnicorns, 250);
 
 setInterval(() => {
   Object.values(kittycheatOpts).forEach((group) => {
