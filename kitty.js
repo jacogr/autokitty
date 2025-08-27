@@ -448,6 +448,20 @@ const kittycheatAdore = () => {
   gamePage.religionTab?.praiseBtn?.domNode.click();
 };
 
+const kittycheatTranscend = () => {
+  let log = false;
+
+  try {
+    log = game.religion.faithRatio > game.religion._getTranscendNextPrice();
+  } catch (e) {
+    console.error('kittycheatTranscend', e);
+  }
+  
+  $('div#kittycheatReligion').html(log ? 'Religion: Transcend' : '');
+    
+  setTimeout(() => kittycheatTranscend(interval), interval);
+};
+
 const kittycheatOpts = {
   'crafting': {
     //'wood': {
@@ -695,6 +709,7 @@ Object.keys(isMax).forEach((id) => {
 });
 
 kittycheatCont.append(kittycheatDivStyle($('<div id="kittycheatUnicorn"></div>')));
+kittycheatCont.append(kittycheatDivStyle($('<div id="kittycheatReligion"></div>')));
 
 // render clicky tabs at startup (as available)
 ['diplomacyTab', 'religionTab', 'timeTab'].forEach((tab) => {
@@ -708,4 +723,5 @@ kittycheatCont.append(kittycheatDivStyle($('<div id="kittycheatUnicorn"></div>')
 // start the loops
 kittycheatExecOpts(100);
 kittycheatUnicorns(500);
+kittycheatTranscend(500);
 kittycheatBuildAll(1000);
