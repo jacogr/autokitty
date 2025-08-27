@@ -21,7 +21,7 @@ const kittycheatSpanClick = (label) => {
   });
 
   if (span.length) {
-    setTimeout(() => span.click(), 0);
+    span.click();
     
     return 1;
   }
@@ -41,7 +41,7 @@ const kittycheatCombust = () => {
   if (cycle) {
     const btn = gamePage.timeTab.cfPanel.children[0].children[0];
     
-    setTimeout(() => btn.model[cycle].handler.call(btn), 0);
+    btn.model[cycle].handler.call(btn);
   }
 };
 
@@ -236,7 +236,7 @@ const kittycheatTrade = (name) => {
     if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
       tab.racePanels.forEach((panel) => {
         if (panel.race.name.toLowerCase().indexOf(name) === 0) {
-          setTimeout(() => panel.tradeBtn.tradeAllHref.link.click(), 0);
+          panel.tradeBtn.tradeAllHref.link.click();
         }
       });
     }
@@ -430,7 +430,7 @@ const kittycheatFeed = () => {
       if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
         tab.racePanels.forEach((panel) => {
           if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
-            setTimeout(() => panel.feedBtn.domNode.click(), 0);
+            panel.feedBtn.domNode.click();
           }
         });
       }
