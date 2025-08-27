@@ -53,6 +53,8 @@ const kittycheatLogUnicorns = (text) => {
 
 const kittycheatUnicorns = (interval) => {
   try {
+    const reQueue = () => setTimeout(() => kittycheatUnicorns(interval), interval);
+    
     gamePage.religionTab.render();
     
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
@@ -62,13 +64,13 @@ const kittycheatUnicorns = (interval) => {
 
     if (!pastureImpl || !pastureImpl.meta.unlocked || !pastureImpl.meta.on) {
       kittycheatLogUnicorns('No pastures built');
-      return;
+      return reQueue();
     } else if (!zigImpl || !zigImpl.meta.unlocked || !zigImpl.meta.on) {
       kittycheatLogUnicorns('No ziggurats built');
-      return;
+      return reQueue();
     } else if (!unicornsPerTickBase) {
       kittycheatLogUnicorns('No ticks per base');
-      return;
+      return reQueue();
     }
 
     // How many unicorns are produced per second.
@@ -195,7 +197,7 @@ const kittycheatUnicorns = (interval) => {
     kittycheatLogUnicorns('Unable to calculate');
   }
 
-  setTimeout(() => kittycheatUnicorns(interval), interval);
+  return reQueue();
 };
 
 const kittycheatHasResource = (vals, isTrade) => {
