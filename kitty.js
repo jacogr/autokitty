@@ -37,8 +37,6 @@ const kittycheatCombust = () => {
     .map(({ cycle }) => cycle)[0];
   
   if (cycle) {
-    // gamePage.timeTab.render();
-    
     const btn = gamePage.timeTab.cfPanel.children[0].children[0];
     
     btn.model[cycle].handler.call(btn);
@@ -52,8 +50,6 @@ const kittycheatUnicorns = (interval) => {
     
       setTimeout(() => kittycheatUnicorns(interval), interval);
     };
-    
-    // gamePage.religionTab.render();
     
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
     const pastureImpl = gamePage.bld.getBuildingExt('unicornPasture');
@@ -230,8 +226,6 @@ const kittycheatTrade = (name) => {
     gamePage.diplomacy.unlockElders();
   }
 
-  // gamePage.diplomacyTab.render();
-  
   gamePage.tabs.forEach((tab) => {
     if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
       tab.racePanels.forEach((panel) => {
