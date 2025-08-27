@@ -596,28 +596,28 @@ const kittycheatOpts = {
         $('input#observeBtn').click();
       },
       active: true,
-      delay: 50
+      delay: 25
     },
     'praise': {
       func: () => {
+        kittycheatMaxFill('faith');
         gamePage.religion.praise();
       },
       active: true,
-      delay: 50
+      delay: 25
     },
     'adore': {
-      func: () => {
-        kittycheatAdore();
-      },
+      func: kittycheatAdore,
       active: false,
       delay: 60000
     },
     'hunt': {
       func: () => {
+        kittycheatMaxFill();
         gamePage.village.huntAll();
       },
       active: true,
-      delay: 250
+      delay: 100
     },
     'tc combust': {
       func: kittycheatCombust,
