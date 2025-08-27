@@ -631,7 +631,10 @@ const kittycheatExecOpts = (interval) => {
   Object.values(kittycheatOpts).forEach((group) => {
     Object.entries(group).forEach(([optname, opts]) => {
       kittycheatMaxFill();
-      kittycheatExec(optname, opts);
+
+      if (!opts.delay) {
+        kittycheatExec(optname, opts);
+      }
     });
   });
 
