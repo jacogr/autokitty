@@ -445,16 +445,9 @@ const kittycheatFeed = () => {
 };
 
 const kittycheatAdore = () => {
-  // TAP
-  ['transcendBtn', 'adoreBtn', 'praiseBtn'].forEach((btn) => {
-    setTimeout(() => {
-      try {
-        gamePage.religionTab[btn].domNode.click();
-      } catch (e) {
-        console.error('kittycheatAdore', btn, e);
-      }
-    }, 0);
-  });
+  gamePage.religionTab?.transcendBtn?.domNode.click();
+  game.religion.resetFaith(1.01, false);
+  gamePage.religionTab?.praiseBtn?.domNode.click();
 };
 
 const kittycheatOpts = {
