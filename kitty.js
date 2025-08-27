@@ -45,13 +45,13 @@ const kittycheatCombust = () => {
   }
 };
 
-const kittycheatLogUnicorns = (text) => {
-  $('div#kittycheatUnicorn').html(`Unicorns: ${text}`);
-};
-
 const kittycheatUnicorns = (interval) => {
   try {
-    const reQueue = () => setTimeout(() => kittycheatUnicorns(interval), interval);
+    const queueExec = (log) => {
+      $('div#kittycheatUnicorn').html(`Unicorns: ${log}`);
+    
+      setTimeout(() => kittycheatUnicorns(interval), interval);
+    };
     
     gamePage.religionTab.render();
     
@@ -61,14 +61,11 @@ const kittycheatUnicorns = (interval) => {
     const unicornsPerTickBase = pastureImpl?.meta.effects?.unicornsPerTickBase;
 
     if (!pastureImpl || !pastureImpl.meta.unlocked || !pastureImpl.meta.on) {
-      kittycheatLogUnicorns('No pastures built');
-      return reQueue();
+      return queueExec('No pasture built');
     } else if (!zigImpl || !zigImpl.meta.unlocked || !zigImpl.meta.on) {
-      kittycheatLogUnicorns('No ziggurats built');
-      return reQueue();
+      return queueExec('No ziggurat built');
     } else if (!unicornsPerTickBase) {
-      kittycheatLogUnicorns('No ticks per base');
-      return reQueue();
+      return queueExec('No ticks per base');
     }
 
     // How many unicorns are produced per second.
@@ -189,13 +186,11 @@ const kittycheatUnicorns = (interval) => {
       }
     }
 
-    kittycheatLogUnicorns(bestBuilding);
+    return queueExec(bestBuilding);
   } catch (e) {
     console.error('Unicorns', e);
-    kittycheatLogUnicorns('Unable to calculate');
+    return queueExec('Unable to calculate');
   }
-
-  return reQueue();
 };
 
 const kittycheatHasResource = (vals, isTrade) => {
