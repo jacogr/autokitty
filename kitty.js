@@ -430,12 +430,31 @@ const kittycheatFeed = () => {
       if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
         tab.racePanels.forEach((panel) => {
           if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
-            panel.feedBtn.domNode.click();
+            setTimeout(() => {
+              try {
+                panel.feedBtn.domNode.click();
+              } catch (e) {
+                console.error('kittycheatFeed', e);
+              }
+            }, 0);
           }
         });
       }
     });
   }
+};
+
+const kittycheatAdore = () => {
+  // TAP
+  ['transcendBtn', 'adoreBtn', 'praiseBtn'].forEach((btn) => {
+    setTimeout(() => {
+      try {
+        gamePage[btn].domNode.click();
+      } catch (e) {
+        console.error('kittycheatAdore', btn, e);
+      }
+    }, 0);
+  });
 };
 
 const kittycheatOpts = {
@@ -586,6 +605,13 @@ const kittycheatOpts = {
       active: true,
       delay: 50
     },
+    'adore': {
+      func: () => {
+        kittycheatAdore();
+      },
+      active: true,
+      delay: 60000
+    },
     'hunt': {
       func: () => {
         gamePage.village.huntAll();
@@ -677,11 +703,11 @@ Object.keys(isMax).forEach((id) => {
 kittycheatCont.append(kittycheatDivStyle($('<div id="kittycheatUnicorn"></div>')));
 
 // render clicky tabs at startup (as available)
-['diplomacyTab', 'religionTab', 'timeTab'].forEach((tabName) => {
+['diplomacyTab', 'religionTab', 'timeTab'].forEach((tab) => {
   try {
-    gamePage[tabName].render();
+    gamePage[tab].render();
   } catch (e) {
-    console.error('initial render', tabName, e);
+    console.error('initial render', tab, e);
   }
 });
 
