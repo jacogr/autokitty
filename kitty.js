@@ -449,7 +449,7 @@ const kittycheatAdore = () => {
   ['transcendBtn', 'adoreBtn', 'praiseBtn'].forEach((btn) => {
     setTimeout(() => {
       try {
-        gamePage[btn].domNode.click();
+        gamePage.religionTab[btn].domNode.click();
       } catch (e) {
         console.error('kittycheatAdore', btn, e);
       }
