@@ -196,7 +196,7 @@ const kittycheatUnicorns = (interval) => {
 
     kittycheatLogUnicorns(bestBuilding);
   } catch (e) {
-    console.error(e);
+    console.error('Unicorns', e);
     kittycheatLogUnicorns('Unable to calculate');
   }
 
@@ -264,10 +264,10 @@ const kittycheatCraft = (name) => {
 };
 
 const kittycheatExec = (name, opts) => {
-  const vals = opts.res || {};
+  try {
+    const vals = opts.res || {};
 
-  if (opts.active && kittycheatHasResource(vals, opts.trade)) {
-    try {
+    if (opts.active && kittycheatHasResource(vals, opts.trade)) {
       if (opts.func) {
         opts.func();
       } else if (opts.trade) {
@@ -277,9 +277,9 @@ const kittycheatExec = (name, opts) => {
       } else {
         kittycheatCraft(name);
       }
-    } catch (e) {
-      console.error(name, opts, e);
     }
+  } catch (e) {
+    console.error('kittycheatExec', name, e);
   }
 };
 
@@ -332,13 +332,13 @@ const kittycheatTabUnlock = (tab) => {
           return count + kittycheatSpanClick(btn.model.metadata.label);
         }
       } catch (e) {
-        console.error(tab.tabName, e);
+        console.error('kittycheatTabUnlock', tab.tabName, e);
       }
 
       return count;
     }, 0);
   } catch (e) {
-    console.error(tab?.tabName, e);
+    console.error('kittycheatTabUnlock', tab?.tabName, e);
   }
 
   return 0;
@@ -398,14 +398,14 @@ const kittycheatTabBuild = (tab) => {
           
           return count + result;
         } catch (e) {
-          console.error(tab.tabName, e);
+          console.error('kittycheatTabBuild', tab.tabName, e);
         }
 
         return count;
       }, 0);
     }, 0);
   } catch (e) {
-    console.error(tab?.tabName, e);
+    console.error('kittycheatTabBuild', tab?.tabName, e);
   }
 
   return 0;
@@ -650,16 +650,20 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
 
     if (opts.delay) {
       const fn = () => {
-        const isFillable = ['hunt', 'praise'].includes(optname);
-
-        if (isFillable) {
-          kittycheatMaxFill();
-        }
-
-        kittycheatExec(optname, opts);
-
-        if (isFillable) {
-          kittycheatMaxFill();
+        try {
+          const isFillable = ['hunt', 'praise'].includes(optname);
+  
+          if (isFillable) {
+            kittycheatMaxFill();
+          }
+  
+          kittycheatExec(optname, opts);
+  
+          if (isFillable) {
+            kittycheatMaxFill();
+          }
+        } catch (e) {
+          console.error('optionDelay', optname, e);
         }
 
         setTimeout(fn, opts.delay);
