@@ -601,7 +601,7 @@ const kittycheatOpts = {
         $('input#observeBtn').click();
       },
       active: true,
-      delay: 25
+      delay: 100
     },
     'praise': {
       func: () => {
@@ -614,7 +614,7 @@ const kittycheatOpts = {
     'adore': {
       func: kittycheatAdore,
       active: true,
-      delay: 60000
+      delay: 120000
     },
     'hunt': {
       func: () => {
