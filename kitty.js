@@ -43,12 +43,12 @@ const kittycheatCombust = () => {
   }
 };
 
-const kittycheatUnicorns = (interval) => {
+const kittycheatUnicorns = (delay) => {
   try {
     const queueExec = (log) => {
       $('div#kittycheatUnicorn').html(`Unicorns: ${log}`);
     
-      setTimeout(() => kittycheatUnicorns(interval), interval);
+      setTimeout(() => kittycheatUnicorns(delay), delay);
     };
     
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
@@ -267,6 +267,28 @@ const kittycheatExec = (name, opts) => {
   }
 };
 
+const kittycheatExecTimer = (name, opts) => {
+  try {
+    if (opts.active) {
+      const isFillable = ['hunt', 'praise'].includes(name);
+  
+      if (isFillable) {
+        kittycheatMaxFill();
+      }
+  
+      kittycheatExec(name, opts);
+  
+      if (isFillable) {
+        kittycheatMaxFill();
+      }
+    }
+  } catch (e) {
+    console.error('kittycheatExecTimer', name, e);
+  }
+
+  setTimeout(() => kittycheatExecTimer(name, opts), opts.delay);
+};
+
 const kittycheatBtnStyle = (btn, opts) => {
   return btn.css({
     'background': opts.active ? 'red' : 'white',
@@ -402,7 +424,7 @@ const kittycheatLoopTabs = (ids, fn) => {
     .reduce((count, t) => count + fn(t), 0);
 };
 
-const kittycheatBuildAll = (interval) => {
+const kittycheatBuildAll = (delay) => {
   let count = 0;
   
   // upgrades: 2:science, 3:workshop, 5:religion, 6:space
@@ -415,7 +437,7 @@ const kittycheatBuildAll = (interval) => {
     count += kittycheatLoopTabs([0, 4, 6], kittycheatTabBuild);
   }
 
-  setTimeout(() => kittycheatBuildAll(interval), count ? 0 : interval);
+  setTimeout(() => kittycheatBuildAll(delay), count ? 0 : delay);
 };
 
 const kittycheatFeed = () => {
@@ -448,7 +470,7 @@ const kittycheatAdore = () => {
   gamePage.religionTab?.praiseBtn?.domNode.click();
 };
 
-const kittycheatTranscend = () => {
+const kittycheatTranscend = (delay) => {
   let log = null;
 
   try {
@@ -459,7 +481,7 @@ const kittycheatTranscend = () => {
   
   $('div#kittycheatReligion').html(log ? `Transcend: ${log}` : '');
     
-  setTimeout(() => kittycheatTranscend(interval), interval);
+  setTimeout(() => kittycheatTranscend(delay), delay);
 };
 
 const kittycheatOpts = {
@@ -632,7 +654,7 @@ const kittycheatOpts = {
   }
 };
 
-const kittycheatExecOpts = (interval) => {
+const kittycheatExecOpts = (delay) => {
   Object.values(kittycheatOpts).forEach((group) => {
     Object.entries(group).forEach(([optname, opts]) => {
       kittycheatMaxFill();
@@ -645,7 +667,7 @@ const kittycheatExecOpts = (interval) => {
 
   kittycheatMaxFill();
 
-  setTimeout(() => kittycheatExecOpts(interval), interval);
+  setTimeout(() => kittycheatExecOpts(delay), delay);
 };
 
 const kittycheatCont = $('<div></div>').css({ 'padding-bottom': '100px' });
@@ -673,27 +695,7 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
     kittycheatActs.append(kittycheatBtnStyle(btn, opts));
 
     if (opts.delay) {
-      const fn = () => {
-        try {
-          const isFillable = ['hunt', 'praise'].includes(optname);
-  
-          if (isFillable) {
-            kittycheatMaxFill();
-          }
-  
-          kittycheatExec(optname, opts);
-  
-          if (isFillable) {
-            kittycheatMaxFill();
-          }
-        } catch (e) {
-          console.error('optionDelay', optname, e);
-        }
-
-        setTimeout(fn, opts.delay);
-      };
-      
-      fn();
+      kittycheatExecTimer(optname, opts);
     }
   });
 });
