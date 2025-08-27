@@ -47,7 +47,11 @@ const kittycheatCombust = () => {
   }
 };
 
-const kittycheatUnicorns = (log = false) => {
+const kittycheatLogUnicorns = (text) => {
+  $('div#kittycheatUnicorn').html(`Unicorns: ${text}`);
+};
+
+const kittycheatUnicorns = (interval) => {
   gamePage.religionTab.render();
   
   try {
@@ -55,7 +59,7 @@ const kittycheatUnicorns = (log = false) => {
     const pastureImpl = gamePage.bld.getBuildingExt('unicornPasture');
 
     if (!pastureImpl?.meta.unlocked) {
-      console.log('Unicorns: No pastures');
+      kittycheatLogUnicorns('No pastures');
       return;
     }
 
@@ -87,7 +91,7 @@ const kittycheatUnicorns = (log = false) => {
     const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
 
     if (!zigImpl) {
-      console.log('Unicorns: No ziggurats');
+      kittycheatLogUnicorns('No ziggurats');
       return;
     }
 
@@ -113,7 +117,7 @@ const kittycheatUnicorns = (log = false) => {
     const unicornsPerTickBase = pastureImpl.meta.effects?.unicornsPerTickBase;
 
     if (!unicornsPerTickBase) {
-      console.log('Unicorns: No ticks per base');
+      kittycheatLogUnicorns('No ticks per base');
       return;
     }
     
@@ -123,11 +127,6 @@ const kittycheatUnicorns = (log = false) => {
     // set it as the default. This is likely to protect against cases where
     // production of unicorns is 0.
     const pastureAmortization = pastureImpl.model?.prices[0].val / pastureProduction;
-
-    if (!pastureAmortization) {
-      console.log('Unicorns: No pasture amortization');
-      // return;
-    }
 
     let bestAmortization = Number.POSITIVE_INFINITY;
     let bestBuilding = 'unicornPasture';
@@ -195,11 +194,13 @@ const kittycheatUnicorns = (log = false) => {
       }
     }
 
-    $('div#kittycheatUnicorn').html(`Unicorns: ${bestBuilding}`);
+    kittycheatLogUnicorns(bestBuilding);
   } catch (e) {
     console.error(e);
-    $('div#kittycheatUnicorn').html('Unicorns: unable to calculate');
+    kittycheatLogUnicorns('Unable to calculate');
   }
+
+  setTimeout(() => kittycheatUnicorns(interval), interval);
 };
 
 const kittycheatHasResource = (vals, isTrade) => {
@@ -417,7 +418,7 @@ const kittycheatLoopTabs = (ids, fn) => {
     .reduce((count, t) => count + fn(t), 0);
 };
 
-const kittycheatBuildAll = () => {
+const kittycheatBuildAll = (interval) => {
   let count = 0;
   
   // upgrades: 2:science, 3:workshop, 5:religion, 6:space
@@ -430,7 +431,7 @@ const kittycheatBuildAll = () => {
     count += kittycheatLoopTabs([0, 4, 6], kittycheatTabBuild);
   }
 
-  setTimeout(kittycheatBuildAll, count ? 0 : 1000);
+  setTimeout(() => kittycheatBuildAll(interval), count ? 0 : interval);
 };
 
 const kittycheatFeed = () => {
@@ -610,6 +611,19 @@ const kittycheatOpts = {
   }
 };
 
+const kittycheatExecOpts = (interval) => {
+  Object.values(kittycheatOpts).forEach((group) => {
+    Object.entries(group).forEach(([optname, opts]) => {
+      kittycheatMaxFill();
+      kittycheatExec(optname, opts);
+    });
+  });
+
+  kittycheatMaxFill();
+
+  setTimeout(() => kittycheatExecOpts(interval), interval);
+};
+
 const kittycheatCont = $('<div></div>').css({ 'padding-bottom': '100px' });
 const kittyIwGroup = kittycheatDivStyle($('<div></div>'));
 
@@ -664,17 +678,6 @@ Object.keys(isMax).forEach((id) => {
 
 kittycheatCont.append(kittycheatDivStyle($('<div id="kittycheatUnicorn"></div>')));
 
-setInterval(() => {
-  Object.values(kittycheatOpts).forEach((group) => {
-    Object.entries(group).forEach(([optname, opts]) => {
-      kittycheatMaxFill();
-      kittycheatExec(optname, opts);
-    });
-  });
-
-  kittycheatMaxFill();
-}, 100);
-
-setInterval(kittycheatUnicorns, 250);
-
-kittycheatBuildAll();
+kittycheatExecOpts(100);
+kittycheatUnicorns(500);
+kittycheatBuildAll(1000);
