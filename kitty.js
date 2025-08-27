@@ -649,7 +649,7 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
     kittycheatActs.append(kittycheatBtnStyle(btn, opts));
 
     if (opts.delay) {
-      setInterval(() => {
+      const fn = () => {
         const isFillable = ['hunt', 'praise'].includes(optname);
 
         if (isFillable) {
@@ -661,7 +661,11 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
         if (isFillable) {
           kittycheatMaxFill();
         }
-      }, opts.delay);
+
+        setTimeout(fn, opts.delay);
+      };
+      
+      fn();
     }
   });
 });
