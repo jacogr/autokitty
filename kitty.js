@@ -56,14 +56,15 @@ const kittycheatUnicorns = (interval) => {
     gamePage.religionTab.render();
     
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
-    const [pastureImpl, zigImpl] = ['unicornPasture', 'ziggurat'].map((b) => gamePage.bld.getBuildingExt(b));
+    const pastureImpl = gamePage.bld.getBuildingExt('unicornPasture');
+    const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
     const unicornsPerTickBase = pastureImpl?.meta.effects?.unicornsPerTickBase;
 
-    if (!zigImpl) {
-      kittycheatLogUnicorns('No ziggurats');
+    if (!pastureImpl || !pastureImpl.meta.unlocked || !pastureImpl.meta.on) {
+      kittycheatLogUnicorns('No pastures built');
       return;
-    } else if (!pastureImpl?.meta.unlocked) {
-      kittycheatLogUnicorns('No pastures');
+    } else if (!zigImpl || !zigImpl.meta.unlocked || !zigImpl.meta.on) {
+      kittycheatLogUnicorns('No ziggurats built');
       return;
     } else if (!unicornsPerTickBase) {
       kittycheatLogUnicorns('No ticks per base');
