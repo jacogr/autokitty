@@ -445,7 +445,11 @@ const kittycheatFeed = () => {
 };
 
 const kittycheatAdore = () => {
-  gamePage.religionTab?.transcendBtn?.domNode.click();
+  // sadly the game always confirms here, leave for now...
+  // if (game.religion.faithRatio > game.religion._getTranscendNextPrice()) {
+  //  gamePage.religionTab?.transcendBtn?.domNode.click();
+  // }
+  
   game.religion.resetFaith(1.01, false);
   gamePage.religionTab?.praiseBtn?.domNode.click();
 };
@@ -601,7 +605,7 @@ const kittycheatOpts = {
     },
     'adore': {
       func: kittycheatAdore,
-      active: false,
+      active: true,
       delay: 60000
     },
     'hunt': {
