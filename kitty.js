@@ -449,15 +449,15 @@ const kittycheatAdore = () => {
 };
 
 const kittycheatTranscend = () => {
-  let log = false;
+  let log = null;
 
   try {
-    log = game.religion.faithRatio > game.religion._getTranscendNextPrice();
+    log = `${(Math.floor(10000 * game.religion.faithRatio / game.religion._getTranscendNextPrice()) / 100).toFixed(2)}%`;
   } catch (e) {
     console.error('kittycheatTranscend', e);
   }
   
-  $('div#kittycheatReligion').html(log ? 'Religion: Transcend' : '');
+  $('div#kittycheatReligion').html(log ? `Transcend: ${log}` : '');
     
   setTimeout(() => kittycheatTranscend(interval), interval);
 };
