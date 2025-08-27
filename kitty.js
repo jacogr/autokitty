@@ -52,14 +52,21 @@ const kittycheatLogUnicorns = (text) => {
 };
 
 const kittycheatUnicorns = (interval) => {
-  gamePage.religionTab.render();
-  
   try {
+    gamePage.religionTab.render();
+    
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
-    const pastureImpl = gamePage.bld.getBuildingExt('unicornPasture');
+    const [pastureImpl, zigImpl] = ['unicornPasture', 'ziggurat'].map((b) => gamePage.bld.getBuildingExt(b));
+    const unicornsPerTickBase = pastureImpl?.meta.effects?.unicornsPerTickBase;
 
-    if (!pastureImpl?.meta.unlocked) {
+    if (!zigImpl) {
+      kittycheatLogUnicorns('No ziggurats');
+      return;
+    } else if (!pastureImpl?.meta.unlocked) {
       kittycheatLogUnicorns('No pastures');
+      return;
+    } else if (!unicornsPerTickBase) {
+      kittycheatLogUnicorns('No ticks per base');
       return;
     }
 
@@ -88,12 +95,6 @@ const kittycheatUnicorns = (interval) => {
     }
 
     const unicornsPerSecond = unicornsPerSecondBase * globalRatio * religionRatio * paragonRatio * faithBonus * cycleBonus;
-    const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
-
-    if (!zigImpl) {
-      kittycheatLogUnicorns('No ziggurats');
-      return;
-    }
 
     // Based on how many ziggurats we have.
     const zigguratRatio = Math.max(zigImpl.meta.on, 1);
@@ -113,13 +114,6 @@ const kittycheatUnicorns = (interval) => {
 
     // We now want to determine how quickly the cost of given building is neutralized
     // by its effect on production of unicorns.
-
-    const unicornsPerTickBase = pastureImpl.meta.effects?.unicornsPerTickBase;
-
-    if (!unicornsPerTickBase) {
-      kittycheatLogUnicorns('No ticks per base');
-      return;
-    }
     
     const pastureProduction = unicornsPerTickBase * gamePage.getTicksPerSecondUI() * globalRatio * religionRatio * paragonRatio * faithBonus * cycleBonus;
 
