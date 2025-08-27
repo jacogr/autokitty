@@ -17,13 +17,21 @@ const combustCycles = {
 
 const kittycheatSpanClick = (label) => {
   try {
-    $('span')
-      .filter(function() { 
-        return $(this).text().indexOf(label) === 0;
-      })
-      .click();
-    
-    return 1;
+    const span = $('span').filter(function() { 
+      return $(this).text().indexOf(label) === 0;
+    });
+
+    if (btn.length) {
+      setTimeout(() => {
+        try {
+          span.click();
+        } catch {
+          // ignore
+        }
+      }, 0);
+      
+      return 1;
+    }
   } catch {
     // ignore
   }
