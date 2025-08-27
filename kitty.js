@@ -21,13 +21,7 @@ const kittycheatSpanClick = (label) => {
   });
 
   if (span.length) {
-    setTimeout(() => {
-      try {
-        span.click();
-      } catch {
-        // ignore
-      }
-    }, 0);
+    setTimeout(() => span.click(), 0);
     
     return 1;
   }
