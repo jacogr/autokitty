@@ -676,6 +676,16 @@ Object.keys(isMax).forEach((id) => {
 
 kittycheatCont.append(kittycheatDivStyle($('<div id="kittycheatUnicorn"></div>')));
 
+// render clicky tabs at startup (as available)
+['diplomacyTab', 'religionTab', 'timeTab'].forEach((tabName) => {
+  try {
+    gamePage[tabName].render();
+  } catch (e) {
+    console.error('initial render', tabName, e);
+  }
+});
+
+// start the loops
 kittycheatExecOpts(100);
 kittycheatUnicorns(500);
 kittycheatBuildAll(1000);
