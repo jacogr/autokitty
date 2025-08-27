@@ -226,13 +226,9 @@ const kittycheatTrade = (name) => {
     gamePage.diplomacy.unlockElders();
   }
 
-  gamePage.tabs.forEach((tab) => {
-    if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
-      tab.racePanels.forEach((panel) => {
-        if (panel.race.name.toLowerCase().indexOf(name) === 0) {
-          panel.tradeBtn.tradeAllHref.link.click();
-        }
-      });
+  gamePage.diplomacyTab.racePanels.forEach((panel) => {
+    if (panel.race.name.toLowerCase().indexOf(name) === 0) {
+      panel.tradeBtn.tradeAllHref.link.click();
     }
   });
 };
