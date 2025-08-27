@@ -636,7 +636,7 @@ const kittycheatOpts = {
     },
     'hunt': {
       func: () => {
-        kittycheatMaxFill();
+        kittycheatMaxFill('manpower');
         gamePage.village.huntAll();
       },
       active: true,
