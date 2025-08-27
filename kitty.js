@@ -609,7 +609,7 @@ const kittycheatOpts = {
       func: () => {
         kittycheatAdore();
       },
-      active: true,
+      active: false,
       delay: 60000
     },
     'hunt': {
