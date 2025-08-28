@@ -43,6 +43,8 @@ const kittycheatMakePercent = (frac) => {
   }
 };
 
+const kittycheatNoop = () => {};
+
 const kittycheatNextTick = (fn) => {
   setTimeout(() => {
     try {
@@ -54,6 +56,9 @@ const kittycheatNextTick = (fn) => {
 
   return 1;
 };
+
+const kittycheatDomClick = (btn) =>
+  kittycheatNextTick(() => btn?.domNode.click());
 
 const kittycheatSpanClick = (label) => {
   const span = $('span').filter(function() { 
@@ -517,22 +522,19 @@ let kittycheatBuildZigPrevTime = 0;
 
 const kittycheatBuildZig = () => {
   try {
-    const noop = () => {};
+    const availTears = gamePage.resPool.get('tears').value;
     
     const findBld = (id) =>
       gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id);
 
     const isVisible = (bld) =>
-      !!(bld && bld.model.visible && bld.model.enabled);
+      !!(bld && bld.model.visible);
 
     const isValid = (bld, trs) =>
-      isVisible(bld) && !!(trs && trs.val);
+      isVisible(bld) && !!(trs && trs.val && availTears > trs.val);
 
     const getTears = (bld) =>
       bld?.model.prices.find((p) => p.name === 'tears');
-    
-    const domClick = (btn) =>
-      kittycheatNextTick(() => btn.domNode.click());
 
     const uni = kittycheatZigguratsCalc();
     
@@ -545,10 +547,9 @@ const kittycheatBuildZig = () => {
     const blck = findBld('blackPyramid');
 
     if (isVisible(blck)) {
-      return domClick(blck);
+      return kittycheatDomClick(blck);
     }
 
-    // get cheapest between best building & markers
     const best = findBld(uni.bestBuilding);
     const mark = findBld('marker');
     
@@ -559,19 +560,19 @@ const kittycheatBuildZig = () => {
     const mv = isValid(mark, mt);
 
     if (bv || mv) {
-      return domClick((bv && mv) ? ((mt.val <= bt.val) ? mark : best) : (mv ? mark : best)); 
+      return kittycheatDomClick((bv && mv) ? ((mt.val <= bt.val) ? mark : best) : (mv ? mark : best)); 
     }
 
     const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
     const availUni = gamePage.resPool.get('unicorns').value;
-    const zigTears = gamePage.resPool.get('tears').value + (zigImpl.meta.on * availUni / 2500);
+    const zigTears = availTears + (zigImpl.meta.on * availUni / 2500);
     const nowTime = Date.now();
     const nowDelta = nowTime - kittycheatBuildZigPrevTime;
 
     // only sacrifice when we do have enough available (twice a minute only)
     if (nowDelta > 30000 && bt && zigTears > bt.val) {
       kittycheatBuildZigPrevTime = nowTime;
-      kittycheatNextTick(() => gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, noop, noop));
+      kittycheatNextTick(() => gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, kittycheatNoop, kittycheatNoop));
     }
 
     return 0;
@@ -597,7 +598,7 @@ const kittycheatBuildTheology = () => {
       return 0;
     }
 
-    kittycheatNextTick(() => bld.domNode.click());
+    kittycheatDomClick(bld);
 
     return 0;
   } catch (e) {
@@ -639,7 +640,7 @@ const kittycheatFeed = () => {
       if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
         tab.racePanels.forEach((panel) => {
           if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
-            kittycheatNextTick(() => panel.feedBtn.domNode.click());
+            kittycheatDomClick(panel.feedBtn);
           }
         });
       }
@@ -650,11 +651,11 @@ const kittycheatFeed = () => {
 const kittycheatAdore = () => {
   // sadly the game always confirms here, leave for now...
   // if (game.religion.faithRatio > game.religion._getTranscendNextPrice()) {
-  //  gamePage.religionTab?.transcendBtn?.domNode.click();
+  //  kittycheatDomClick(gamePage.religionTab?.transcendBtn);
   // }
   
   game.religion.resetFaith(1.01, false);
-  gamePage.religionTab?.praiseBtn?.domNode.click();
+  kittycheatDomClick(gamePage.religionTab?.praiseBtn);
 };
 
 const kittycheatOpts = {
