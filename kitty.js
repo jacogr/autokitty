@@ -501,7 +501,7 @@ const kittycheatBuildZig = () => {
       kittycheatNextTick(() => btn.domNode.click());
 
     const uni = kittycheatZigguratsCalc();
-
+    
     // we don't auto-build pastures (or nothing)
     if (!uni.bestBuilding || uni.bestBuilding === 'unicornPasture') {
       return 0;
@@ -530,9 +530,14 @@ const kittycheatBuildZig = () => {
       return domClick(best);
     }
 
-    kittycheatNextTick(() => gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, noop, noop));
+    const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
+    const zigTears = gamePage.resPool.get('tears').value + (gamePage.resPool.get('unicorns').value / 2500) * (zigImpl.meta.on || 0);
 
-    // we don't count these, just go into slow loop
+    // only sacrifice when we do have enough available
+    if (mt && zigTears > mt.val) {
+      kittycheatNextTick(() => gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, noop, noop));
+    }
+
     return 0;
   } catch (e) {
     console.error('kittycheatZiggurats', e);
@@ -556,7 +561,9 @@ const kittycheatBuildTheology = () => {
       return 0;
     }
 
-    return kittycheatNextTick(() => bld.domNode.click());
+    kittycheatNextTick(() => bld.domNode.click());
+
+    return 0;
   } catch (e) {
     console.error('kittycheatBuildTheology', e);
   }
