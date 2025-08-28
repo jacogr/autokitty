@@ -522,7 +522,7 @@ const kittycheatBuildZig = () => {
 
     const isValid = (bld) =>
       !!(bld && bld.model.visible) &&
-      kittycheatHasResource(bld.model.prices.reduce((o, { name, val }) => ({ ...0, [name]: val }), {}), true);
+      kittycheatHasResource(bld.model.prices.reduce((o, { name, val }) => ({ ...o, [name]: val }), {}), true);
 
     const getTearsPrice = (bld) =>
       bld?.model.prices.find((p) => p.name === 'tears');
