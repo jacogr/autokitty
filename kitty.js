@@ -57,8 +57,16 @@ const kittycheatNextTick = (fn) => {
   return 1;
 };
 
-const kittycheatDomClick = (btn) =>
-  kittycheatNextTick(() => btn?.domNode.click());
+const kittycheatDomClick = (btn) => {
+  try {
+    btn.domNode.click()
+  } catch (e) {
+    console.error('kittycheatDomClick', e);
+    return 0;
+  }
+  
+  return 1;
+};
 
 const kittycheatSpanClick = (label) => {
   const span = $('span').filter(function() { 
