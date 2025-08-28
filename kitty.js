@@ -534,7 +534,7 @@ const kittycheatBuildZig = () => {
     const blck = findBld('blackPyramid');
 
     if (isValid(blck)) {
-      // console.log('kittycheatBuildZig', 'Building blackPyramid');
+      console.log('kittycheatBuildZig:', 'blackPyramid');
       blck.domNode.click();
       return 1;
     }
@@ -553,7 +553,7 @@ const kittycheatBuildZig = () => {
         ? ((mt.val <= bt.val) ? mark : best)
         : (mv ? mark : best);
       
-      // console.log('kittycheatBuildZig', `building ${next.id}`);
+      console.log('kittycheatBuildZig:', next.id);
       next.domNode.click();
       return 1;
     }
@@ -564,7 +564,7 @@ const kittycheatBuildZig = () => {
 
     // only sacrifice when we do have enough available (only every 10 seconds)
     if (nowDelta > 10000 && bt && zigTears > bt.val) {
-      // console.log('kittycheatBuildZig', 'sacrificing');
+      console.log('kittycheatBuildZig:', 'sacrifice');
       kittycheatBuildZigPrevTime = nowTime;
       gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, kittycheatNoop, kittycheatNoop);
       return 1;
