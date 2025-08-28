@@ -6,6 +6,7 @@ const isMax = {
   'buildings': false,
   'resources': true,
   'upgrades': true,
+  'zig': false,
   'x10': false
 };
 
@@ -473,6 +474,74 @@ const kittycheatLoopTabs = (ids, fn) => {
     .reduce((count, t) => count + fn(t), 0);
 };
 
+const kittycheatZiggurats = () => {
+  try {
+    const findBld = (id) =>
+      gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id && b.model.visible && b.model.enabled);
+
+    const getTears = (bld) =>
+      bld?.model.prices.find((p) => p.name === 'tears');
+    
+    const domClick = (btn) => {
+      setTimeout(() => {
+        try {
+          btn.domNode.click();
+        } catch (e) {
+          console.error('kittycheatZiggurats:click', e);
+        }
+      }, 0);
+
+      // we don't count these, just go into slow loop
+      return 0;
+    };
+
+    const uni = kittycheatUnicornsCalc();
+
+    // we don't auto-build pastures (or nothing)
+    if (!uni.bestBuilding || uni.bestBuilding === 'unicornPasture') {
+      return 0;
+    }
+
+    // first we see if we can do a black pyramid
+    const blck = findBld('blackPyramid');
+
+    if (blck) {
+      return domClick(blck);
+    }
+
+    // get cheapest between best building & markers
+    const best = findBld(uni.bestBuilding);
+    const mark = findBld('marker');
+    const bt = getTears(best);
+    const mt = getTears(mark);
+
+    if (bt?.val && mt?.val) {
+      const next = (mt.val <= bt.val) ? mark : best;
+
+      return domClick(next); 
+    } else if (mt?.val) {
+      return domClick(mark);
+    } else if (bt?.val) {
+      return domClick(best);
+    }
+
+    setTimeout(() => {
+      try {
+        sacrificeBtn.model.allLink.handler.call(sacrificeBtn);
+      } catch (e) {
+        console.error('kittycheatZiggurats:sacrifice', e);
+      }
+    }, 0);
+
+    // we don't count these, just go into slow loop
+    return 0;
+  } catch (e) {
+    console.error('kittycheatZiggurats', e);
+  }
+
+  return 0;
+};
+
 const kittycheatBuildAll = (delay) => {
   let count = 0;
   
@@ -484,6 +553,11 @@ const kittycheatBuildAll = (delay) => {
   // buildings: 0:bonfire, 4:trade, 6:space
   if (isMax.buildings) {
     count += kittycheatLoopTabs([0, 4, 6], kittycheatTabBuild);
+  }
+
+  // religion: zigurats, crypto
+  if (isMax.zig) {
+    count += kittycheatZiggurats();
   }
 
   setTimeout(() => kittycheatBuildAll(delay), count ? 0 : delay);
