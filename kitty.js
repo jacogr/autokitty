@@ -527,7 +527,7 @@ const kittycheatZiggurats = () => {
 
     setTimeout(() => {
       try {
-        sacrificeBtn.model.allLink.handler.call(sacrificeBtn);
+        gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, () = {}, () => {});
       } catch (e) {
         console.error('kittycheatZiggurats:sacrifice', e);
       }
