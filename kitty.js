@@ -910,6 +910,6 @@ kittycheatCont.append(kittyTxGroup);
 });
 
 // start the loops
-kittycheatExecOpts(50);
+kittycheatExecOpts(75);
 kittycheatReligion(500);
 kittycheatBuildAll(1000);
