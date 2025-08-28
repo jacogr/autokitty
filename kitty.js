@@ -253,16 +253,37 @@ const kittycheatTheologyCalc = () => {
 };
 
 const kittycheatReligion = (delay) => {
-  const uni = kittycheatZigguratsCalc();
+  const zig = kittycheatZigguratsCalc();
   const cry = kittycheatTheologyCalc();
   const trd = kittycheatTranscendCalc();
+  let zigText = zig.bestBuilding;
+
+  if (zig.bestBuilding && zig.bestPrices) {
+    const zigguratRatio = gamePage.bld.getBuildingExt('ziggurat').meta.on || 0;
+
+    const tears2uni = (tears) =>
+      (tears * 2500) / zigguratRatio;
+    
+    let unicornTotal = tears2uni(gamePage.resPool.get('tears').value) + gamePage.resPool.get('unicorns').value;
+    let unicornPrice = 0;
+        
+    for (const price of zig.bestPrices) {
+      if (price.name === 'unicorns') {
+        unicornPrice += price.val;
+      } else if (price.name === 'tears') {
+        unicornPrice += tears2uni(price.val);
+      }
+    }
+  
+    zigText = zig.bestBuilding + `, ${kittycheatMakePercent(unicornPrice / unicornTotal)}`;
+  }
 
   const cryText = cry && (
     (cry.bestBuilding === 'singularity' ? 'eventHorizon' : cry.bestBuilding) + 
     (cry.percent ? `, ${cry.percent.text}` : '')
   );
   
-  $('div#kittycheatZiggurat').html(`Ziggurat : ${uni.bestBuilding || uni.err || '-'}`);
+  $('div#kittycheatZiggurat').html(`Ziggurat : ${zigText || zig.err || '-'}`);
   $('div#kittycheatTheology').html(`Theology : ${cryText || '-'}`);
   $('div#kittycheatTranscend').html(`Transcend: ${trd?.text || '-'}`);
 
