@@ -199,12 +199,27 @@ const kittycheatTranscendCalc = () => {
   return null;
 };
 
+const kittycheatCryptoCalc = () => {
+  try {
+    return gamePage.religionTab.ctPanel.children[0].children
+      .filter((a) => a.model.prices.length === 1 && a.model.prices[0].name === 'relic')
+      .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
+      .map((a) => a.id)[0];
+  } catch (e) {
+    console.error('kittycheatCryptoCalc', e);
+  }
+
+  return null;
+};
+
 const kittycheatReligion = (delay) => {
   const uni = kittycheatUnicornsCalc();
+  const cry = kittycheatCryptoCalc();
   const trd = kittycheatTranscendCalc();
   
-  $('div#kittycheatUnicorn').html(`Unicorns: ${uni.bestBuilding || uni.err || 'unknown'}`);
-  $('div#kittycheatTranscend').html(trd ? `Transcend: ${trd}` : '');
+  $('div#kittycheatUnicorn').html(`Unicorns : ${uni.bestBuilding || uni.err || '-'}`);
+  $('div#kittycheatCrypto').html(`Theology : ${cry || '-'}`);
+  $('div#kittycheatTranscend').html(`Transcend: ${trd || '-'}`);
 
   setTimeout(() => kittycheatReligion(delay), delay);  
 };
@@ -308,12 +323,14 @@ const kittycheatExecTimer = (name, opts) => {
 const kittycheatBtnStyle = (btn, opts) => {
   return btn.css({
     'background': opts.active ? 'red' : 'white',
-    'color': opts.active ? 'white' : 'black'
+    'color': opts.active ? 'white' : 'black',
+    'font-family': 'monospace',
+    'font-size': 'small'
   });
 };
 
-const kittycheatDivStyle = (div) => {
-  return div.css({ 'margin-bottom': '20px' });
+const kittycheatDivStyle = (div, small = false) => {
+  return div.css({ 'margin-bottom': small ? '5px' : '20px' });
 };
 
 const kittycheatBtnClick = (btn, name, opts) => {
@@ -672,7 +689,11 @@ const kittycheatExecOpts = (delay) => {
   setTimeout(() => kittycheatExecOpts(delay), delay);
 };
 
-const kittycheatCont = $('<div></div>').css({ 'padding-bottom': '100px' });
+const kittycheatCont = $('<div></div>').css({ 
+  'padding-bottom': '100px',
+  'font-family': 'monospace',
+  'font-size': 'small'
+});
 const kittyIwGroup = kittycheatDivStyle($('<div></div>'));
 const kittyTxGroup = kittycheatDivStyle($('<div></div>'));
 
@@ -715,8 +736,9 @@ Object.keys(isMax).forEach((id) => {
 
 kittycheatCont.append(kittyTxGroup);
 
-kittyTxGroup.append($('<div id="kittycheatUnicorn"></div>'));
-kittyTxGroup.append($('<div id="kittycheatTranscend"></div>'));
+['kittycheatUnicorn', 'kittycheatCrypto', 'kittycheatTranscend'].forEach((id) => {
+  kittyTxGroup.append(kittycheatDivStyle($(`<div id="${id}"></div>`), true));
+});
 
 // render clicky tabs at startup (as available)
 ['diplomacyTab', 'religionTab', 'timeTab'].forEach((tab) => {
