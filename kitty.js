@@ -43,7 +43,7 @@ const kittycheatCombust = () => {
   }
 };
 
-const kittycheatUnicornsBest = () => {
+const kittycheatUnicornsCalc = () => {
   try {
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
     const pastureImpl = gamePage.bld.getBuildingExt('unicornPasture');
@@ -185,12 +185,28 @@ const kittycheatUnicornsBest = () => {
   }
 };
 
-const kittycheatUnicorns = (delay) => {
-  const res = kittycheatUnicornsBest();
-  
-  $('div#kittycheatUnicorn').html(`Unicorns: ${res.bestBuilding || res.err || 'unknown'}`);
+const kittycheatTranscendCalc = () => {
+  try {
+    const frac = game.religion.faithRatio / game.religion._getTranscendNextPrice();
 
-  setTimeout(() => kittycheatUnicorns(delay), delay);  
+    if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
+      return `${(Math.floor(10000 * frac) / 100).toFixed(2)}%`;
+    }
+  } catch (e) {
+    console.error('kittycheatTranscendCalc', e);
+  }
+
+  return null;
+};
+
+const kittycheatReligion = (delay) => {
+  const uni = kittycheatUnicornsCalc();
+  const trd = kittycheatTranscendCalc();
+  
+  $('div#kittycheatUnicorn').html(`Unicorns: ${uni.bestBuilding || uni.err || 'unknown'}`);
+  $('div#kittycheatTranscend').html(trd ? `Transcend: ${trd}` : '');
+
+  setTimeout(() => kittycheatReligion(delay), delay);  
 };
 
 const kittycheatHasResource = (vals, isTrade) => {
@@ -470,20 +486,6 @@ const kittycheatAdore = () => {
   gamePage.religionTab?.praiseBtn?.domNode.click();
 };
 
-const kittycheatTranscend = (delay) => {
-  let log = null;
-
-  try {
-    log = `${(Math.floor(10000 * game.religion.faithRatio / game.religion._getTranscendNextPrice()) / 100).toFixed(2)}%`;
-  } catch (e) {
-    console.error('kittycheatTranscend', e);
-  }
-  
-  $('div#kittycheatReligion').html(log ? `Transcend: ${log}` : '');
-    
-  setTimeout(() => kittycheatTranscend(delay), delay);
-};
-
 const kittycheatOpts = {
   'crafting': {
     //'wood': {
@@ -672,6 +674,7 @@ const kittycheatExecOpts = (delay) => {
 
 const kittycheatCont = $('<div></div>').css({ 'padding-bottom': '100px' });
 const kittyIwGroup = kittycheatDivStyle($('<div></div>'));
+const kittyTxGroup = kittycheatDivStyle($('<div></div>'));
 
 $('div#leftColumn').append(kittycheatCont);
 
@@ -710,8 +713,10 @@ Object.keys(isMax).forEach((id) => {
   kittyIwGroup.append(kittycheatBtnStyle(btn, { active: isMax[id] }));
 });
 
-kittycheatCont.append(kittycheatDivStyle($('<div id="kittycheatUnicorn"></div>')));
-kittycheatCont.append(kittycheatDivStyle($('<div id="kittycheatReligion"></div>')));
+kittycheatCont.append(kittyTxGroup);
+
+kittyTxGroup.append($('<div id="kittycheatUnicorn"></div>'));
+kittyTxGroup.append($('<div id="kittycheatTranscend"></div>'));
 
 // render clicky tabs at startup (as available)
 ['diplomacyTab', 'religionTab', 'timeTab'].forEach((tab) => {
@@ -724,6 +729,5 @@ kittycheatCont.append(kittycheatDivStyle($('<div id="kittycheatReligion"></div>'
 
 // start the loops
 kittycheatExecOpts(100);
-kittycheatUnicorns(500);
-kittycheatTranscend(500);
+kittycheatReligion(500);
 kittycheatBuildAll(1000);
