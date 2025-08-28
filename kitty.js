@@ -45,29 +45,6 @@ const kittycheatMakePercent = (frac) => {
 
 const kittycheatNoop = () => {};
 
-const kittycheatNextTick = (fn) => {
-  setTimeout(() => {
-    try {
-      fn();
-    } catch (e) {
-      console.error('kittycheatNextTick', e);
-    }
-  }, 0);
-
-  return 1;
-};
-
-const kittycheatDomClick = (btn) => {
-  try {
-    btn.domNode.click()
-  } catch (e) {
-    console.error('kittycheatDomClick', e);
-    return 0;
-  }
-  
-  return 1;
-};
-
 const kittycheatSpanClick = (label) => {
   const span = $('span').filter(function() { 
     return $(this).text().indexOf(label) === 0;
@@ -92,7 +69,7 @@ const kittycheatCombust = () => {
   if (cycle) {
     const btn = gamePage.timeTab.cfPanel.children[0].children[0];
 
-    kittycheatNextTick(() => btn.model[cycle].handler.call(btn));
+    btn.model[cycle].handler.call(btn);
   }
 };
 
@@ -555,7 +532,7 @@ const kittycheatBuildZig = () => {
     const blck = findBld('blackPyramid');
 
     if (isVisible(blck)) {
-      kittycheatDomClick(blck);
+      blck.domNode.click();
       return 0;
     }
 
@@ -569,7 +546,7 @@ const kittycheatBuildZig = () => {
     const mv = isValid(mark, mt);
 
     if (bv || mv) {
-      kittycheatDomClick((bv && mv) ? ((mt.val <= bt.val) ? mark : best) : (mv ? mark : best));
+      ((bv && mv) ? ((mt.val <= bt.val) ? mark : best) : (mv ? mark : best)).domNode.click();
       return 0;
     }
 
@@ -582,7 +559,8 @@ const kittycheatBuildZig = () => {
     // only sacrifice when we do have enough available (twice a minute only)
     if (nowDelta > 30000 && bt && zigTears > bt.val) {
       kittycheatBuildZigPrevTime = nowTime;
-      return kittycheatNextTick(() => gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, kittycheatNoop, kittycheatNoop));
+      gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, kittycheatNoop, kittycheatNoop);
+      return 0;
     }
 
     return 0;
@@ -608,7 +586,7 @@ const kittycheatBuildTheology = () => {
       return 0;
     }
 
-    kittycheatDomClick(bld);
+    bld.domNode.click();
 
     return 0;
   } catch (e) {
@@ -650,7 +628,7 @@ const kittycheatFeed = () => {
       if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
         tab.racePanels.forEach((panel) => {
           if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
-            kittycheatDomClick(panel.feedBtn);
+            panel.feedBtn.domNode.click()
           }
         });
       }
@@ -661,11 +639,11 @@ const kittycheatFeed = () => {
 const kittycheatAdore = () => {
   // sadly the game always confirms here, leave for now...
   // if (game.religion.faithRatio > game.religion._getTranscendNextPrice()) {
-  //  kittycheatDomClick(gamePage.religionTab?.transcendBtn);
+  //  gamePage.religionTab?.transcendBtn.domNode.click();
   // }
   
   game.religion.resetFaith(1.01, false);
-  kittycheatDomClick(gamePage.religionTab?.praiseBtn);
+  gamePage.religionTab?.praiseBtn.domNode.click();
 };
 
 const kittycheatOpts = {
