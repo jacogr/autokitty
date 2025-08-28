@@ -274,8 +274,10 @@ const kittycheatReligion = (delay) => {
         unicornPrice += tears2uni(price.val);
       }
     }
+
+    const calc = kittycheatMakePercent(unicornPrice / unicornTotal);
   
-    zigText = zig.bestBuilding + `, ${kittycheatMakePercent(unicornPrice / unicornTotal)}`;
+    zigText = zig.bestBuilding + (calc?.percent ? `, ${calc.percent.text}` : '');
   }
 
   const cryText = cry && (
