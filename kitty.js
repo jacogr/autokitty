@@ -520,8 +520,11 @@ const kittycheatBuildZig = () => {
     const findBld = (id) =>
       gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id);
 
+    const isVisible = (bld) =>
+      !!(bld && bld.model.visible && bld.model.enabled);
+
     const isValid = (bld, tears) =>
-      !!(bld && bld.model.visible && bld.model.enabled && trs && trs.val);
+      isVisible(bld) && !!(trs && trs.val);
 
     const getTears = (bld) =>
       bld?.model.prices.find((p) => p.name === 'tears');
@@ -539,7 +542,7 @@ const kittycheatBuildZig = () => {
     // first we see if we can do a black pyramid
     const blck = findBld('blackPyramid');
 
-    if (blck && blck.model.visible && blck.model.enabled) {
+    if (isVisible(blck)) {
       return domClick(blck);
     }
 
@@ -553,14 +556,8 @@ const kittycheatBuildZig = () => {
     const bv = isValid(best, bt);
     const mv = isValid(mark, mt);
 
-    if (bv && mv) {
-      const next = (mt.val <= bt.val) ? mark : best;
-
-      return domClick(next); 
-    } else if (mv) {
-      return domClick(mark);
-    } else if (bv) {
-      return domClick(best);
+    if (bv || mv) {
+      return domClick((bv && mv) ? ((mt.val <= bt.val) ? mark : best) : (mv ? mark : best)); 
     }
 
     const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
