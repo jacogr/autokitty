@@ -185,13 +185,17 @@ const kittycheatUnicornsCalc = () => {
   }
 };
 
+const kittycheatMakePercent = (frac) => {
+  if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
+    return `${(Math.floor(10000 * frac) / 100).toFixed(2)}%`;
+  }
+
+  return null;
+};
+
 const kittycheatTranscendCalc = () => {
   try {
-    const frac = game.religion.faithRatio / game.religion._getTranscendNextPrice();
-
-    if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
-      return `${(Math.floor(10000 * frac) / 100).toFixed(2)}%`;
-    }
+    return kittycheatMakePercent(game.religion.faithRatio / game.religion._getTranscendNextPrice());
   } catch (e) {
     console.error('kittycheatTranscendCalc', e);
   }
@@ -201,10 +205,15 @@ const kittycheatTranscendCalc = () => {
 
 const kittycheatCryptoCalc = () => {
   try {
+    const relics = gamePage.resPool.get('relic').value;
+    
     return gamePage.religionTab.ctPanel.children[0].children
       .filter((a) => a.model.prices.length === 1 && a.model.prices[0].name === 'relic')
       .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
-      .map((a) => a.id)[0];
+      .map((a) => ({ 
+        bestBuilding: a.id,
+        percent: kittycheatMakePercent(a.model.prices[0].val / relics)
+      }))[0];
   } catch (e) {
     console.error('kittycheatCryptoCalc', e);
   }
@@ -218,7 +227,7 @@ const kittycheatReligion = (delay) => {
   const trd = kittycheatTranscendCalc();
   
   $('div#kittycheatUnicorn').html(`Unicorns : ${uni.bestBuilding || uni.err || '-'}`);
-  $('div#kittycheatCrypto').html(`Theology : ${cry || '-'}`);
+  $('div#kittycheatCrypto').html(`Theology : ${cry ? (cry.bestBuilding + (cry.percent ? (', ' + cry.percent) : '')) : '-'}`);
   $('div#kittycheatTranscend').html(`Transcend: ${trd || '-'}`);
 
   setTimeout(() => kittycheatReligion(delay), delay);  
