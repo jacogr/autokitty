@@ -507,6 +507,10 @@ let kittycheatBuildZigPrevTime = 0;
 
 const kittycheatBuildZig = () => {
   try {
+    if (game.ui.activeTabId !== gamePage.religionTab.tabId) {
+      gamePage.religionTab.render();
+    }
+    
     const availTears = gamePage.resPool.get('tears').value;
     const availSorrow = gamePage.resPool.get('sorrow').value;
     
@@ -581,6 +585,10 @@ const kittycheatBuildZig = () => {
 
 const kittycheatBuildTheology = () => {
   try {
+    if (game.ui.activeTabId !== gamePage.religionTab.tabId) {
+      gamePage.religionTab.render();
+    }
+    
     const best = kittycheatTheologyCalc();
 
     if (!best || !best.percent || best.percent.raw > 1) {
