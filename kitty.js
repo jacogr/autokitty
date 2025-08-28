@@ -15,6 +15,21 @@ const combustCycles = {
   nextCycleLink: 5
 };
 
+const kittycheatStyleBtn = (btn, opts) => {
+  return btn.css({
+    'background': opts.active ? 'red' : 'white',
+    'color': opts.active ? 'white' : 'black',
+    'font-family': 'monospace',
+    'font-size': 'small',
+    'border-width': '1px',
+    'padding-inline': '4px'
+  });
+};
+
+const kittycheatStyleDiv = (div, small = false) => {
+  return div.css({ 'margin-bottom': small ? '5px' : '20px' });
+};
+
 const kittycheatSpanClick = (label) => {
   const span = $('span').filter(function() { 
     return $(this).text().indexOf(label) === 0;
@@ -329,23 +344,10 @@ const kittycheatExecTimer = (name, opts) => {
   setTimeout(() => kittycheatExecTimer(name, opts), opts.delay);
 };
 
-const kittycheatBtnStyle = (btn, opts) => {
-  return btn.css({
-    'background': opts.active ? 'red' : 'white',
-    'color': opts.active ? 'white' : 'black',
-    'font-family': 'monospace',
-    'font-size': 'small'
-  });
-};
-
-const kittycheatDivStyle = (div, small = false) => {
-  return div.css({ 'margin-bottom': small ? '5px' : '20px' });
-};
-
 const kittycheatBtnClick = (btn, name, opts) => {
   opts.active = !opts.active;
 
-  kittycheatBtnStyle(btn, opts);
+  kittycheatStyleBtn(btn, opts);
   kittycheatExec(name, opts);
 };
 
@@ -703,8 +705,8 @@ const kittycheatCont = $('<div></div>').css({
   'font-family': 'monospace',
   'font-size': 'small'
 });
-const kittyIwGroup = kittycheatDivStyle($('<div></div>'));
-const kittyTxGroup = kittycheatDivStyle($('<div></div>'));
+const kittyIwGroup = kittycheatStyleDiv($('<div></div>'));
+const kittyTxGroup = kittycheatStyleDiv($('<div></div>'));
 
 $('div#leftColumn').append(kittycheatCont);
 
@@ -712,7 +714,7 @@ kittycheatCont.append(kittyIwGroup);
 
 // add groups for all the options
 Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
-  const kittycheatGroup = kittycheatDivStyle($('<div></div>'));
+  const kittycheatGroup = kittycheatStyleDiv($('<div></div>'));
   const kittycheatActs = $('<div></div>');
 
   kittycheatCont.append(kittycheatGroup);
@@ -725,7 +727,7 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
       kittycheatBtnClick(btn, optname, opts);
     });
     
-    kittycheatActs.append(kittycheatBtnStyle(btn, opts));
+    kittycheatActs.append(kittycheatStyleBtn(btn, opts));
 
     if (opts.delay) {
       kittycheatExecTimer(optname, opts);
@@ -737,16 +739,16 @@ Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
 Object.keys(isMax).forEach((id) => {
   const btn = $(`<button>${id}</button>`).click(() => {
     isMax[id] = !isMax[id];
-    kittycheatBtnStyle(btn, { active: isMax[id] });
+    kittycheatStyleBtn(btn, { active: isMax[id] });
   });
 
-  kittyIwGroup.append(kittycheatBtnStyle(btn, { active: isMax[id] }));
+  kittyIwGroup.append(kittycheatStyleBtn(btn, { active: isMax[id] }));
 });
 
 kittycheatCont.append(kittyTxGroup);
 
 ['kittycheatUnicorn', 'kittycheatCrypto', 'kittycheatTranscend'].forEach((id) => {
-  kittyTxGroup.append(kittycheatDivStyle($(`<div id="${id}"></div>`), true));
+  kittyTxGroup.append(kittycheatStyleDiv($(`<div id="${id}"></div>`), true));
 });
 
 // render clicky tabs at startup (as available)
