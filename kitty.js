@@ -844,7 +844,7 @@ const kittycheatExecOpts = (delay) => {
 };
 
 const kittycheatCont = $('<div></div>').css({ 
-  'padding-bottom': '20px',
+  'padding-bottom': '50px',
   'font-family': 'monospace',
   'font-size': 'small'
 });
