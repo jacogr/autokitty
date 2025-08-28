@@ -539,7 +539,7 @@ const kittycheatBuildZig = () => {
     if (isValid(blck, getPrice(blck, 'sorrow'), availSorrow)) {
       // console.log('kittycheatBuildZig', 'Building blackPyramid');
       blck.domNode.click();
-      return 0;
+      return 1;
     }
 
     const best = findBld(uni.bestBuilding);
@@ -558,7 +558,7 @@ const kittycheatBuildZig = () => {
       
       // console.log('kittycheatBuildZig', `building ${next.id}`);
       next.domNode.click();
-      return 0;
+      return 1;
     }
 
     const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
@@ -572,7 +572,7 @@ const kittycheatBuildZig = () => {
       // console.log('kittycheatBuildZig', 'sacrificing');
       kittycheatBuildZigPrevTime = nowTime;
       gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, kittycheatNoop, kittycheatNoop);
-      return 0;
+      return 1;
     }
 
     return 0;
@@ -604,7 +604,7 @@ const kittycheatBuildTheology = () => {
 
     bld.domNode.click();
 
-    return 0;
+    return 1;
   } catch (e) {
     console.error('kittycheatBuildTheology', e);
   }
