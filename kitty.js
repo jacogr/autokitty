@@ -23,6 +23,7 @@ const kittycheatStyleBtn = (btn, opts) => {
     'color': opts.active ? 'white' : 'black',
     'font-family': 'monospace',
     'font-size': 'small',
+    'border-radius': '2px',
     'border-width': '1px',
     'padding-inline': '4px',
     'margin-right': '1px',
