@@ -822,7 +822,7 @@ const kittycheatOpts = {
         gamePage.village.huntAll();
       },
       active: true,
-      delay: 100
+      delay: 50
     },
     'tc combust': {
       func: kittycheatCombust,
@@ -835,9 +835,8 @@ const kittycheatOpts = {
 const kittycheatExecOpts = (delay) => {
   Object.values(kittycheatOpts).forEach((group) => {
     Object.entries(group).forEach(([optname, opts]) => {
-      kittycheatMaxFill();
-
       if (!opts.delay) {
+        kittycheatMaxFill();
         kittycheatExec(optname, opts);
       }
     });
@@ -909,6 +908,6 @@ kittycheatCont.append(kittyTxGroup);
 });
 
 // start the loops
-kittycheatExecOpts(100);
+kittycheatExecOpts(50);
 kittycheatReligion(500);
 kittycheatBuildAll(1000);
