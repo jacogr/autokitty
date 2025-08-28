@@ -287,19 +287,17 @@ const kittycheatReligion = (delay) => {
   setTimeout(() => kittycheatReligion(delay), delay);  
 };
 
-const kittycheatHasResource = (vals, isTrade) => {
+const kittycheatHasResource = (vals = {}, isTrade = false) => {
   let cando = true;
 
   Object.entries(vals).forEach(([key, val]) => {
     if (cando) {
       const res = gamePage.resPool.get(key);
   
-      if (val.value) {
-        cando = cando && (res.value >= val.value);
-      }
+      cando = res.value >= val;
       
-      if (!isTrade && res.maxValue > 0) {
-        cando = cando && ((res.value / res.maxValue) >= 0.05);
+      if (cando && !isTrade && res.maxValue > 0) {
+        cando = (res.value / res.maxValue) >= 0.05;
       }
     }
   });
@@ -345,9 +343,7 @@ const kittycheatCraft = (name) => {
 
 const kittycheatExec = (name, opts) => {
   try {
-    const vals = opts.res || {};
-
-    if (opts.active && kittycheatHasResource(vals, opts.trade)) {
+    if (opts.active && kittycheatHasResource(opts.res, opts.trade)) {
       if (opts.func) {
         opts.func();
       } else if (opts.trade) {
