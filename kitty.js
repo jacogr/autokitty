@@ -276,7 +276,7 @@ const kittycheatReligion = (delay) => {
       }
     }
 
-    const calc = kittycheatMakePercent(unicornPrice / unicornTotal);
+    const calc = kittycheatMakePercent(unicornTotal / unicornPrice);
   
     zigText = zig.bestBuilding + (calc ? `, ${calc.text}` : '');
   }
@@ -518,7 +518,10 @@ const kittycheatBuildZig = () => {
     const noop = () => {};
     
     const findBld = (id) =>
-      gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id && b.model.visible && b.model.enabled);
+      gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id);
+
+    const isValid = (bld, tears) =>
+      !!(bld && bld.model.visible && bld.model.enabled && trs && trs.val);
 
     const getTears = (bld) =>
       bld?.model.prices.find((p) => p.name === 'tears');
@@ -536,23 +539,27 @@ const kittycheatBuildZig = () => {
     // first we see if we can do a black pyramid
     const blck = findBld('blackPyramid');
 
-    if (blck) {
+    if (blck && blck.model.visible && blck.model.enabled) {
       return domClick(blck);
     }
 
     // get cheapest between best building & markers
     const best = findBld(uni.bestBuilding);
     const mark = findBld('marker');
+    
     const bt = getTears(best);
     const mt = getTears(mark);
+    
+    const bv = isValid(best, bt);
+    const mv = isValid(mark, mt);
 
-    if (bt?.val && mt?.val) {
+    if (bv && mv) {
       const next = (mt.val <= bt.val) ? mark : best;
 
       return domClick(next); 
-    } else if (mt?.val) {
+    } else if (mv) {
       return domClick(mark);
-    } else if (bt?.val) {
+    } else if (bv) {
       return domClick(best);
     }
 
@@ -560,7 +567,7 @@ const kittycheatBuildZig = () => {
     const zigTears = gamePage.resPool.get('tears').value + (zigImpl.meta.on * gamePage.resPool.get('unicorns').value / 2500);
 
     // only sacrifice when we do have enough available
-    if (mt && zigTears > mt.val) {
+    if (bt && zigTears > bt.val) {
       kittycheatNextTick(() => gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, noop, noop));
     }
 
