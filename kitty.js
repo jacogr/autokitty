@@ -528,6 +528,9 @@ const kittycheatBuildZig = () => {
     const getPrice = (bld, name = 'tears') =>
       bld?.model.prices.find((p) => p.name === name);
 
+    const hasPrices = (bld) =>
+      kittycheatHasResource(bld.model.prices.reduce((o, { name, val }) => ({ ...0, [name]: val }), {}), true);
+
     const uni = kittycheatZigguratsCalc();
     
     // we don't auto-build pastures (or nothing)
@@ -538,7 +541,7 @@ const kittycheatBuildZig = () => {
     // first we see if we can do a black pyramid
     const blck = findBld('blackPyramid');
 
-    if (isValid(blck, getPrice(blck, 'sorrow'), availSorrow) && kittycheatHasResource(blck.model.prices, true)) {
+    if (isValid(blck, getPrice(blck, 'sorrow'), availSorrow) && hasPrices(blck)) {
       // console.log('kittycheatBuildZig', 'Building blackPyramid');
       blck.domNode.click();
       return 1;
@@ -551,7 +554,7 @@ const kittycheatBuildZig = () => {
     const mt = getPrice(mark);
     
     const bv = isValid(best, bt);
-    const mv = isValid(mark, mt) && kittycheatHasResource(mark.model.prices, true);
+    const mv = isValid(mark, mt) && hasPrices(mark);
 
     if (bv || mv) {
       const next = (bv && mv)
