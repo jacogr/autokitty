@@ -637,7 +637,7 @@ const kittycheatBuildAll = (delay) => {
     count += kittycheatBuildTheology();
   }
 
-  setTimeout(() => kittycheatBuildAll(delay), delay / (count ? 10 : 1));
+  setTimeout(() => kittycheatBuildAll(delay), Math.ceil(delay / (count ? 10 : 1)));
 };
 
 const kittycheatFeed = () => {
@@ -824,7 +824,7 @@ const kittycheatOpts = {
         gamePage.village.huntAll();
       },
       active: true,
-      delay: 88
+      delay: 99
     },
     'tc combust': {
       func: kittycheatCombust,
@@ -910,6 +910,6 @@ kittycheatCont.append(kittyTxGroup);
 });
 
 // start the loops
-kittycheatExecOpts(88);
+kittycheatExecOpts(99);
 kittycheatReligion(500);
 kittycheatBuildAll(1000);
