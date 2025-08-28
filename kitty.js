@@ -547,7 +547,8 @@ const kittycheatBuildZig = () => {
     const blck = findBld('blackPyramid');
 
     if (isVisible(blck)) {
-      return kittycheatDomClick(blck);
+      kittycheatDomClick(blck);
+      return 0;
     }
 
     const best = findBld(uni.bestBuilding);
@@ -560,7 +561,8 @@ const kittycheatBuildZig = () => {
     const mv = isValid(mark, mt);
 
     if (bv || mv) {
-      return kittycheatDomClick((bv && mv) ? ((mt.val <= bt.val) ? mark : best) : (mv ? mark : best)); 
+      kittycheatDomClick((bv && mv) ? ((mt.val <= bt.val) ? mark : best) : (mv ? mark : best));
+      return 0;
     }
 
     const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
@@ -572,7 +574,7 @@ const kittycheatBuildZig = () => {
     // only sacrifice when we do have enough available (twice a minute only)
     if (nowDelta > 30000 && bt && zigTears > bt.val) {
       kittycheatBuildZigPrevTime = nowTime;
-      kittycheatNextTick(() => gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, kittycheatNoop, kittycheatNoop));
+      return kittycheatNextTick(() => gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, kittycheatNoop, kittycheatNoop));
     }
 
     return 0;
