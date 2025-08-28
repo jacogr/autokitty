@@ -5,9 +5,10 @@ const $ = window.$;
 const isMax = {
   'buildings': false,
   'resources': true,
+  'x10': false,
   'upgrades': true,
   'zig': false,
-  'x10': false
+  'theology': false
 };
 
 const combustCycles = { 
@@ -474,7 +475,7 @@ const kittycheatLoopTabs = (ids, fn) => {
     .reduce((count, t) => count + fn(t), 0);
 };
 
-const kittycheatZiggurats = () => {
+const kittycheatBuildZig = () => {
   try {
     const findBld = (id) =>
       gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id && b.model.visible && b.model.enabled);
@@ -491,8 +492,7 @@ const kittycheatZiggurats = () => {
         }
       }, 0);
 
-      // we don't count these, just go into slow loop
-      return 0;
+      return 1;
     };
 
     const uni = kittycheatUnicornsCalc();
@@ -542,6 +542,36 @@ const kittycheatZiggurats = () => {
   return 0;
 };
 
+const kittycheatBuildTheology = () => {
+  try {
+    const best = kittycheatCryptoCalc();
+
+    if (!best || !best.percent || best.percent.raw > 1) {
+      return 0;
+    }
+
+    const bld = gamePage.religionTab.ctPanel.children[0].children.find((b) => b.id === best.bestBuilding && b.model.visible && b.model.enabled);
+
+    if (!bld) {
+      return 0;
+    }
+
+    setTimeout(() => {
+      try {
+        bld.domNode.click();
+      } catch (e) {
+        console.error('kittycheatZiggurats:click', e);
+      }
+    }, 0);
+
+    return 1;
+  } catch (e) {
+    console.error('kittycheatBuildTheology', e);
+  }
+
+  return 0;
+};
+
 const kittycheatBuildAll = (delay) => {
   let count = 0;
   
@@ -555,9 +585,14 @@ const kittycheatBuildAll = (delay) => {
     count += kittycheatLoopTabs([0, 4, 6], kittycheatTabBuild);
   }
 
-  // religion: zigurats, crypto
+  // religion: zigurats
   if (isMax.zig) {
-    count += kittycheatZiggurats();
+    count += kittycheatBuildZig();
+  }
+
+  // religion: cryptotheology
+  if (isMax.theology) {
+    count += kittycheatBuildTheology();
   }
 
   setTimeout(() => kittycheatBuildAll(delay), count ? 0 : delay);
