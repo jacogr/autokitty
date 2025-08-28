@@ -554,7 +554,7 @@ const kittycheatBuildZig = () => {
     }
 
     const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
-    const zigTears = gamePage.resPool.get('tears').value + (gamePage.resPool.get('unicorns').value / 2500) * (zigImpl.meta.on || 0);
+    const zigTears = gamePage.resPool.get('tears').value + (zigImpl.meta.on * gamePage.resPool.get('unicorns').value / 2500);
 
     // only sacrifice when we do have enough available
     if (mt && zigTears > mt.val) {
