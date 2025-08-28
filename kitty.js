@@ -637,7 +637,7 @@ const kittycheatBuildAll = (delay) => {
     count += kittycheatBuildTheology();
   }
 
-  setTimeout(() => kittycheatBuildAll(delay), count ? 0 : delay);
+  setTimeout(() => kittycheatBuildAll(delay), delay / (count ? 10 : 1));
 };
 
 const kittycheatFeed = () => {
