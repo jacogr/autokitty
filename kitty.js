@@ -67,6 +67,10 @@ const kittycheatCombust = () => {
     .map(({ cycle }) => cycle)[0];
   
   if (cycle) {
+    if (game.ui.activeTabId !== gamePage.timeTab.tabId) {
+      gamePage.timeTab.render();
+    }
+    
     const btn = gamePage.timeTab.cfPanel.children[0].children[0];
 
     btn.model[cycle].handler.call(btn);
@@ -645,13 +649,13 @@ const kittycheatBuildAll = (delay) => {
 
 const kittycheatFeed = () => {
   if (gamePage.resPool.get('necrocorn').value > 1) {
-    gamePage.tabs.forEach((tab) => {
-      if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
-        tab.racePanels.forEach((panel) => {
-          if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
-            panel.feedBtn.domNode.click()
-          }
-        });
+    if (game.ui.activeTabId !== gamePage.diplomacyTab.tabId) {
+      gamePage.diplomacyTab.render();
+    }
+    
+    gamePage.diplomacyTab.racePanels.forEach((panel) => {
+      if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
+        panel.feedBtn.domNode.click()
       }
     });
   }
@@ -735,11 +739,7 @@ const kittycheatOpts = {
     },
     'tMythril': { 
       res: { 'bloodstone': 5 }
-    },
-    /*'feeding': {
-      res: { 'necrocorn': 1 },
-      func: kittycheatFeed
-    }*/
+    }
   },
   'trading': {
     'leviathans': {
@@ -805,8 +805,7 @@ const kittycheatOpts = {
       func: () => { 
         $('input#observeBtn').click();
       },
-      active: true,
-      delay: 100
+      active: true
     },
     'praise': {
       func: () => {
@@ -826,21 +825,26 @@ const kittycheatOpts = {
         kittycheatMaxFill('manpower');
         gamePage.village.huntAll();
       },
-      active: true,
-      delay: 99
+      active: true
     },
     'tc combust': {
       func: kittycheatCombust,
       active: false,
-      delay: 1500
+      delay: 1000
+    },
+    'feeding': {
+      res: { 'necrocorn': 1 },
+      func: kittycheatFeed,
+      active: false,
+      delay: 60000
     }
   }
 };
 
 const kittycheatExecOpts = (delay) => {
   Object.values(kittycheatOpts).forEach((group) => {
-    Object.entries(group).forEach(([optname, opts]) => {
-      if (!opts.delay) {
+    Object.entries(group).filter((, opts) => opts.active && !opts.delay).forEach(([optname, opts]) => {
+      if (opts.active && !opts.delay) {
         kittycheatMaxFill();
         kittycheatExec(optname, opts);
       }
@@ -904,7 +908,7 @@ kittycheatCont.append(kittyTxGroup);
 });
 
 // render clicky tabs at startup (as available)
-['diplomacyTab', 'religionTab', 'timeTab'].forEach((tab) => {
+['diplomacyTab', 'libraryTab', 'religionTab', 'timeTab'].forEach((tab) => {
   try {
     gamePage[tab].render();
   } catch (e) {
