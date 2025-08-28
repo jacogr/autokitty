@@ -567,8 +567,8 @@ const kittycheatBuildZig = () => {
     const nowTime = Date.now();
     const nowDelta = nowTime - kittycheatBuildZigPrevTime;
 
-    // only sacrifice when we do have enough available (three times a minute only)
-    if (nowDelta > 20000 && bt && zigTears > bt.val) {
+    // only sacrifice when we do have enough available (only every 10 seconds)
+    if (nowDelta > 10000 && bt && zigTears > bt.val) {
       // console.log('kittycheatBuildZig', 'sacrificing');
       kittycheatBuildZigPrevTime = nowTime;
       gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, kittycheatNoop, kittycheatNoop);
