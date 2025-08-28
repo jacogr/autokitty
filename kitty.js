@@ -59,6 +59,12 @@ const kittycheatSpanClick = (label) => {
   return 0;
 };
 
+const kittycheatRenderBgTab = (tab) => {
+  if (game.ui.activeTabId !== tab.tabId) {
+    tab.render();
+  }
+};
+
 const kittycheatCombust = () => {
   const cycle = Object
     .entries(combustCycles)
@@ -67,9 +73,7 @@ const kittycheatCombust = () => {
     .map(({ cycle }) => cycle)[0];
   
   if (cycle) {
-    if (game.ui.activeTabId !== gamePage.timeTab.tabId) {
-      gamePage.timeTab.render();
-    }
+    kittycheatRenderBgTab(gamePage.timeTab);
     
     const btn = gamePage.timeTab.cfPanel.children[0].children[0];
 
@@ -324,11 +328,7 @@ const kittycheatTrade = (name) => {
     gamePage.diplomacy.unlockElders();
   }
 
-  gamePage.diplomacyTab.racePanels.forEach((panel) => {
-    if (panel.race.name.toLowerCase().indexOf(name) === 0) {
-      panel.tradeBtn.tradeAllHref.link.click();
-    }
-  });
+  gamePage.diplomacyTab.racePanels.find((p) => p.race.name === name)?.tradeBtn.tradeAllHref.link.click();
 };
 
 const kittycheatCraft = (name) => {
@@ -509,9 +509,7 @@ let kittycheatBuildZigPrevTime = 0;
 
 const kittycheatBuildZig = () => {
   try {
-    if (game.ui.activeTabId !== gamePage.religionTab.tabId) {
-      gamePage.religionTab.render();
-    }
+    kittycheatRenderBgTab(gamePage.religionTab);
     
     const findBld = (id) =>
       gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id);
@@ -580,9 +578,7 @@ const kittycheatBuildZig = () => {
 
 const kittycheatBuildTheology = () => {
   try {
-    if (game.ui.activeTabId !== gamePage.religionTab.tabId) {
-      gamePage.religionTab.render();
-    }
+    kittycheatRenderBgTab(gamePage.religionTab);
     
     const best = kittycheatTheologyCalc();
 
@@ -635,26 +631,20 @@ const kittycheatBuildAll = (delay) => {
 
 const kittycheatFeed = () => {
   if (gamePage.resPool.get('necrocorn').value > 1) {
-    if (game.ui.activeTabId !== gamePage.diplomacyTab.tabId) {
-      gamePage.diplomacyTab.render();
-    }
+    kittycheatRenderBgTab(gamePage.diplomacyTab)
     
-    gamePage.diplomacyTab.racePanels.forEach((panel) => {
-      if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
-        panel.feedBtn.domNode.click()
-      }
-    });
+    gamePage.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans')?.feedBtn.domNode.click();
   }
 };
 
 const kittycheatAdore = () => {
   // sadly the game always confirms here, leave for now...
   // if (game.religion.faithRatio > game.religion._getTranscendNextPrice()) {
-  //  gamePage.religionTab?.transcendBtn.domNode.click();
+  //  gamePage.religionTab?.transcendBtn?.domNode.click();
   // }
   
   game.religion.resetFaith(1.01, false);
-  gamePage.religionTab?.praiseBtn.domNode.click();
+  gamePage.religionTab?.praiseBtn?.domNode.click();
 };
 
 const kittycheatOpts = {
@@ -854,7 +844,7 @@ $('div#leftColumn').append(kittycheatCont);
 kittycheatCont.append(kittyIwGroup);
 
 // add groups for all the options
-Object.entries(kittycheatOpts).forEach(([groupname, group]) => {
+Object.values(kittycheatOpts).forEach((group) => {
   const kittycheatGroup = kittycheatStyleDiv($('<div></div>'));
   const kittycheatActs = $('<div></div>');
 
