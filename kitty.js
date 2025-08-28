@@ -44,6 +44,14 @@ const kittycheatSpanClick = (label) => {
   return 0;
 };
 
+const kittycheatMakePercent = (frac) => {
+  if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
+    return `${(100 * frac).toFixed(4)}%`;
+  }
+
+  return null;
+};
+
 const kittycheatCombust = () => {
   const cycle = Object
     .entries(combustCycles)
@@ -198,14 +206,6 @@ const kittycheatUnicornsCalc = () => {
     console.error('Unicorns', e);
     return { err: 'Unable to calculate' };
   }
-};
-
-const kittycheatMakePercent = (frac) => {
-  if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
-    return `${(Math.floor(10000 * frac) / 100).toFixed(2)}%`;
-  }
-
-  return null;
 };
 
 const kittycheatTranscendCalc = () => {
