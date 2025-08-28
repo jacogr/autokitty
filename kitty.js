@@ -532,7 +532,7 @@ const kittycheatBuildZig = () => {
     // first we see if we can do a black pyramid
     const blck = findBld('blackPyramid');
 
-    if (isValid(blck, getPrice(blck, 'sorrow'), availSorrow) {
+    if (isValid(blck, getPrice(blck, 'sorrow'), availSorrow)) {
       console.log('kittycheatBuildZig', 'Building blackPyramid');
       blck.domNode.click();
       return 0;
