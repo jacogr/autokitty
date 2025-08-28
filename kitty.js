@@ -536,7 +536,7 @@ const kittycheatBuildZig = () => {
     // first we see if we can do a black pyramid
     const blck = findBld('blackPyramid');
 
-    if (isValid(blck, getPrice(blck, 'sorrow'), availSorrow)) {
+    if (isValid(blck, getPrice(blck, 'sorrow'), availSorrow) && kittycheatHasResource(blck.model.prices)) {
       // console.log('kittycheatBuildZig', 'Building blackPyramid');
       blck.domNode.click();
       return 1;
@@ -549,7 +549,7 @@ const kittycheatBuildZig = () => {
     const mt = getPrice(mark);
     
     const bv = isValid(best, bt);
-    const mv = isValid(mark, mt);
+    const mv = isValid(mark, mt) && kittycheatHasResource(mark.model.prices);
 
     if (bv || mv) {
       const next = (bv && mv)
