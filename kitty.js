@@ -513,6 +513,8 @@ const kittycheatLoopTabs = (ids, fn) => {
     .reduce((count, t) => count + fn(t), 0);
 };
 
+let kittycheatBuildZigPrevTime = 0;
+
 const kittycheatBuildZig = () => {
   try {
     const noop = () => {};
@@ -563,9 +565,12 @@ const kittycheatBuildZig = () => {
     const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
     const availUni = gamePage.resPool.get('unicorns').value;
     const zigTears = gamePage.resPool.get('tears').value + (zigImpl.meta.on * availUni / 2500);
+    const nowTime = Date.now();
+    const nowDelta = nowTime - kittycheatBuildZigPrevTime;
 
-    // only sacrifice when we do have enough available
-    if (bt && zigTears > bt.val) {
+    // only sacrifice when we do have enough available (once every minute only)
+    if (nowDelta > 60000 && bt && zigTears > bt.val) {
+      kittycheatBuildZigPrevTime = nowTime;
       kittycheatNextTick(() => gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, noop, noop));
     }
 
