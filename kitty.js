@@ -43,25 +43,19 @@ const kittycheatCombust = () => {
   }
 };
 
-const kittycheatUnicorns = (delay) => {
+const kittycheatUnicornsBest = () => {
   try {
-    const queueExec = (log) => {
-      $('div#kittycheatUnicorn').html(`Unicorns: ${log}`);
-    
-      setTimeout(() => kittycheatUnicorns(delay), delay);
-    };
-    
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
     const pastureImpl = gamePage.bld.getBuildingExt('unicornPasture');
     const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
     const unicornsPerTickBase = pastureImpl?.meta.effects?.unicornsPerTickBase;
 
     if (!pastureImpl || !pastureImpl.meta.unlocked || !pastureImpl.meta.on) {
-      return queueExec('No pasture built');
+      return { err: 'No pasture built' };
     } else if (!zigImpl || !zigImpl.meta.unlocked || !zigImpl.meta.on) {
-      return queueExec('No ziggurat built');
+      return { err: 'No ziggurat built' };
     } else if (!unicornsPerTickBase) {
-      return queueExec('No ticks per base');
+      return { err: 'No ticks per base' };
     }
 
     // How many unicorns are produced per second.
@@ -118,6 +112,7 @@ const kittycheatUnicorns = (delay) => {
 
     let bestAmortization = Number.POSITIVE_INFINITY;
     let bestBuilding = 'unicornPasture';
+    let bestPrices = pastureImpl.model?.prices || [];
     
     if (pastureAmortization < bestAmortization) {
       bestAmortization = pastureAmortization;
@@ -178,15 +173,24 @@ const kittycheatUnicorns = (delay) => {
         if (0 < riftBonus || (religionRatio < religionBonus && 0 < unicornPrice)) {
           bestAmortization = amortization;
           bestBuilding = building;
+          bestPrices = buildingImpl.model.prices;
         }
       }
     }
 
-    return queueExec(bestBuilding);
+    return { bestBuilding, bestPrices };
   } catch (e) {
     console.error('Unicorns', e);
-    return queueExec('Unable to calculate');
+    return { err: 'Unable to calculate' };
   }
+};
+
+const kittycheatUnicorns = (delay) => {
+  const res = kittycheatUnicornsBest();
+  
+  $('div#kittycheatUnicorn').html(`Unicorns: ${res.bestBuilding || res.err || 'unknown'}`);
+
+  setTimeout(() => kittycheatUnicorns(delay), delay);  
 };
 
 const kittycheatHasResource = (vals, isTrade) => {
