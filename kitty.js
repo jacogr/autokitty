@@ -240,9 +240,14 @@ const kittycheatReligion = (delay) => {
   const uni = kittycheatUnicornsCalc();
   const cry = kittycheatCryptoCalc();
   const trd = kittycheatTranscendCalc();
+
+  const cryText = cry && (
+    (cry.bestBuilding === 'singularity' ? 'eventHorizon' : cry.bestBuilding) + 
+    (cry.percent ? (', ' + cry.percent.text) : '')
+  );
   
   $('div#kittycheatUnicorn').html(`Unicorns : ${uni.bestBuilding || uni.err || '-'}`);
-  $('div#kittycheatCrypto').html(`Theology : ${cry ? (cry.bestBuilding + (cry.percent ? (', ' + cry.percent.text) : '')) : '-'}`);
+  $('div#kittycheatCrypto').html(`Theology : ${cryText : '-'}`);
   $('div#kittycheatTranscend').html(`Transcend: ${trd?.text || '-'}`);
 
   setTimeout(() => kittycheatReligion(delay), delay);  
