@@ -46,10 +46,10 @@ const kittycheatSpanClick = (label) => {
 
 const kittycheatMakePercent = (frac) => {
   if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
-    return `${(100 * frac).toFixed(4)}%`;
+    const raw = 100 * frac;
+    
+    return { text: `${raw.toFixed(3)}%`, raw };
   }
-
-  return null;
 };
 
 const kittycheatCombust = () => {
@@ -242,8 +242,8 @@ const kittycheatReligion = (delay) => {
   const trd = kittycheatTranscendCalc();
   
   $('div#kittycheatUnicorn').html(`Unicorns : ${uni.bestBuilding || uni.err || '-'}`);
-  $('div#kittycheatCrypto').html(`Theology : ${cry ? (cry.bestBuilding + (cry.percent ? (', ' + cry.percent) : '')) : '-'}`);
-  $('div#kittycheatTranscend').html(`Transcend: ${trd || '-'}`);
+  $('div#kittycheatCrypto').html(`Theology : ${cry ? (cry.bestBuilding + (cry.percent ? (', ' + cry.percent.text) : '')) : '-'}`);
+  $('div#kittycheatTranscend').html(`Transcend: ${trd?.text || '-'}`);
 
   setTimeout(() => kittycheatReligion(delay), delay);  
 };
