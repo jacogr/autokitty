@@ -508,6 +508,7 @@ let kittycheatBuildZigPrevTime = 0;
 const kittycheatBuildZig = () => {
   try {
     const availTears = gamePage.resPool.get('tears').value;
+    const availSorrow = gamePage.resPool.get('sorrow').value);
     
     const findBld = (id) =>
       gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id);
@@ -515,11 +516,11 @@ const kittycheatBuildZig = () => {
     const isVisible = (bld) =>
       !!(bld && bld.model.visible);
 
-    const isValid = (bld, trs) =>
-      isVisible(bld) && !!(trs && trs.val && availTears > trs.val);
+    const isValid = (bld, tst, avail = availTears) =>
+      isVisible(bld) && !!(tst && tst.val && avail > tst.val);
 
-    const getTears = (bld) =>
-      bld?.model.prices.find((p) => p.name === 'tears');
+    const getPrice = (bld, name = 'tears') =>
+      bld?.model.prices.find((p) => p.name === name);
 
     const uni = kittycheatZigguratsCalc();
     
@@ -531,7 +532,8 @@ const kittycheatBuildZig = () => {
     // first we see if we can do a black pyramid
     const blck = findBld('blackPyramid');
 
-    if (isVisible(blck)) {
+    if (isValid(blck, getPrice(blck, 'sorrow'), availSorrow) {
+      console.log('kittycheatBuildZig', 'Building blackPyramid');
       blck.domNode.click();
       return 0;
     }
@@ -539,14 +541,17 @@ const kittycheatBuildZig = () => {
     const best = findBld(uni.bestBuilding);
     const mark = findBld('marker');
     
-    const bt = getTears(best);
-    const mt = getTears(mark);
+    const bt = getPrice(best);
+    const mt = getPrice(mark);
     
     const bv = isValid(best, bt);
     const mv = isValid(mark, mt);
 
     if (bv || mv) {
-      ((bv && mv) ? ((mt.val <= bt.val) ? mark : best) : (mv ? mark : best)).domNode.click();
+      const next = ((bv && mv) ? ((mt.val <= bt.val) ? mark : best) : (mv ? mark : best));
+      
+      console.log('kittycheatBuildZig', `building ${next.id}`);
+      next.domNode.click();
       return 0;
     }
 
@@ -558,6 +563,7 @@ const kittycheatBuildZig = () => {
 
     // only sacrifice when we do have enough available (twice a minute only)
     if (nowDelta > 30000 && bt && zigTears > bt.val) {
+      console.log('kittycheatBuildZig', 'sacrificing');
       kittycheatBuildZigPrevTime = nowTime;
       gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, kittycheatNoop, kittycheatNoop);
       return 0;
