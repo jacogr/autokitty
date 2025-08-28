@@ -824,7 +824,7 @@ const kittycheatOpts = {
         gamePage.village.huntAll();
       },
       active: true,
-      delay: 50
+      delay: 75
     },
     'tc combust': {
       func: kittycheatCombust,
