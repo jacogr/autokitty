@@ -3,10 +3,10 @@ const gamePage = window.gamePage;
 const $ = window.$;
 
 const isMax = {
-  'buildings': false,
-  'resources': true,
+  'build': false,
+  'max': true,
   'x10': false,
-  'upgrades': true,
+  'upgrade': true,
   'zig': false,
   'theology': false
 };
@@ -359,7 +359,7 @@ const kittycheatBtnClick = (btn, name, opts) => {
 };
 
 const kittycheatMaxFill = (name = null) => {
-  if (!isMax.resources && !name) {
+  if (!isMax.max && !name) {
     return;
   }
 
@@ -576,12 +576,12 @@ const kittycheatBuildAll = (delay) => {
   let count = 0;
   
   // upgrades: 2:science, 3:workshop, 5:religion, 6:space
-  if (isMax.upgrades) {
+  if (isMax.upgrade) {
     count += kittycheatLoopTabs([2, 3, 5, 6], kittycheatTabUnlock);
   }
 
   // buildings: 0:bonfire, 4:trade, 6:space
-  if (isMax.buildings) {
+  if (isMax.build) {
     count += kittycheatLoopTabs([0, 4, 6], kittycheatTabBuild);
   }
 
