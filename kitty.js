@@ -25,7 +25,8 @@ const kittycheatStyleBtn = (btn, opts) => {
     'font-size': 'small',
     'border-width': '1px',
     'padding-inline': '4px',
-    'margin-right': '1px'
+    'margin-right': '1px',
+    'margin-bottom': '1px'
   });
 };
 
