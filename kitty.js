@@ -517,23 +517,15 @@ const kittycheatBuildZig = () => {
       gamePage.religionTab.render();
     }
     
-    const availTears = gamePage.resPool.get('tears').value;
-    const availSorrow = gamePage.resPool.get('sorrow').value;
-    
     const findBld = (id) =>
       gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id);
 
-    const isVisible = (bld) =>
-      !!(bld && bld.model.visible);
-
-    const isValid = (bld, tst, avail = availTears) =>
-      isVisible(bld) && !!(tst && tst.val && avail > tst.val);
-
-    const getPrice = (bld, name = 'tears') =>
-      bld?.model.prices.find((p) => p.name === name);
-
-    const hasPrices = (bld) =>
+    const isValid = (bld) =>
+      !!(bld && bld.model.visible) &&
       kittycheatHasResource(bld.model.prices.reduce((o, { name, val }) => ({ ...0, [name]: val }), {}), true);
+
+    const getTearsPrice = (bld) =>
+      bld?.model.prices.find((p) => p.name === 'tears');
 
     const uni = kittycheatZigguratsCalc();
     
@@ -545,7 +537,7 @@ const kittycheatBuildZig = () => {
     // first we see if we can do a black pyramid
     const blck = findBld('blackPyramid');
 
-    if (isValid(blck, getPrice(blck, 'sorrow'), availSorrow) && hasPrices(blck)) {
+    if (isValid(blck)) {
       // console.log('kittycheatBuildZig', 'Building blackPyramid');
       blck.domNode.click();
       return 1;
@@ -554,11 +546,11 @@ const kittycheatBuildZig = () => {
     const best = findBld(uni.bestBuilding);
     const mark = findBld('marker');
     
-    const bt = getPrice(best);
-    const mt = getPrice(mark);
-    
-    const bv = isValid(best, bt);
-    const mv = isValid(mark, mt) && hasPrices(mark);
+    const bv = isValid(best);
+    const mv = isValid(mark);
+
+    const bt = getTearsPrice(best);
+    const mt = getTearsPrice(mark);
 
     if (bv || mv) {
       const next = (bv && mv)
@@ -570,9 +562,7 @@ const kittycheatBuildZig = () => {
       return 1;
     }
 
-    const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
-    const availUni = gamePage.resPool.get('unicorns').value;
-    const zigTears = availTears + (zigImpl.meta.on * availUni / 2500);
+    const zigTears = gamePage.resPool.get('tears').value + (gamePage.bld.getBuildingExt('ziggurat').meta.on * gamePage.resPool.get('unicorns').value / 2500);
     const nowTime = Date.now();
     const nowDelta = nowTime - kittycheatBuildZigPrevTime;
 
