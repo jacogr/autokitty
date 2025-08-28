@@ -68,7 +68,7 @@ const kittycheatCombust = () => {
   }
 };
 
-const kittycheatUnicornsCalc = () => {
+const kittycheatZigguratsCalc = () => {
   try {
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
     const pastureImpl = gamePage.bld.getBuildingExt('unicornPasture');
@@ -220,7 +220,7 @@ const kittycheatTranscendCalc = () => {
   return null;
 };
 
-const kittycheatCryptoCalc = () => {
+const kittycheatTheologyCalc = () => {
   try {
     const relics = gamePage.resPool.get('relic').value;
     
@@ -232,15 +232,15 @@ const kittycheatCryptoCalc = () => {
         percent: kittycheatMakePercent(a.model.prices[0].val / relics)
       }))[0];
   } catch (e) {
-    console.error('kittycheatCryptoCalc', e);
+    console.error('kittycheatTheologyCalc', e);
   }
 
   return null;
 };
 
 const kittycheatReligion = (delay) => {
-  const uni = kittycheatUnicornsCalc();
-  const cry = kittycheatCryptoCalc();
+  const uni = kittycheatZigguratsCalc();
+  const cry = kittycheatTheologyCalc();
   const trd = kittycheatTranscendCalc();
 
   const cryText = cry && (
@@ -248,8 +248,8 @@ const kittycheatReligion = (delay) => {
     (cry.percent ? `, ${cry.percent.text}` : '')
   );
   
-  $('div#kittycheatUnicorn').html(`Unicorns : ${uni.bestBuilding || uni.err || '-'}`);
-  $('div#kittycheatCrypto').html(`Theology : ${cryText || '-'}`);
+  $('div#kittycheatZiggurat').html(`Ziggurat : ${uni.bestBuilding || uni.err || '-'}`);
+  $('div#kittycheatTheology').html(`Theology : ${cryText || '-'}`);
   $('div#kittycheatTranscend').html(`Transcend: ${trd?.text || '-'}`);
 
   setTimeout(() => kittycheatReligion(delay), delay);  
@@ -495,7 +495,7 @@ const kittycheatBuildZig = () => {
       return 1;
     };
 
-    const uni = kittycheatUnicornsCalc();
+    const uni = kittycheatZigguratsCalc();
 
     // we don't auto-build pastures (or nothing)
     if (!uni.bestBuilding || uni.bestBuilding === 'unicornPasture') {
@@ -544,7 +544,7 @@ const kittycheatBuildZig = () => {
 
 const kittycheatBuildTheology = () => {
   try {
-    const best = kittycheatCryptoCalc();
+    const best = kittycheatTheologyCalc();
 
     if (!best || !best.percent || best.percent.raw > 1) {
       return 0;
@@ -861,7 +861,7 @@ Object.keys(isMax).forEach((id) => {
 
 kittycheatCont.append(kittyTxGroup);
 
-['kittycheatUnicorn', 'kittycheatCrypto', 'kittycheatTranscend'].forEach((id) => {
+['kittycheatZiggurat', 'kittycheatTheology', 'kittycheatTranscend'].forEach((id) => {
   kittyTxGroup.append(kittycheatStyleDiv($(`<div id="${id}"></div>`), true));
 });
 
