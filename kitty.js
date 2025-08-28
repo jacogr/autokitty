@@ -823,7 +823,6 @@ const kittycheatOpts = {
       delay: 1000
     },
     'feeding': {
-      res: { 'necrocorn': 1 },
       func: kittycheatFeed,
       active: false,
       delay: 60000
