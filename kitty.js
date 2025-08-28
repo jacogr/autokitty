@@ -824,7 +824,7 @@ const kittycheatOpts = {
         gamePage.village.huntAll();
       },
       active: true,
-      delay: 75
+      delay: 88
     },
     'tc combust': {
       func: kittycheatCombust,
@@ -910,6 +910,6 @@ kittycheatCont.append(kittyTxGroup);
 });
 
 // start the loops
-kittycheatExecOpts(75);
+kittycheatExecOpts(88);
 kittycheatReligion(500);
 kittycheatBuildAll(1000);
