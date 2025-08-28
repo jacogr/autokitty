@@ -833,10 +833,10 @@ const kittycheatOpts = {
 
 const kittycheatExecOpts = (delay) => {
   Object.values(kittycheatOpts).forEach((group) => {
-    Object.entries(group).filter((, opts) => opts.active && !opts.delay).forEach(([optname, opts]) => {
-      if (opts.active && !opts.delay) {
+    Object.entries(group).filter(([, o]) => o.active && !o.delay).forEach(([n, o]) => {
+      if (o.active && !o.delay) {
         kittycheatMaxFill();
-        kittycheatExec(optname, opts);
+        kittycheatExec(n, o);
       }
     });
   });
