@@ -54,6 +54,18 @@ const kittycheatMakePercent = (frac) => {
   }
 };
 
+const kittycheatNextTick = (fn) => {
+  setTimeout(() => {
+    try {
+      fn();
+    } catch (e) {
+      console.error('kittycheatNextTick', e);
+    }
+  }, 0);
+
+  return 1;
+};
+
 const kittycheatCombust = () => {
   const cycle = Object
     .entries(combustCycles)
@@ -477,23 +489,16 @@ const kittycheatLoopTabs = (ids, fn) => {
 
 const kittycheatBuildZig = () => {
   try {
+    const noop = () => {};
+    
     const findBld = (id) =>
       gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id && b.model.visible && b.model.enabled);
 
     const getTears = (bld) =>
       bld?.model.prices.find((p) => p.name === 'tears');
     
-    const domClick = (btn) => {
-      setTimeout(() => {
-        try {
-          btn.domNode.click();
-        } catch (e) {
-          console.error('kittycheatZiggurats:click', e);
-        }
-      }, 0);
-
-      return 1;
-    };
+    const domClick = (btn) =>
+      kittycheatNextTick(() => btn.domNode.click());
 
     const uni = kittycheatZigguratsCalc();
 
@@ -525,13 +530,7 @@ const kittycheatBuildZig = () => {
       return domClick(best);
     }
 
-    setTimeout(() => {
-      try {
-        gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, () = {}, () => {});
-      } catch (e) {
-        console.error('kittycheatZiggurats:sacrifice', e);
-      }
-    }, 0);
+    kittycheatNextTick(() => gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, noop, noop));
 
     // we don't count these, just go into slow loop
     return 0;
@@ -550,21 +549,14 @@ const kittycheatBuildTheology = () => {
       return 0;
     }
 
-    const bld = gamePage.religionTab.ctPanel.children[0].children.find((b) => b.id === best.bestBuilding && b.model.visible && b.model.enabled);
+    const cld = gamePage.religionTab.ctPanel.children[0].children;
+    const bld = cld.find((b) => b.id === best.bestBuilding && b.model.visible && b.model.enabled);
 
     if (!bld) {
       return 0;
     }
 
-    setTimeout(() => {
-      try {
-        bld.domNode.click();
-      } catch (e) {
-        console.error('kittycheatZiggurats:click', e);
-      }
-    }, 0);
-
-    return 1;
+    return kittycheatNextTick(() => bld.domNode.click());
   } catch (e) {
     console.error('kittycheatBuildTheology', e);
   }
@@ -604,13 +596,7 @@ const kittycheatFeed = () => {
       if (tab.tabName.toLowerCase().indexOf('trade') === 0) {
         tab.racePanels.forEach((panel) => {
           if (panel.race.name.toLowerCase().indexOf('leviathans') === 0) {
-            setTimeout(() => {
-              try {
-                panel.feedBtn.domNode.click();
-              } catch (e) {
-                console.error('kittycheatFeed', e);
-              }
-            }, 0);
+            kittycheatNextTick(() => panel.feedBtn.domNode.click());
           }
         });
       }
