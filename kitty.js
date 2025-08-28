@@ -243,7 +243,7 @@ const kittycheatReligion = (delay) => {
 
   const cryText = cry && (
     (cry.bestBuilding === 'singularity' ? 'eventHorizon' : cry.bestBuilding) + 
-    (cry.percent ? (', ' + cry.percent.text) : '')
+    (cry.percent ? `, ${cry.percent.text}` : '')
   );
   
   $('div#kittycheatUnicorn').html(`Unicorns : ${uni.bestBuilding || uni.err || '-'}`);
