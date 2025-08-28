@@ -508,7 +508,7 @@ let kittycheatBuildZigPrevTime = 0;
 const kittycheatBuildZig = () => {
   try {
     const availTears = gamePage.resPool.get('tears').value;
-    const availSorrow = gamePage.resPool.get('sorrow').value);
+    const availSorrow = gamePage.resPool.get('sorrow').value;
     
     const findBld = (id) =>
       gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id);
@@ -548,7 +548,9 @@ const kittycheatBuildZig = () => {
     const mv = isValid(mark, mt);
 
     if (bv || mv) {
-      const next = ((bv && mv) ? ((mt.val <= bt.val) ? mark : best) : (mv ? mark : best));
+      const next = (bv && mv)
+        ? ((mt.val <= bt.val) ? mark : best)
+        : (mv ? mark : best);
       
       console.log('kittycheatBuildZig', `building ${next.id}`);
       next.domNode.click();
