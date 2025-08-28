@@ -287,14 +287,16 @@ const kittycheatHasResource = (vals, isTrade) => {
   let cando = true;
 
   Object.entries(vals).forEach(([key, val]) => {
-    const res = gamePage.resPool.get(key);
-
-    if (val.value) {
-      cando = cando && (res.value >= val.value);
-    }
-    
-    if (!isTrade && res.maxValue > 0) {
-      cando = cando && ((res.value / res.maxValue) >= 0.05);
+    if (cando) {
+      const res = gamePage.resPool.get(key);
+  
+      if (val.value) {
+        cando = cando && (res.value >= val.value);
+      }
+      
+      if (!isTrade && res.maxValue > 0) {
+        cando = cando && ((res.value / res.maxValue) >= 0.05);
+      }
     }
   });
 
@@ -536,7 +538,7 @@ const kittycheatBuildZig = () => {
     // first we see if we can do a black pyramid
     const blck = findBld('blackPyramid');
 
-    if (isValid(blck, getPrice(blck, 'sorrow'), availSorrow) && kittycheatHasResource(blck.model.prices)) {
+    if (isValid(blck, getPrice(blck, 'sorrow'), availSorrow) && kittycheatHasResource(blck.model.prices, true)) {
       // console.log('kittycheatBuildZig', 'Building blackPyramid');
       blck.domNode.click();
       return 1;
@@ -549,7 +551,7 @@ const kittycheatBuildZig = () => {
     const mt = getPrice(mark);
     
     const bv = isValid(best, bt);
-    const mv = isValid(mark, mt) && kittycheatHasResource(mark.model.prices);
+    const mv = isValid(mark, mt) && kittycheatHasResource(mark.model.prices, true);
 
     if (bv || mv) {
       const next = (bv && mv)
