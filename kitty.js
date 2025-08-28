@@ -278,7 +278,7 @@ const kittycheatReligion = (delay) => {
 
     const calc = kittycheatMakePercent(unicornPrice / unicornTotal);
   
-    zigText = zig.bestBuilding + (calc?.percent ? `, ${calc.percent.text}` : '');
+    zigText = zig.bestBuilding + (calc ? `, ${calc.text}` : '');
   }
 
   const cryText = cry && (
