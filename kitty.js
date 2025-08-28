@@ -247,7 +247,7 @@ const kittycheatReligion = (delay) => {
   );
   
   $('div#kittycheatUnicorn').html(`Unicorns : ${uni.bestBuilding || uni.err || '-'}`);
-  $('div#kittycheatCrypto').html(`Theology : ${cryText : '-'}`);
+  $('div#kittycheatCrypto').html(`Theology : ${cryText || '-'}`);
   $('div#kittycheatTranscend').html(`Transcend: ${trd?.text || '-'}`);
 
   setTimeout(() => kittycheatReligion(delay), delay);  
