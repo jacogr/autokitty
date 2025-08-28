@@ -523,7 +523,7 @@ const kittycheatBuildZig = () => {
     const isVisible = (bld) =>
       !!(bld && bld.model.visible && bld.model.enabled);
 
-    const isValid = (bld, tears) =>
+    const isValid = (bld, trs) =>
       isVisible(bld) && !!(trs && trs.val);
 
     const getTears = (bld) =>
@@ -561,7 +561,8 @@ const kittycheatBuildZig = () => {
     }
 
     const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
-    const zigTears = gamePage.resPool.get('tears').value + (zigImpl.meta.on * gamePage.resPool.get('unicorns').value / 2500);
+    const availUni = gamePage.resPool.get('unicorns').value;
+    const zigTears = gamePage.resPool.get('tears').value + (zigImpl.meta.on * availUni / 2500);
 
     // only sacrifice when we do have enough available
     if (bt && zigTears > bt.val) {
