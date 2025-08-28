@@ -8,7 +8,7 @@ const isMax = {
   'x10': false,
   'upgrade': true,
   'zig': false,
-  'theology': false
+  'crypto': false
 };
 
 const combustCycles = { 
@@ -32,25 +32,11 @@ const kittycheatStyleDiv = (div, small = false) => {
   return div.css({ 'margin-bottom': small ? '5px' : '20px' });
 };
 
-const kittycheatSpanClick = (label) => {
-  const span = $('span').filter(function() { 
-    return $(this).text().indexOf(label) === 0;
-  });
-
-  if (span.length) {
-    span.click();
-    
-    return 1;
-  }
-
-  return 0;
-};
-
 const kittycheatMakePercent = (frac) => {
   if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
     const raw = 100 * frac;
     
-    return { text: `${raw.toFixed(3)}%`, raw };
+    return { text: `${raw.toFixed(2)}%`, raw };
   }
 };
 
@@ -66,6 +52,20 @@ const kittycheatNextTick = (fn) => {
   return 1;
 };
 
+const kittycheatSpanClick = (label) => {
+  const span = $('span').filter(function() { 
+    return $(this).text().indexOf(label) === 0;
+  });
+
+  if (span.length) {
+    span.click();
+    
+    return 1;
+  }
+
+  return 0;
+};
+
 const kittycheatCombust = () => {
   const cycle = Object
     .entries(combustCycles)
@@ -75,8 +75,8 @@ const kittycheatCombust = () => {
   
   if (cycle) {
     const btn = gamePage.timeTab.cfPanel.children[0].children[0];
-    
-    btn.model[cycle].handler.call(btn);
+
+    kittycheatNextTick(() => btn.model[cycle].handler.call(btn));
   }
 };
 
@@ -590,7 +590,7 @@ const kittycheatBuildAll = (delay) => {
   }
 
   // religion: cryptotheology
-  if (isMax.theology) {
+  if (isMax.crypto) {
     count += kittycheatBuildTheology();
   }
 
