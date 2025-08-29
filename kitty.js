@@ -487,7 +487,10 @@
     let count = 0;
 
     try {
-      // for unlocks, we allow work in the background
+      if (!tab.visible) {
+        return 0;
+      }
+
       renderBgTab(tab);
 
       const buttons =
@@ -560,9 +563,11 @@
 
     try {
       // for builds, we always want the tab visible & active
-      if (dryRun) {
+      if (!tab.visible) {
+        return 0;
+      } else if (dryRun) {
         renderBgTab(tab);
-      } else if (!tab.visible || game.ui.activeTabId !== tab.tabId) {
+      } else if (game.ui.activeTabId !== tab.tabId) {
         return 0;
       }
 
@@ -590,7 +595,7 @@
     return count;
   };
 
-  const loopTabs = (fn, tabs, dryRun) => {
+  const loopTabs = (dryRun, stats, statsType, tabs, fn) => {
     const indv = [];
     let total = 0;
 
@@ -598,52 +603,37 @@
       const count = fn(gamePage[tab], dryRun);
 
       if (count) {
-        indv.push({ name: gamePage[tab].tabName, count });
+        indv.push({ name: gamePage[tab].tabId, count });
         total += count;
       }
     }
 
-    return { total, indv };
+    if (total) {
+      stats[statsType] = { total, indv };
+    }
+
+    return total;
   };
 
   const execBuildAll = (delay, dryRun = false) => {
     const stats = {};
     let total = 0;
 
-    const viaLoop = (type, tabs, fn) => {
-      const res = loopTabs(fn, tabs, dryRun);
-
-      if (res.total) {
-        total += res.total;
-
-        stats[type] = res;
-      }
-    };
-
-    const viaSingle = (type, tab, fn) => {
-      const count = fn(dryRun);
-
-      if (count) {
-        total += count;
-        stats[type] = { total: count, indv: { name: gamePage[tab].tabName, count }};
-      }
-    };
-
     if (isMax.upgrade.active || dryRun) {
-      viaLoop('upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'workshopTab'], unlockTab);
+      total += loopTabs(dryRun, stats, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'workshopTab'], unlockTab);
     }
 
     if (isMax.build.active || dryRun) {
-      viaLoop('build', ['bldTab', 'diplomacyTab', 'spaceTab'], buildTab);
+      total += loopTabs(dryRun, stats, 'build', ['bldTab', 'diplomacyTab', 'spaceTab'], buildTab);
     }
 
     if (!dryRun) {
       if (isMax.zig.active) {
-        viaSingle('zig', 'religionTab', buildZig);
+        total += loopTabs(dryRun, stats, 'zig', ['religionTab'], (_, dryRun) => buildZig(dryRun));
       }
 
       if (isMax.crypto.active) {
-        viaSingle('crypto', 'religionTab', buildTheology);
+        total += loopTabs(dryRun, stats, 'crypto', ['religionTab'], (_, dryRun) => buildTheology(dryRun));
       }
     }
 
@@ -656,7 +646,8 @@
 
   const execTextInfo = (delay) => {
     const concatNext = (s) =>
-      s?.indv.map(({ count, name }) => `${name}(${count})`).join(', ');
+      // `${e.name}(${e.count})`
+      s?.indv.map((e) => e.name).join(', ');
 
     renderBgTab(gamePage.religionTab);
 
