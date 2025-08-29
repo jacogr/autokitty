@@ -863,11 +863,14 @@ for (const id in isMax) {
     if (isMax[id].active = !isMax[id].active && isMax[id].excl) {
       for (const o of isMax[id].excl) {
         isMax[o].active = false;
+        kittycheatStyleBtn(isMax[o].btn, { active: false });
       }
     }
     
     kittycheatStyleBtn(btn, { active: isMax[id].active });
   });
+
+  isMax[id].btn = btn;
 
   kittyIwGroup.append(kittycheatStyleBtn(btn, { active: isMax[id].active }));
 }
