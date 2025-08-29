@@ -499,11 +499,13 @@ const kittycheatTabBuild = (tab) => {
 };
 
 const kittycheatLoopTabs = (ids, fn) => {
+  const count = 0;
+  
   for (const i of ids) {
-    fn(gamePage.tabs[i]);
+    count += fn(gamePage.tabs[i]);
   }
 
-  return 0;
+  return count;
 };
 
 let kittycheatBuildZigPrevTime = 0;
@@ -623,7 +625,7 @@ const kittycheatBuildAll = (delay) => {
     count += kittycheatBuildTheology();
   }
 
-  setTimeout(() => kittycheatBuildAll(delay), Math.ceil(delay / (count ? 10 : 1)));
+  setTimeout(() => kittycheatBuildAll(delay), Math.ceil(delay / (count ? 5 : 1)));
 };
 
 const kittycheatFeed = () => {
