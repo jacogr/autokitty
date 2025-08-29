@@ -7,7 +7,7 @@ const isMax = {
   'upgrade': { active: true, end: true },
   'zig': { active: false },
   'crypto': { active: false, end: true },
-  'max': { active: true, excl: ['x10'] },
+  'max': { active: false, excl: ['x10'] },
   'x10': { active: false, excl: ['max'], end: true }
 };
 
