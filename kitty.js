@@ -4,7 +4,7 @@ const $ = window.$;
 
 const isMax = {
   'build': { active: false },
-  'upgrade': { active: true, end: true },
+  'upgrade': { active: false, end: true },
   'zig': { active: false },
   'crypto': { active: false, end: true },
   'max': { active: false, excl: ['x10'] },
