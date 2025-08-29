@@ -399,6 +399,9 @@ const kittycheatTabUnlock = (tab) => {
   let count = 0;
 
   try {
+    // for unlocks, we allow work in the background
+    kittycheatRenderBgTab(tab);
+    
     const buttons =
       // religion
       tab.rUpgradeButtons ||
@@ -409,7 +412,7 @@ const kittycheatTabUnlock = (tab) => {
 
     for (const btn of buttons) {
       try {
-        if (btn && btn.model && btn.model.enabled && btn.model.visible && btn.model.metadata && !btn.model.prices.find((p) => ['void'].includes(p.name))) {
+        if (btn?.model?.enabled && btn.model.visible && btn.model.metadata && !btn.model.prices.find((p) => p.name === 'void')) {
           count += kittycheatClickDom(btn);
         }
       } catch (e) {
@@ -427,7 +430,7 @@ const kittycheatBuildButtonClick = (btn) => {
   const model = btn?.model;
 
   // don't buy invisible or switched off
-  if (!model || !model.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val)) {
+  if (!model?.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val)) {
     return 0;
   }
 
@@ -457,6 +460,11 @@ const kittycheatTabBuild = (tab) => {
   let count = 0;
 
   try {
+    // for builds, we always want the tab visible & active
+    if (!tab.visible || game.ui.activeTabId !== tab.tabId) {
+      return 0;
+    }
+  
     const areas =
       // space
       tab.planetPanels ||
@@ -492,11 +500,7 @@ const kittycheatTabBuild = (tab) => {
 
 const kittycheatLoopTabs = (ids, fn) => {
   for (const i of ids) {
-    const t = gamePage.tabs[i];
-
-    if (t.visible && game.ui.activeTabId === t.tabId) {
-      return fn(t);
-    }
+    fn(gamePage.tabs[i]);
   }
 
   return 0;
