@@ -440,9 +440,7 @@ const kittycheatBuildButtonClick = (model) => {
   kittycheatMaxFill();
 
   // get first invalid price
-  const firstInvalid = model.prices.find((p) =>
-    game.resPool.resources.find((r) => r.name === p.name).value < p.val
-  );
+  const firstInvalid = model.prices.find((p) => gamePage.resPool.get(p.name).value < p.val);
 
   // ensure we have enough of everything
   if (firstInvalid) {
@@ -450,9 +448,7 @@ const kittycheatBuildButtonClick = (model) => {
   }
 
   // at least something with a max
-  const firstMax = model.prices.find((p) =>
-    game.resPool.resources.find((r) => r.name === p.name).maxValue > 0
-  );
+  const firstMax = model.prices.find((p) => gamePage.resPool.get(p.name).maxValue > 0);
 
   // without a max, we only build a single
   if (!firstMax && model.metadata.on >= 1) {
