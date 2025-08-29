@@ -11,7 +11,7 @@ const isMax = {
   'crypto': false
 };
 
-const combustCycles = { 
+const combustCycles = {
   tenErasLink: 500,
   previousCycleLink: 45,
   nextCycleLink: 5
@@ -38,21 +38,31 @@ const kittycheatStyleDiv = (div, small = false) => {
 const kittycheatMakePercent = (frac) => {
   if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
     const raw = 100 * frac;
-    
+
     return { text: `${raw.toFixed(2)}%`, raw };
   }
 };
 
 const kittycheatNoop = () => {};
 
-const kittycheatSpanClick = (label) => {
-  const span = $('span').filter(function() { 
+const kittycheatClickDom = (btn) => {
+  if (btn?.domNode) {
+    btn.domNode.click();
+
+    return 1;
+  }
+
+  return 0;
+};
+
+const kittycheatClickSpan = (label) => {
+  const span = $('span').filter(function() {
     return $(this).text().indexOf(label) === 0;
   });
 
   if (span.length) {
     span.click();
-    
+
     return 1;
   }
 
@@ -68,15 +78,15 @@ const kittycheatRenderBgTab = (tab) => {
 const kittycheatCombust = () => {
   const res = Object
     .entries(combustCycles)
-    .map(([cycle, div]) => ({ 
+    .map(([cycle, div]) => ({
       cycle,
       count: Math.floor(((game.getEffect('heatMax') - game.time.heat) / div) / 10)
     }))
     .find((r) => r.count > 0);
-  
+
   if (res) {
     kittycheatRenderBgTab(gamePage.timeTab);
-    
+
     const btn = gamePage.timeTab.cfPanel.children[0].children[0];
 
     btn.model[res.cycle].handler.call(btn);
@@ -113,7 +123,7 @@ const kittycheatZigguratsCalc = () => {
 
     // The modifier applied by the current cycle and holding a festival.
     let cycleBonus = 1;
-    
+
     // If the current cycle has an effect on unicorn production during festivals
     if (currentCycle.festivalEffects.unicorns !== undefined) {
       // Numeromancy is the metaphysics upgrade that grants bonuses based on cycles.
@@ -126,23 +136,23 @@ const kittycheatZigguratsCalc = () => {
 
     // Based on how many ziggurats we have.
     const zigguratRatio = Math.max(zigImpl.meta.on, 1);
-    
+
     // How many unicorns do we receive in a unicorn rift?
     const baseUnicornsPerRift = 500 * (1 + gamePage.getEffect('unicornsRatioReligion') * 0.1);
 
     // How likely are unicorn rifts to happen? The unicornmancy metaphysics upgrade increases this chance.
     let riftChanceRatio = 1;
-    
+
     if (gamePage.prestige.getPerk('unicornmancy').researched) {
       riftChanceRatio *= 1.1;
     }
-    
+
     // ?
     const unicornRiftChange = ((gamePage.getEffect('riftChance') * riftChanceRatio) / (10000 * 2)) * baseUnicornsPerRift;
 
     // We now want to determine how quickly the cost of given building is neutralized
     // by its effect on production of unicorns.
-    
+
     const pastureProduction = unicornsPerTickBase * gamePage.getTicksPerSecondUI() * globalRatio * religionRatio * paragonRatio * faithBonus * cycleBonus;
 
     // If the unicorn pasture amortizes itself in less than infinity ticks,
@@ -153,7 +163,7 @@ const kittycheatZigguratsCalc = () => {
     let bestAmortization = Number.POSITIVE_INFINITY;
     let bestBuilding = 'unicornPasture';
     let bestPrices = pastureImpl.model?.prices || [];
-    
+
     if (pastureAmortization < bestAmortization) {
       bestAmortization = pastureAmortization;
     }
@@ -168,13 +178,13 @@ const kittycheatZigguratsCalc = () => {
 
       // Determine a price value for this building.
       let unicornPrice = 0;
-      
+
       for (const price of buildingImpl.model.prices) {
         // Add the amount of unicorns the building costs (if any).
         if (price.name === 'unicorns') {
           unicornPrice += price.val;
         }
-        
+
         // Tears result from unicorn sacrifices, so factor that into the price proportionally.
         if (price.name === 'tears') {
           unicornPrice += (price.val * 2500) / zigguratRatio;
@@ -185,12 +195,12 @@ const kittycheatZigguratsCalc = () => {
       const buildingInfo = gamePage.religion.getZU(building);
       let religionBonus = religionRatio;
       let riftChance = gamePage.getEffect('riftChance');
-      
+
       for (const effect in buildingInfo.effects) {
         if (effect === 'unicornsRatioReligion') {
           religionBonus += buildingInfo.effects.unicornsRatioReligion;
         }
-        
+
         if (effect === 'riftChance') {
           riftChance += buildingInfo.effects.riftChance;
         }
@@ -199,14 +209,14 @@ const kittycheatZigguratsCalc = () => {
       // The rest should be straight forward.
       const unicornsPerRift = 500 * ((religionBonus - 1) * 0.1 + 1);
       let riftBonus = ((riftChance * riftChanceRatio) / (10000 * 2)) * unicornsPerRift;
-      
+
       riftBonus -= unicornRiftChange;
-      
+
       let buildingProduction = unicornsPerSecondBase * globalRatio * religionBonus * paragonRatio * faithBonus * cycleBonus;
-      
+
       buildingProduction -= unicornsPerSecond;
       buildingProduction += riftBonus;
-      
+
       const amortization = unicornPrice / buildingProduction;
 
       if (amortization < bestAmortization) {
@@ -242,7 +252,7 @@ const kittycheatTheologyCalc = () => {
       .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)[0];
 
     if (best) {
-      return { 
+      return {
         bestBuilding: best.id,
         percent: kittycheatMakePercent(best.model.prices[0].val / gamePage.resPool.get('relic').value)
       };
@@ -265,10 +275,10 @@ const kittycheatReligion = (delay) => {
 
     const tears2uni = (tears) =>
       (tears * 2500) / zigguratRatio;
-    
+
     let unicornTotal = tears2uni(gamePage.resPool.get('tears').value) + gamePage.resPool.get('unicorns').value;
     let unicornPrice = 0;
-        
+
     for (const price of zig.bestPrices) {
       if (price.name === 'unicorns') {
         unicornPrice += price.val;
@@ -278,20 +288,20 @@ const kittycheatReligion = (delay) => {
     }
 
     const calc = kittycheatMakePercent(unicornTotal / unicornPrice);
-  
+
     zigText = zig.bestBuilding + (calc ? `, ${calc.text}` : '');
   }
 
   const cryText = cry && (
-    (cry.bestBuilding === 'singularity' ? 'eventHorizon' : cry.bestBuilding) + 
+    (cry.bestBuilding === 'singularity' ? 'eventHorizon' : cry.bestBuilding) +
     (cry.percent ? `, ${cry.percent.text}` : '')
   );
-  
+
   $('div#kittycheatZiggurat').html(`Ziggurat : ${zigText || zig.err || '-'}`);
   $('div#kittycheatTheology').html(`Theology : ${cryText || '-'}`);
   $('div#kittycheatTranscend').html(`Transcend: ${trd?.text || '-'}`);
 
-  setTimeout(() => kittycheatReligion(delay), delay);  
+  setTimeout(() => kittycheatReligion(delay), delay);
 };
 
 const kittycheatHasResource = (vals = {}, isTrade = false) => {
@@ -300,9 +310,9 @@ const kittycheatHasResource = (vals = {}, isTrade = false) => {
   for (const key in vals) {
     if (cando) {
       const res = gamePage.resPool.get(key);
-  
+
       cando = res.value >= vals[key];
-      
+
       if (cando && !isTrade && res.maxValue > 0) {
         cando = (res.value / res.maxValue) >= 0.05;
       }
@@ -350,13 +360,13 @@ const kittycheatExecTimer = (name, opts) => {
   try {
     if (opts.active) {
       const isFillable = ['hunt', 'praise'].includes(name);
-  
+
       if (isFillable) {
         kittycheatMaxFill();
       }
-  
+
       kittycheatExec(name, opts);
-  
+
       if (isFillable) {
         kittycheatMaxFill();
       }
@@ -391,7 +401,7 @@ const kittycheatMaxFill = (name = null) => {
 
 const kittycheatTabUnlock = (tab) => {
   let count = 0;
-  
+
   try {
     const buttons =
       // religion
@@ -404,7 +414,7 @@ const kittycheatTabUnlock = (tab) => {
     for (const btn of buttons) {
       try {
         if (btn && btn.model && btn.model.enabled && btn.model.visible && btn.model.metadata && !btn.model.prices.find((p) => ['void'].includes(p.name))) {
-          count += kittycheatSpanClick(btn.model.metadata.label);
+          count += kittycheatClickDom(btn);
         }
       } catch (e) {
         console.error('kittycheatTabUnlock', tab.tabName, e);
@@ -417,7 +427,9 @@ const kittycheatTabUnlock = (tab) => {
   return count;
 };
 
-const kittycheatBuildButtonClick = (model) => {
+const kittycheatBuildButtonClick = (btn) => {
+  const model = btn?.model;
+
   // don't buy invisible or switched off
   if (!model || !model.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val)) {
     return 0;
@@ -442,12 +454,12 @@ const kittycheatBuildButtonClick = (model) => {
     return 0;
   }
 
-  return kittycheatSpanClick(model.metadata.label);
+  return kittycheatClickDom(btn);
 };
 
 const kittycheatTabBuild = (tab) => {
   let count = 0;
-  
+
   try {
     const areas =
       // space
@@ -460,13 +472,13 @@ const kittycheatTabBuild = (tab) => {
     for (const area of areas) {
       for (const child of area.children) {
         try {
-          const result = kittycheatBuildButtonClick(child?.model);
-          
-          // for trade, explore after click - some ui nigglies which this unlocks
+          const result = kittycheatBuildButtonClick(child);
+
+          // for trade, explore after click
           if (result && tab.exploreBtn) {
-            kittycheatSpanClick(tab.exploreBtn.model.name);
+            kittycheatClickDom(tab.exploreBtn);
           }
-          
+
           count += result;
         } catch (e) {
           console.error('kittycheatTabBuild', tab.tabName, e);
@@ -483,12 +495,12 @@ const kittycheatTabBuild = (tab) => {
 const kittycheatLoopTabs = (ids, fn) => {
   for (const i of ids) {
     const t = gamePage.tabs[i];
-    
+
     if (t.visible && game.ui.activeTabId === t.tabId) {
       return fn(t);
     }
   }
-  
+
   return 0;
 };
 
@@ -497,7 +509,7 @@ let kittycheatBuildZigPrevTime = 0;
 const kittycheatBuildZig = () => {
   try {
     kittycheatRenderBgTab(gamePage.religionTab);
-    
+
     const findBld = (id) =>
       gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id);
 
@@ -509,7 +521,7 @@ const kittycheatBuildZig = () => {
       bld?.model.prices.find((p) => p.name === 'tears');
 
     const uni = kittycheatZigguratsCalc();
-    
+
     // we don't auto-build pastures (or nothing)
     if (!uni.bestBuilding || uni.bestBuilding === 'unicornPasture') {
       return 0;
@@ -520,13 +532,12 @@ const kittycheatBuildZig = () => {
 
     if (isValid(blck)) {
       // console.log('kittycheatBuildZig:', 'blackPyramid');
-      blck.domNode.click();
-      return 1;
+      return kittycheatClickDom(blck);
     }
 
     const best = findBld(uni.bestBuilding);
     const mark = findBld('marker');
-    
+
     const bv = isValid(best);
     const mv = isValid(mark);
 
@@ -537,10 +548,9 @@ const kittycheatBuildZig = () => {
       const next = (bv && mv)
         ? ((mt.val <= bt.val) ? mark : best)
         : (mv ? mark : best);
-      
+
       // console.log('kittycheatBuildZig:', next.id);
-      next.domNode.click();
-      return 1;
+      return kittycheatClickDom(next);
     }
 
     const zigTears = gamePage.resPool.get('tears').value + (gamePage.bld.getBuildingExt('ziggurat').meta.on * gamePage.resPool.get('unicorns').value / 2500);
@@ -566,7 +576,7 @@ const kittycheatBuildZig = () => {
 const kittycheatBuildTheology = () => {
   try {
     kittycheatRenderBgTab(gamePage.religionTab);
-    
+
     const best = kittycheatTheologyCalc();
 
     if (!best || !best.percent || best.percent.raw > 1) {
@@ -580,9 +590,7 @@ const kittycheatBuildTheology = () => {
       return 0;
     }
 
-    bld.domNode.click();
-
-    return 1;
+    return kittycheatClickDom(bld);
   } catch (e) {
     console.error('kittycheatBuildTheology', e);
   }
@@ -592,7 +600,7 @@ const kittycheatBuildTheology = () => {
 
 const kittycheatBuildAll = (delay) => {
   let count = 0;
-  
+
   // upgrades: 2:science, 3:workshop, 5:religion, 6:space
   if (isMax.upgrade) {
     count += kittycheatLoopTabs([2, 3, 5, 6], kittycheatTabUnlock);
@@ -619,8 +627,8 @@ const kittycheatBuildAll = (delay) => {
 const kittycheatFeed = () => {
   if (gamePage.resPool.get('necrocorn').value > 1) {
     kittycheatRenderBgTab(gamePage.diplomacyTab)
-    
-    gamePage.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans')?.feedBtn.domNode.click();
+
+    kittycheatClickDom(gamePage.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans')?.feedBtn);
   }
 };
 
@@ -629,9 +637,9 @@ const kittycheatAdore = () => {
   // if (game.religion.faithRatio > game.religion._getTranscendNextPrice()) {
   //  gamePage.religionTab?.transcendBtn?.domNode.click();
   // }
-  
+
   game.religion.resetFaith(1.01, false);
-  gamePage.religionTab?.praiseBtn?.domNode.click();
+  kittycheatClickDom(gamePage.religionTab?.praiseBtn);
 };
 
 const kittycheatOpts = Object.values({
@@ -700,7 +708,7 @@ const kittycheatOpts = Object.values({
     'bloodstone': {
       res: { 'timeCrystal': 5000, 'relic': 10000 }
     },
-    'tMythril': { 
+    'tMythril': {
       res: { 'bloodstone': 5 }
     }
   },
@@ -746,22 +754,22 @@ const kittycheatOpts = Object.values({
   },
   'actions': {
     'catnip': {
-      func: () => { 
-        kittycheatSpanClick('Gather catnip');
+      func: () => {
+        kittycheatClickSpan('Gather catnip');
       },
       active: true,
       delay: 5
     },
     'refine': {
-      func: () => { 
+      func: () => {
         kittycheatMaxFill('catnip');
-        kittycheatSpanClick('Refine catnip');
+        kittycheatClickSpan('Refine catnip');
       },
       active: true,
       delay: 1000
     },
     'observe': {
-      func: () => { 
+      func: () => {
         $('input#observeBtn').click();
       },
       active: true
@@ -803,7 +811,7 @@ const kittycheatExecOpts = (delay) => {
   for (const group of kittycheatOpts) {
     for (const n in group) {
       const o = group[n];
-      
+
       if (o.active && !o.delay) {
         kittycheatMaxFill();
         kittycheatExec(n, o);
@@ -816,7 +824,7 @@ const kittycheatExecOpts = (delay) => {
   setTimeout(() => kittycheatExecOpts(delay), delay);
 };
 
-const kittycheatCont = $('<div></div>').css({ 
+const kittycheatCont = $('<div></div>').css({
   'padding-bottom': '30px',
   'font-family': 'monospace',
   'font-size': 'small'
@@ -836,13 +844,13 @@ for (const group of kittycheatOpts) {
 
   for (const optname in group) {
     const opts = group[optname];
-    
+
     opts.active = opts.active || false;
 
     const btn = $(`<button>${optname}</button>`).click(() => {
       kittycheatBtnClick(btn, optname, opts);
     });
-    
+
     kittycheatGroup.append(kittycheatStyleBtn(btn, opts));
 
     if (opts.delay) {
