@@ -941,6 +941,6 @@
 
   // start the loops
   execOpts(99);
-  execTextInfo(500);
-  execBuildAll(1000);
+  execTextInfo(999);
+  execBuildAll(999);
 })();
