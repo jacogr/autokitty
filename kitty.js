@@ -39,7 +39,14 @@ const kittycheatMakePercent = (frac) => {
   if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
     const raw = 100 * frac;
 
-    return { text: `${raw.toFixed(2)}%`, raw };
+    return { 
+      text: raw >= 100.99
+        ? '>100.99%'
+        : raw <= 0.99
+          ? '<0.99%'
+          : `${raw.toFixed(2)}%`, 
+      raw
+    };
   }
 };
 
@@ -265,6 +272,8 @@ const kittycheatTheologyCalc = () => {
 };
 
 const kittycheatReligion = (delay) => {
+  kittycheatRenderBgTab(gamePage.religionTab);
+  
   const zig = kittycheatZigguratsCalc();
   const cry = kittycheatTheologyCalc();
   const trd = kittycheatTranscendCalc();
