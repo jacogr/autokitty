@@ -93,6 +93,20 @@ const kittycheatCombust = () => {
   }
 };
 
+const kittycheatZigguratsCalcPrices = (prices, zigguratRatio) => {
+  let unicornPrice = 0;
+  
+  for (const price of prices) {
+    if (price.name === 'unicorns') {
+      unicornPrice += price.val;
+    } else if (price.name === 'tears') {
+      unicornPrice += (price.val * 2500) / zigguratRatio;
+    }
+  }
+
+  return unicornPrice;
+};
+
 const kittycheatZigguratsCalc = () => {
   try {
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
@@ -177,19 +191,7 @@ const kittycheatZigguratsCalc = () => {
       }
 
       // Determine a price value for this building.
-      let unicornPrice = 0;
-
-      for (const price of buildingImpl.model.prices) {
-        // Add the amount of unicorns the building costs (if any).
-        if (price.name === 'unicorns') {
-          unicornPrice += price.val;
-        }
-
-        // Tears result from unicorn sacrifices, so factor that into the price proportionally.
-        if (price.name === 'tears') {
-          unicornPrice += (price.val * 2500) / zigguratRatio;
-        }
-      }
+      const unicornPrice = kittycheatZigguratsCalcPrices(buildingImpl.model.prices, zigguratRatio);
 
       // Determine the effect the building will have on unicorn production and unicorn rifts.
       const buildingInfo = gamePage.religion.getZU(building);
@@ -199,9 +201,7 @@ const kittycheatZigguratsCalc = () => {
       for (const effect in buildingInfo.effects) {
         if (effect === 'unicornsRatioReligion') {
           religionBonus += buildingInfo.effects.unicornsRatioReligion;
-        }
-
-        if (effect === 'riftChance') {
+        } else if (effect === 'riftChance') {
           riftChance += buildingInfo.effects.riftChance;
         }
       }
@@ -271,22 +271,9 @@ const kittycheatReligion = (delay) => {
   let zigText = zig.bestBuilding;
 
   if (zig.bestBuilding && zig.bestPrices) {
-    const zigguratRatio = gamePage.bld.getBuildingExt('ziggurat').meta.on || 0;
-
-    const tears2uni = (tears) =>
-      (tears * 2500) / zigguratRatio;
-
-    let unicornTotal = tears2uni(gamePage.resPool.get('tears').value) + gamePage.resPool.get('unicorns').value;
-    let unicornPrice = 0;
-
-    for (const price of zig.bestPrices) {
-      if (price.name === 'unicorns') {
-        unicornPrice += price.val;
-      } else if (price.name === 'tears') {
-        unicornPrice += tears2uni(price.val);
-      }
-    }
-
+    const zigguratRatio = Math.max(gamePage.bld.getBuildingExt('ziggurat').meta.on, 1);
+    const unicornTotal = ((gamePage.resPool.get('tears').value * 2500) / zigguratRatio) + gamePage.resPool.get('unicorns').value;
+    const unicornPrice = kittycheatZigguratsCalcPrices(zig.bestPrices, zigguratRatio);
     const calc = kittycheatMakePercent(unicornTotal / unicornPrice);
 
     zigText = zig.bestBuilding + (calc ? `, ${calc.text}` : '');
