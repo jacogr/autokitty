@@ -395,118 +395,6 @@ const kittycheatMaxFill = (name = null) => {
   }
 };
 
-const kittycheatTabUnlock = (tab) => {
-  let count = 0;
-
-  try {
-    // for unlocks, we allow work in the background
-    kittycheatRenderBgTab(tab);
-    
-    const buttons =
-      // religion
-      tab.rUpgradeButtons ||
-      // space
-      tab.GCPanel?.children ||
-      // science, workshop
-      tab.buttons;
-
-    for (const btn of buttons) {
-      try {
-        if (btn?.model?.enabled && btn.model.visible && btn.model.metadata && !btn.model.prices.find((p) => p.name === 'void')) {
-          count += kittycheatClickDom(btn);
-        }
-      } catch (e) {
-        console.error('kittycheatTabUnlock', tab.tabName, e);
-      }
-    }
-  } catch (e) {
-    console.error('kittycheatTabUnlock', tab?.tabName, e);
-  }
-
-  return count;
-};
-
-const kittycheatBuildButtonClick = (btn) => {
-  const model = btn?.model;
-
-  // don't buy invisible or switched off
-  if (!model?.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val)) {
-    return 0;
-  }
-
-  // max resources
-  kittycheatMaxFill();
-
-  // get first invalid price
-  const firstInvalid = model.prices.find((p) => gamePage.resPool.get(p.name).value < p.val);
-
-  // ensure we have enough of everything
-  if (firstInvalid) {
-    return 0;
-  }
-
-  // at least something with a max
-  const firstMax = model.prices.find((p) => gamePage.resPool.get(p.name).maxValue > 0);
-
-  // without a max, we only build a single
-  if (!firstMax && model.metadata.on >= 1) {
-    return 0;
-  }
-
-  return kittycheatClickDom(btn);
-};
-
-const kittycheatTabBuild = (tab) => {
-  let count = 0;
-
-  try {
-    // for builds, we always want the tab visible & active
-    if (!tab.visible || game.ui.activeTabId !== tab.tabId) {
-      return 0;
-    }
-  
-    const areas =
-      // space
-      tab.planetPanels ||
-      // trade
-      tab.racePanels?.map((r) => ({ children: [r.embassyButton] })) ||
-      // others
-      [tab];
-
-    for (const area of areas) {
-      for (const child of area.children) {
-        try {
-          count += kittycheatBuildButtonClick(child);
-        } catch (e) {
-          console.error('kittycheatTabBuild', tab.tabName, e);
-        }
-      }
-    }
-
-    // for trade, explore after clicks (when not all are there)
-    if (tab.exploreBtn && tab.racePanels) {
-      const maxRaces = tab.leviathansInfo ? 8 : 7;
-      
-      if (tab.racePanels.length !== maxRaces) {
-        kittycheatClickDom(tab.exploreBtn);
-      }
-    }
-  } catch (e) {
-    console.error('kittycheatTabBuild', tab?.tabName, e);
-  }
-
-  return count;
-};
-
-const kittycheatLoopTabs = (ids, fn) => {
-  const count = 0;
-  
-  for (const i of ids) {
-    count += fn(gamePage.tabs[i]);
-  }
-
-  return count;
-};
 
 let kittycheatBuildZigPrevTime = 0;
 
@@ -602,6 +490,138 @@ const kittycheatBuildTheology = () => {
   return 0;
 };
 
+
+const kittycheatFeed = () => {
+  if (gamePage.resPool.get('necrocorn').value > 1) {
+    kittycheatRenderBgTab(gamePage.diplomacyTab)
+
+    kittycheatClickDom(gamePage.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans')?.feedBtn);
+  }
+};
+
+const kittycheatAdore = () => {
+  // sadly the game always confirms here, leave for now...
+  // if (game.religion.faithRatio > game.religion._getTranscendNextPrice()) {
+  //  gamePage.religionTab?.transcendBtn?.domNode.click();
+  // }
+
+  game.religion.resetFaith(1.01, false);
+  kittycheatClickDom(gamePage.religionTab?.praiseBtn);
+};
+
+const kittycheatTabUnlock = (tab) => {
+  let count = 0;
+
+  try {
+    // for unlocks, we allow work in the background
+    kittycheatRenderBgTab(tab);
+    
+    const buttons =
+      // religion
+      tab.rUpgradeButtons ||
+      // space
+      tab.GCPanel?.children ||
+      // science, workshop
+      tab.buttons;
+
+    for (const btn of buttons) {
+      try {
+        if (btn?.model?.enabled && btn.model.visible && btn.model.metadata && !btn.model.prices.find((p) => p.name === 'void')) {
+          count += kittycheatClickDom(btn);
+        }
+      } catch (e) {
+        console.error('kittycheatTabUnlock', tab.tabName, e);
+      }
+    }
+  } catch (e) {
+    console.error('kittycheatTabUnlock', tab?.tabName, e);
+  }
+
+  return count;
+};
+
+const kittycheatBuildButtonClick = (btn) => {
+  const model = btn?.model;
+
+  // don't buy invisible or switched off
+  if (!model?.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val)) {
+    return 0;
+  }
+
+  // max resources
+  kittycheatMaxFill();
+
+  // get first invalid price
+  const firstInvalid = model.prices.find((p) => gamePage.resPool.get(p.name).value < p.val);
+
+  // ensure we have enough of everything
+  if (firstInvalid) {
+    return 0;
+  }
+
+  // at least something with a max
+  const firstMax = model.prices.find((p) => gamePage.resPool.get(p.name).maxValue > 0);
+
+  // without a max, we only build a single
+  if (!firstMax && model.metadata.on >= 1) {
+    return 0;
+  }
+
+  return kittycheatClickDom(btn);
+};
+
+const kittycheatTabBuild = (tab) => {
+  let count = 0;
+
+  try {
+    // for builds, we always want the tab visible & active
+    if (!tab.visible || game.ui.activeTabId !== tab.tabId) {
+      return 0;
+    }
+  
+    const areas =
+      // space
+      tab.planetPanels ||
+      // trade
+      tab.racePanels?.map((r) => ({ children: [r.embassyButton] })) ||
+      // others
+      [tab];
+
+    for (const area of areas) {
+      for (const child of area.children) {
+        try {
+          count += kittycheatBuildButtonClick(child);
+        } catch (e) {
+          console.error('kittycheatTabBuild', tab.tabName, e);
+        }
+      }
+    }
+
+    // for trade, explore after clicks (when not all are there)
+    if (tab.exploreBtn && tab.racePanels) {
+      const maxRaces = tab.leviathansInfo ? 8 : 7;
+      
+      if (tab.racePanels.length !== maxRaces) {
+        count += kittycheatClickDom(tab.exploreBtn);
+      }
+    }
+  } catch (e) {
+    console.error('kittycheatTabBuild', tab?.tabName, e);
+  }
+
+  return count;
+};
+
+const kittycheatLoopTabs = (ids, fn) => {
+  const count = 0;
+  
+  for (const i of ids) {
+    count += fn(gamePage.tabs[i]);
+  }
+
+  return count;
+};
+
 const kittycheatBuildAll = (delay) => {
   let count = 0;
 
@@ -626,24 +646,6 @@ const kittycheatBuildAll = (delay) => {
   }
 
   setTimeout(() => kittycheatBuildAll(delay), Math.ceil(delay / (count ? 5 : 1)));
-};
-
-const kittycheatFeed = () => {
-  if (gamePage.resPool.get('necrocorn').value > 1) {
-    kittycheatRenderBgTab(gamePage.diplomacyTab)
-
-    kittycheatClickDom(gamePage.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans')?.feedBtn);
-  }
-};
-
-const kittycheatAdore = () => {
-  // sadly the game always confirms here, leave for now...
-  // if (game.religion.faithRatio > game.religion._getTranscendNextPrice()) {
-  //  gamePage.religionTab?.transcendBtn?.domNode.click();
-  // }
-
-  game.religion.resetFaith(1.01, false);
-  kittycheatClickDom(gamePage.religionTab?.praiseBtn);
 };
 
 const kittycheatOpts = Object.values({
