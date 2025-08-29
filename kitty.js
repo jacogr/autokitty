@@ -311,15 +311,13 @@ const kittycheatHasResource = (vals = {}, isTrade = false) => {
   return cando;
 };
 
-const kittycheatHasTradeSpace = (get) => {
-  if (!get) {
-    return true;
-  }
+const kittycheatHasTradeSpace = (name) => {
+  if (name) {
+    const res = gamePage.resPool.get(name);
 
-  const res = gamePage.resPool.get(get.name);
-
-  if (res.maxValue > 0) {
-    return (res.value / res.maxValue) <= 0.99;
+    if (res.maxValue > 0) {
+      return (res.value / res.maxValue) <= 0.99;
+    }
   }
 
   return true;
@@ -397,9 +395,8 @@ const kittycheatMaxFill = (name = null) => {
 
   for (const r of game.resPool.resources) {
     const max = r.maxValue * ((isMax.x10 || ['faith', 'manpower'].includes(r.name)) ? 10 : 1);
-    const isFillable = !!max && r.visible && r.unlocked && r.value < max && !['kittens', 'zebras'].includes(r.name) && (!name || r.name === name);
 
-    if (isFillable) {
+    if (max && r.unlocked && r.visible && r.value < max && !['kittens', 'zebras'].includes(r.name) && (!name || r.name === name)) {
       r.value = max;
     }
   }
