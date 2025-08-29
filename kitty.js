@@ -68,7 +68,10 @@ const kittycheatRenderBgTab = (tab) => {
 const kittycheatCombust = () => {
   const res = Object
     .entries(combustCycles)
-    .map(([cycle, div]) => ({ cycle, count: Math.floor(((game.getEffect('heatMax') - game.time.heat) / div) / 10) }))
+    .map(([cycle, div]) => ({ 
+      cycle,
+      count: Math.floor(((game.getEffect('heatMax') - game.time.heat) / div) / 10)
+    }))
     .find((r) => r.count > 0);
   
   if (res) {
