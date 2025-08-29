@@ -66,18 +66,17 @@ const kittycheatRenderBgTab = (tab) => {
 };
 
 const kittycheatCombust = () => {
-  const cycle = Object
+  const res = Object
     .entries(combustCycles)
     .map(([cycle, div]) => ({ cycle, count: Math.floor(((game.getEffect('heatMax') - game.time.heat) / div) / 10) }))
-    .filter(({ count }) => count > 0)
-    .map(({ cycle }) => cycle)[0];
+    .find((r) => r.count > 0);
   
-  if (cycle) {
+  if (res) {
     kittycheatRenderBgTab(gamePage.timeTab);
     
     const btn = gamePage.timeTab.cfPanel.children[0].children[0];
 
-    btn.model[cycle].handler.call(btn);
+    btn.model[res.cycle].handler.call(btn);
   }
 };
 
@@ -294,17 +293,17 @@ const kittycheatReligion = (delay) => {
 const kittycheatHasResource = (vals = {}, isTrade = false) => {
   let cando = true;
 
-  Object.entries(vals).forEach(([key, val]) => {
+  for (const key in vals) {
     if (cando) {
       const res = gamePage.resPool.get(key);
   
-      cando = res.value >= val;
+      cando = res.value >= vals[key];
       
       if (cando && !isTrade && res.maxValue > 0) {
         cando = (res.value / res.maxValue) >= 0.05;
       }
     }
-  });
+  }
 
   return cando;
 };
@@ -393,17 +392,19 @@ const kittycheatMaxFill = (name = null) => {
     return;
   }
 
-  game.resPool.resources.forEach((r) => {
+  for (const r of game.resPool.resources) {
     const max = r.maxValue * ((isMax.x10 || ['faith', 'manpower'].includes(r.name)) ? 10 : 1);
     const isFillable = !!max && r.visible && r.unlocked && r.value < max && !['kittens', 'zebras'].includes(r.name) && (!name || r.name === name);
 
     if (isFillable) {
       r.value = max;
     }
-  });
+  }
 };
 
 const kittycheatTabUnlock = (tab) => {
+  let count = 0;
+  
   try {
     const buttons =
       // religion
@@ -413,22 +414,20 @@ const kittycheatTabUnlock = (tab) => {
       // science, workshop
       tab.buttons;
 
-    return buttons.reduce((count, btn) => {
+    for (const btn of buttons) {
       try {
         if (btn && btn.model && btn.model.enabled && btn.model.visible && btn.model.metadata && !btn.model.prices.find((p) => ['void'].includes(p.name))) {
-          return count + kittycheatSpanClick(btn.model.metadata.label);
+          count += kittycheatSpanClick(btn.model.metadata.label);
         }
       } catch (e) {
         console.error('kittycheatTabUnlock', tab.tabName, e);
       }
-
-      return count;
-    }, 0);
+    }
   } catch (e) {
     console.error('kittycheatTabUnlock', tab?.tabName, e);
   }
 
-  return 0;
+  return count;
 };
 
 const kittycheatBuildButtonClick = (model) => {
@@ -464,6 +463,8 @@ const kittycheatBuildButtonClick = (model) => {
 };
 
 const kittycheatTabBuild = (tab) => {
+  let count = 0;
+  
   try {
     const areas =
       // space
@@ -473,8 +474,8 @@ const kittycheatTabBuild = (tab) => {
       // others
       [tab];
 
-    return areas.reduce((count, area) => {
-      return count + area.children.reduce((count, child) => {
+    for (const area of areas) {
+      for (const child of area.children) {
         try {
           const result = kittycheatBuildButtonClick(child?.model);
           
@@ -483,26 +484,29 @@ const kittycheatTabBuild = (tab) => {
             kittycheatSpanClick(tab.exploreBtn.model.name);
           }
           
-          return count + result;
+          count += result;
         } catch (e) {
           console.error('kittycheatTabBuild', tab.tabName, e);
         }
-
-        return count;
-      }, 0);
-    }, 0);
+      }
+    }
   } catch (e) {
     console.error('kittycheatTabBuild', tab?.tabName, e);
   }
 
-  return 0;
+  return count;
 };
 
 const kittycheatLoopTabs = (ids, fn) => {
-  return ids
-    .map((i) => gamePage.tabs[i])
-    .filter((t) => t.visible && game.ui.activeTabId === t.tabId)
-    .reduce((count, t) => count + fn(t), 0);
+  for (const i of ids) {
+    const t = gamePage.tabs[i];
+    
+    if (t.visible && game.ui.activeTabId === t.tabId) {
+      return fn(t);
+    }
+  }
+  
+  return 0;
 };
 
 let kittycheatBuildZigPrevTime = 0;
@@ -647,7 +651,7 @@ const kittycheatAdore = () => {
   gamePage.religionTab?.praiseBtn?.domNode.click();
 };
 
-const kittycheatOpts = {
+const kittycheatOpts = Object.values({
   'crafting': {
     //'wood': {
     //  res: { 'catnip': 250 }
@@ -814,17 +818,19 @@ const kittycheatOpts = {
       delay: 60000
     }
   }
-};
+});
 
 const kittycheatExecOpts = (delay) => {
-  Object.values(kittycheatOpts).forEach((group) => {
-    Object.entries(group).filter(([, o]) => o.active && !o.delay).forEach(([n, o]) => {
+  for (const group of kittycheatOpts) {
+    for (const n in group) {
+      const o = group[n];
+      
       if (o.active && !o.delay) {
         kittycheatMaxFill();
         kittycheatExec(n, o);
       }
-    });
-  });
+    }
+  }
 
   kittycheatMaxFill();
 
@@ -844,52 +850,52 @@ $('div#leftColumn').append(kittycheatCont);
 kittycheatCont.append(kittyIwGroup);
 
 // add groups for all the options
-Object.values(kittycheatOpts).forEach((group) => {
+for (const group of kittycheatOpts) {
   const kittycheatGroup = kittycheatStyleDiv($('<div></div>'));
-  const kittycheatActs = $('<div></div>');
 
   kittycheatCont.append(kittycheatGroup);
-  kittycheatGroup.append(kittycheatActs);
 
-  Object.entries(group).forEach(([optname, opts]) => {
+  for (const optname in group) {
+    const opts = group[optname];
+    
     opts.active = opts.active || false;
 
     const btn = $(`<button>${optname}</button>`).click(() => {
       kittycheatBtnClick(btn, optname, opts);
     });
     
-    kittycheatActs.append(kittycheatStyleBtn(btn, opts));
+    kittycheatGroup.append(kittycheatStyleBtn(btn, opts));
 
     if (opts.delay) {
       kittycheatExecTimer(optname, opts);
     }
-  });
-});
+  }
+}
 
 // building setup
-Object.keys(isMax).forEach((id) => {
+for (const id in isMax) {
   const btn = $(`<button>${id}</button>`).click(() => {
     isMax[id] = !isMax[id];
     kittycheatStyleBtn(btn, { active: isMax[id] });
   });
 
   kittyIwGroup.append(kittycheatStyleBtn(btn, { active: isMax[id] }));
-});
+}
 
 kittycheatCont.append(kittyTxGroup);
 
-['kittycheatZiggurat', 'kittycheatTheology', 'kittycheatTranscend'].forEach((id) => {
+for (const id of ['kittycheatZiggurat', 'kittycheatTheology', 'kittycheatTranscend']) {
   kittyTxGroup.append(kittycheatStyleDiv($(`<div id="${id}"></div>`), true));
-});
+}
 
 // render clicky tabs at startup (as available)
-['diplomacyTab', 'libraryTab', 'religionTab', 'timeTab'].forEach((tab) => {
+for (const tab of ['diplomacyTab', 'libraryTab', 'religionTab', 'timeTab']) {
   try {
     gamePage[tab].render();
   } catch (e) {
     console.error('initial render', tab, e);
   }
-});
+}
 
 // start the loops
 kittycheatExecOpts(99);
