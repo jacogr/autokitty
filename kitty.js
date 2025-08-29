@@ -311,18 +311,6 @@ const kittycheatHasResource = (vals = {}, isTrade = false) => {
   return cando;
 };
 
-const kittycheatHasTradeSpace = (name) => {
-  if (name) {
-    const res = gamePage.resPool.get(name);
-
-    if (res.maxValue > 0) {
-      return (res.value / res.maxValue) <= 0.99;
-    }
-  }
-
-  return true;
-};
-
 const kittycheatTrade = (name) => {
   if ((name === 'leviathans') && (gamePage.religion.getZU('blackPyramid').val > 0) && (gamePage.diplomacy.get('leviathans').unlocked === false)) {
     gamePage.diplomacy.unlockElders();
@@ -347,9 +335,7 @@ const kittycheatExec = (name, opts) => {
       if (opts.func) {
         opts.func();
       } else if (opts.trade) {
-        if (kittycheatHasTradeSpace(opts.get)) {
-          kittycheatTrade(name);
-        }
+        kittycheatTrade(name);
       } else {
         kittycheatCraft(name);
       }
@@ -725,39 +711,32 @@ const kittycheatOpts = Object.values({
     },
     'dragons': {
       res: { 'titanium': 250 },
-      get: 'uranium',
       trade: true,
       active: true
     },
     'zebras': {
       res: { 'slab': 50 },
-      get: 'titanium',
       trade: true,
       active: true
     },
     'nagas': {
       res: { 'ivory': 500 },
-      get: 'minerals',
       trade: true
     },
     'spiders': {
       res: { 'scaffold': 50 },
-      get: 'coal',
       trade: true
     },
     'griffins': {
       res: { 'wood': 500 },
-      get: 'iron',
       trade: true
     },
     'lizards': {
       res: { 'minerals': 1000 },
-      get: 'wood',
       trade: true
     },
     'sharks': {
       res: { 'iron': 100 },
-      get: 'catnip',
       trade: true
     }
   },
