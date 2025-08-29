@@ -3,12 +3,12 @@ const gamePage = window.gamePage;
 const $ = window.$;
 
 const isMax = {
-  'build': false,
-  'max': true,
-  'x10': false,
-  'upgrade': true,
-  'zig': false,
-  'crypto': false
+  'build': { active: false },
+  'max': { active: true, excl: ['x10'] },
+  'x10': { active: false, excl: ['max'] },
+  'upgrade': { active: true },
+  'zig': { active: false },
+  'crypto': { active: false }
 };
 
 const combustCycles = {
@@ -382,12 +382,12 @@ const kittycheatBtnClick = (btn, name, opts) => {
 };
 
 const kittycheatMaxFill = (name = null) => {
-  if (!isMax.max && !name) {
+  if (!(isMax.max.active || isMax.x10.active) && !name) {
     return;
   }
 
   for (const r of game.resPool.resources) {
-    const max = r.maxValue * ((isMax.x10 || ['faith', 'manpower'].includes(r.name)) ? 10 : 1);
+    const max = r.maxValue * (isMax.x10.active ? 10 : 1);
 
     if (max && r.unlocked && r.visible && r.value < max && !['kittens', 'zebras'].includes(r.name) && (!name || r.name === name)) {
       r.value = max;
@@ -600,22 +600,22 @@ const kittycheatBuildAll = (delay) => {
   let count = 0;
 
   // upgrades: 2:science, 3:workshop, 5:religion, 6:space
-  if (isMax.upgrade) {
+  if (isMax.upgrade.active) {
     count += kittycheatLoopTabs([2, 3, 5, 6], kittycheatTabUnlock);
   }
 
   // buildings: 0:bonfire, 4:trade, 6:space
-  if (isMax.build) {
+  if (isMax.build.active) {
     count += kittycheatLoopTabs([0, 4, 6], kittycheatTabBuild);
   }
 
   // religion: zigurats
-  if (isMax.zig) {
+  if (isMax.zig.active) {
     count += kittycheatBuildZig();
   }
 
   // religion: cryptotheology
-  if (isMax.crypto) {
+  if (isMax.crypto.active) {
     count += kittycheatBuildTheology();
   }
 
@@ -860,11 +860,16 @@ for (const group of kittycheatOpts) {
 // building setup
 for (const id in isMax) {
   const btn = $(`<button>${id}</button>`).click(() => {
-    isMax[id] = !isMax[id];
-    kittycheatStyleBtn(btn, { active: isMax[id] });
+    if (isMax[id].active = !isMax[id].active && isMax[id].excl) {
+      for (const o of isMax[id].excl) {
+        isMax[o].active = false;
+      }
+    }
+    
+    kittycheatStyleBtn(btn, { active: isMax[id].active });
   });
 
-  kittyIwGroup.append(kittycheatStyleBtn(btn, { active: isMax[id] }));
+  kittyIwGroup.append(kittycheatStyleBtn(btn, { active: isMax[id].active }));
 }
 
 kittycheatCont.append(kittyTxGroup);
