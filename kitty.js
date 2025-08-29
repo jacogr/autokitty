@@ -533,6 +533,15 @@ const kittycheatTabUnlock = (tab) => {
         console.error('kittycheatTabUnlock', tab.tabName, e);
       }
     }
+
+    // for trade, unlock new races to trade with
+    if (tab.exploreBtn && tab.racePanels) {
+      const maxRaces = tab.leviathansInfo ? 8 : 7;
+
+      if (tab.racePanels.length !== maxRaces) {
+        count += kittycheatClickDom(tab.exploreBtn);
+      }
+    }
   } catch (e) {
     console.error('kittycheatTabUnlock', tab?.tabName, e);
   }
@@ -596,15 +605,6 @@ const kittycheatTabBuild = (tab) => {
         }
       }
     }
-
-    // for trade, explore after clicks (when not all are there)
-    if (tab.exploreBtn && tab.racePanels) {
-      const maxRaces = tab.leviathansInfo ? 8 : 7;
-
-      if (tab.racePanels.length !== maxRaces) {
-        count += kittycheatClickDom(tab.exploreBtn);
-      }
-    }
   } catch (e) {
     console.error('kittycheatTabBuild', tab?.tabName, e);
   }
@@ -626,7 +626,7 @@ const kittycheatBuildAll = (delay) => {
   let count = 0;
 
   if (isMax.upgrade.active) {
-    count += kittycheatLoopTabs(kittycheatTabUnlock, ['libraryTab', 'workshopTab', 'religionTab', 'spaceTab']);
+    count += kittycheatLoopTabs(kittycheatTabUnlock, ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'workshopTab']);
   }
 
   if (isMax.build.active) {
