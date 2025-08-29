@@ -4,9 +4,9 @@ const $ = window.$;
 
 const isMax = {
   'build': { active: false },
+  'upgrade': { active: true, end: true },
   'max': { active: true, excl: ['x10'] },
-  'x10': { active: false, excl: ['max'] },
-  'upgrade': { active: true },
+  'x10': { active: false, excl: ['max'], end: true },
   'zig': { active: false },
   'crypto': { active: false }
 };
@@ -26,7 +26,7 @@ const kittycheatStyleBtn = (btn, opts) => {
     'border-radius': '2px',
     'border-width': '1px',
     'padding-inline': '4px',
-    'margin-right': '1px',
+    'margin-right': opts.end ? '4px' : '1px',
     'margin-bottom': '1px'
   });
 };
@@ -860,19 +860,20 @@ for (const group of kittycheatOpts) {
 // building setup
 for (const id in isMax) {
   const btn = $(`<button>${id}</button>`).click(() => {
-    if (isMax[id].active = !isMax[id].active && isMax[id].excl) {
+    isMax[id].active = !isMax[id].active;
+    
+    if (isMax[id].active && isMax[id].excl) {
       for (const o of isMax[id].excl) {
         isMax[o].active = false;
-        kittycheatStyleBtn(isMax[o].btn, { active: false });
+        kittycheatStyleBtn(isMax[o].btn, isMax[o]);
       }
     }
     
-    kittycheatStyleBtn(btn, { active: isMax[id].active });
+    kittycheatStyleBtn(btn, isMax[id]);
   });
 
   isMax[id].btn = btn;
-
-  kittyIwGroup.append(kittycheatStyleBtn(btn, { active: isMax[id].active }));
+  kittyIwGroup.append(kittycheatStyleBtn(btn, isMax[id]));
 }
 
 kittycheatCont.append(kittyTxGroup);
