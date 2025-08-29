@@ -472,18 +472,16 @@ const kittycheatTabBuild = (tab) => {
     for (const area of areas) {
       for (const child of area.children) {
         try {
-          const result = kittycheatBuildButtonClick(child);
-
-          // for trade, explore after click
-          if (result && tab.exploreBtn) {
-            kittycheatClickDom(tab.exploreBtn);
-          }
-
-          count += result;
+          count += kittycheatBuildButtonClick(child);
         } catch (e) {
           console.error('kittycheatTabBuild', tab.tabName, e);
         }
       }
+    }
+
+    // for trade, explore after clicks (when not all are there)
+    if (tab.exploreBtn && tab.racePanels && tab.racePanels.length < 8) {
+      kittycheatClickDom(tab.exploreBtn);
     }
   } catch (e) {
     console.error('kittycheatTabBuild', tab?.tabName, e);
