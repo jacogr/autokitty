@@ -730,15 +730,18 @@ const kittycheatOpts = Object.values({
     },
     'griffins': {
       res: { 'wood': 500 },
-      trade: true
+      trade: true,
+      active: true
     },
     'lizards': {
       res: { 'minerals': 1000 },
-      trade: true
+      trade: true,
+      active: true
     },
     'sharks': {
       res: { 'iron': 100 },
-      trade: true
+      trade: true,
+      active: true
     }
   },
   'actions': {
