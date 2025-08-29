@@ -32,8 +32,8 @@
     });
   };
 
-  const styleDiv = (div, small = false) => {
-    return div.css({ 'margin-bottom': small ? '5px' : '20px' });
+  const styleDiv = (div, small = false, extra = {}) => {
+    return div.css({ ...extra, 'margin-bottom': small ? '5px' : '20px' });
   };
 
   const toPercent = (frac) => {
@@ -286,35 +286,6 @@
     return null;
   };
 
-  const execCalcs = (delay) => {
-    renderBgTab(gamePage.religionTab);
-
-    const zig = calcZiggurats();
-    const cry = calcTheology();
-    const trd = calcTranscend();
-    let zigText = zig.bestBuilding;
-
-    if (zig.bestBuilding && zig.bestPrices) {
-      const zigguratRatio = Math.max(gamePage.bld.getBuildingExt('ziggurat').meta.on, 1);
-      const unicornTotal = ((gamePage.resPool.get('tears').value * 2500) / zigguratRatio) + gamePage.resPool.get('unicorns').value;
-      const unicornPrice = calcZigguratsPrices(zig.bestPrices, zigguratRatio);
-      const calc = toPercent(unicornTotal / unicornPrice);
-
-      zigText = zig.bestBuilding + (calc ? `, ${calc.text}` : '');
-    }
-
-    const cryText = cry && (
-      (cry.bestBuilding === 'singularity' ? 'eventHorizon' : cry.bestBuilding) +
-      (cry.percent ? `, ${cry.percent.text}` : '')
-    );
-
-    $('div#kittycheatZiggurat').html(`Ziggurat : ${zigText || zig.err || '-'}`);
-    $('div#kittycheatTheology').html(`Theology : ${cryText || '-'}`);
-    $('div#kittycheatTranscend').html(`Transcend: ${trd?.text || '-'}`);
-
-    setTimeout(() => execCalcs(delay), delay);
-  };
-
   const execTrade = (name) => {
     if ((name === 'leviathans') && (gamePage.religion.getZU('blackPyramid').val > 0) && (gamePage.diplomacy.get('leviathans').unlocked === false)) {
       gamePage.diplomacy.unlockElders();
@@ -426,7 +397,7 @@
     !!(bld && bld.model.visible) &&
     hasResource(bld.model.prices.reduce((o, { name, val }) => ({ ...o, [name]: val }), {}), true);
 
-  const buildZig = () => {
+  const buildZig = (dryRun) => {
     try {
       renderBgTab(gamePage.religionTab);
 
@@ -442,7 +413,7 @@
 
       if (isBuildable(blck)) {
         // console.log('buildZig:', 'blackPyramid');
-        return clickDom(blck);
+        return dryRun ? 1 : clickDom(blck);
       }
 
       const best = findZigBld(uni.bestBuilding);
@@ -460,7 +431,7 @@
           : (mv ? mark : best);
 
         // console.log('buildZig:', next.id);
-        return clickDom(next);
+        return dryRun ? 1 : clickDom(next);
       }
 
       const zigTears = gamePage.resPool.get('tears').value + (gamePage.bld.getBuildingExt('ziggurat').meta.on * gamePage.resPool.get('unicorns').value / 2500);
@@ -471,7 +442,11 @@
       if (nowDelta > 10000 && bt && zigTears > bt.val) {
         // console.log('buildZig:', 'sacrifice');
         buildZigPrevTime = nowTime;
-        gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, noop, noop);
+
+        if (!dryRun) {
+          gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, noop, noop);
+        }
+
         return 1;
       }
 
@@ -483,7 +458,7 @@
     return 0;
   };
 
-  const buildTheology = () => {
+  const buildTheology = (dryRun) => {
     try {
       renderBgTab(gamePage.religionTab);
 
@@ -500,7 +475,7 @@
         return 0;
       }
 
-      return clickDom(bld);
+      return dryRun ? 1 : clickDom(bld);
     } catch (e) {
       console.error('buildTheology', e);
     }
@@ -508,7 +483,7 @@
     return 0;
   };
 
-  const doTabUnlock = (tab) => {
+  const unlockTab = (tab, dryRun) => {
     let count = 0;
 
     try {
@@ -526,10 +501,10 @@
       for (const btn of buttons) {
         try {
           if (btn?.model?.enabled && btn.model.visible && btn.model.metadata && !btn.model.prices.find((p) => p.name === 'void')) {
-            count += clickDom(btn);
+            count += dryRun ? 1 : clickDom(btn);
           }
         } catch (e) {
-          console.error('doTabUnlock', tab.tabName, e);
+          console.error('unlockTab', tab.tabName, e);
         }
       }
 
@@ -538,17 +513,17 @@
         const maxRaces = tab.leviathansInfo ? 8 : 7;
 
         if (tab.racePanels.length !== maxRaces) {
-          count += clickDom(tab.exploreBtn);
+          count += dryRun ? 1 : clickDom(tab.exploreBtn);
         }
       }
     } catch (e) {
-      console.error('doTabUnlock', tab?.tabName, e);
+      console.error('unlockTab', tab?.tabName, e);
     }
 
     return count;
   };
 
-  const doTabBuildBtn = (btn) => {
+  const buildTabBtn = (btn, dryRun) => {
     const model = btn?.model;
 
     // don't buy invisible or switched off
@@ -557,7 +532,9 @@
     }
 
     // max resources
-    fillResources();
+    if (!dryRun) {
+      fillResources();
+    }
 
     // get first invalid price
     const firstInvalid = model.prices.find((p) => gamePage.resPool.get(p.name).value < p.val);
@@ -575,15 +552,17 @@
       return 0;
     }
 
-    return clickDom(btn);
+    return dryRun ? 1 : clickDom(btn);
   };
 
-  const doTabBuild = (tab) => {
+  const buildTab = (tab, dryRun) => {
     let count = 0;
 
     try {
       // for builds, we always want the tab visible & active
-      if (!tab.visible || game.ui.activeTabId !== tab.tabId) {
+      if (dryRun) {
+        renderBgTab(gamePage.religionTab);
+      } else if (!tab.visible || game.ui.activeTabId !== tab.tabId) {
         return 0;
       }
 
@@ -598,49 +577,116 @@
       for (const area of areas) {
         for (const child of area.children) {
           try {
-            count += doTabBuildBtn(child);
+            count += buildTabBtn(child, dryRun);
           } catch (e) {
-            console.error('doTabBuild', tab.tabName, e);
+            console.error('buildTab', tab.tabName, e);
           }
         }
       }
     } catch (e) {
-      console.error('doTabBuild', tab?.tabName, e);
+      console.error('buildTab', tab?.tabName, e);
     }
 
     return count;
   };
 
-  const loopTabs = (fn, tabs) => {
-    let count = 0;
+  const loopTabs = (fn, tabs, dryRun) => {
+    const indv = [];
+    let total = 0;
 
     for (const tab of tabs) {
-      count += fn(gamePage[tab]);
+      const count = fn(gamePage[tab], dryRun);
+
+      if (count) {
+        indv.push({ name: gamePage[tab].tabName, count });
+        total += count;
+      }
     }
 
-    return count;
+    return { total, indv };
   };
 
-  const execBuildAll = (delay) => {
-    let count = 0;
+  const execBuildAll = (delay, dryRun = false) => {
+    const stats = {};
+    let total = 0;
 
-    if (isMax.upgrade.active) {
-      count += loopTabs(doTabUnlock, ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'workshopTab']);
+    const viaLoop = (type, tabs, fn) => {
+      const res = loopTabs(fn, tabs, dryRun);
+
+      if (res.total) {
+        total += res.total;
+
+        stats[type] = res;
+      }
+    };
+
+    const viaSingle = (type, tab, fn) => {
+      const count = fn(dryRun);
+
+      if (count) {
+        total += count;
+        stats[type] = { total: count, indv: { name: gamePage[tab].tabName, count }};
+      }
+    };
+
+    if (isMax.upgrade.active || dryRun) {
+      viaLoop('upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'workshopTab'], unlockTab);
     }
 
-    if (isMax.build.active) {
-      count += loopTabs(doTabBuild, ['bldTab', 'diplomacyTab', 'spaceTab']);
+    if (isMax.build.active || dryRun) {
+      viaLoop('build', ['bldTab', 'diplomacyTab', 'spaceTab'], buildTab);
     }
 
-    if (isMax.zig.active) {
-      count += buildZig();
+    if (!dryRun) {
+      if (isMax.zig.active) {
+        viaSingle('zig', 'religionTab', buildZig);
+      }
+
+      if (isMax.crypto.active) {
+        viaSingle('crypto', 'religionTab', buildTheology);
+      }
     }
 
-    if (isMax.crypto.active) {
-      count += buildTheology();
+    if (delay) {
+      setTimeout(() => execBuildAll(delay), Math.ceil(delay / (total ? 5 : 1)));
     }
 
-    setTimeout(() => execBuildAll(delay), Math.ceil(delay / (count ? 5 : 1)));
+    return { stats, total };
+  };
+
+  const execTextInfo = (delay) => {
+    const concatNext = (s) =>
+      s?.indv.map(({ count, name }) => `${name}(${count})`).join(', ');
+
+    renderBgTab(gamePage.religionTab);
+
+    const next = execBuildAll(0, true);
+    const zig = calcZiggurats();
+    const cry = calcTheology();
+    const trd = calcTranscend();
+    let zigText = zig.bestBuilding;
+
+    if (zig.bestBuilding && zig.bestPrices) {
+      const zigguratRatio = Math.max(gamePage.bld.getBuildingExt('ziggurat').meta.on, 1);
+      const unicornTotal = ((gamePage.resPool.get('tears').value * 2500) / zigguratRatio) + gamePage.resPool.get('unicorns').value;
+      const unicornPrice = calcZigguratsPrices(zig.bestPrices, zigguratRatio);
+      const calc = toPercent(unicornTotal / unicornPrice);
+
+      zigText = zig.bestBuilding + (calc ? `, ${calc.text}` : '');
+    }
+
+    const cryText = cry && (
+      (cry.bestBuilding === 'singularity' ? 'eventHorizon' : cry.bestBuilding) +
+      (cry.percent ? `, ${cry.percent.text}` : '')
+    );
+
+    $('div#kittycheatZiggurat').html(`Ziggurat : ${zigText || zig.err || '-'}`);
+    $('div#kittycheatTheology').html(`Theology : ${cryText || '-'}`);
+    $('div#kittycheatTranscend').html(`Transcend: ${trd?.text || '-'}`);
+    $('div#kittycheatDryrunBuild').html(`Buildings: ${concatNext(next.stats.build) || '-'}`);
+    $('div#kittycheatDryrunUpgrd').html(`Upgrades : ${concatNext(next.stats.upgrade) || '-'}`);
+
+    setTimeout(() => execTextInfo(delay), delay);
   };
 
   const kittycheatOpts = Object.values({
@@ -885,6 +931,14 @@
     divTxGroup.append(styleDiv($(`<div id="${id}"></div>`), true));
   }
 
+  const divDryrun = styleDiv($('<div id="kittycheatDryrun"></div>'), true, { 'padding-top': '10px' });
+
+  divTxGroup.append(divDryrun);
+
+  for (const id of ['kittycheatDryrunBuild', 'kittycheatDryrunUpgrd']) {
+    divDryrun.append(styleDiv($(`<div id="${id}"></div>`), true));
+  }
+
   // render clicky tabs at startup (as available)
   for (const tab of ['diplomacyTab', 'libraryTab', 'religionTab', 'timeTab']) {
     try {
@@ -896,6 +950,6 @@
 
   // start the loops
   execOpts(99);
-  execCalcs(500);
+  execTextInfo(500);
   execBuildAll(1000);
 })();
