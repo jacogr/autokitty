@@ -39,12 +39,12 @@ const kittycheatMakePercent = (frac) => {
   if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
     const raw = 100 * frac;
 
-    return { 
+    return {
       text: raw >= 100.99
         ? '>100.99%'
         : raw <= 0.99
           ? '<0.99%'
-          : `${raw.toFixed(2)}%`, 
+          : `${raw.toFixed(2)}%`,
       raw
     };
   }
@@ -102,7 +102,7 @@ const kittycheatCombust = () => {
 
 const kittycheatZigguratsCalcPrices = (prices, zigguratRatio) => {
   let unicornPrice = 0;
-  
+
   for (const price of prices) {
     if (price.name === 'unicorns') {
       unicornPrice += price.val;
@@ -273,7 +273,7 @@ const kittycheatTheologyCalc = () => {
 
 const kittycheatReligion = (delay) => {
   kittycheatRenderBgTab(gamePage.religionTab);
-  
+
   const zig = kittycheatZigguratsCalc();
   const cry = kittycheatTheologyCalc();
   const trd = kittycheatTranscendCalc();
@@ -515,7 +515,7 @@ const kittycheatTabUnlock = (tab) => {
   try {
     // for unlocks, we allow work in the background
     kittycheatRenderBgTab(tab);
-    
+
     const buttons =
       // religion
       tab.rUpgradeButtons ||
@@ -578,7 +578,7 @@ const kittycheatTabBuild = (tab) => {
     if (!tab.visible || game.ui.activeTabId !== tab.tabId) {
       return 0;
     }
-  
+
     const areas =
       // space
       tab.planetPanels ||
@@ -600,7 +600,7 @@ const kittycheatTabBuild = (tab) => {
     // for trade, explore after clicks (when not all are there)
     if (tab.exploreBtn && tab.racePanels) {
       const maxRaces = tab.leviathansInfo ? 8 : 7;
-      
+
       if (tab.racePanels.length !== maxRaces) {
         count += kittycheatClickDom(tab.exploreBtn);
       }
@@ -612,11 +612,11 @@ const kittycheatTabBuild = (tab) => {
   return count;
 };
 
-const kittycheatLoopTabs = (ids, fn) => {
-  const count = 0;
-  
-  for (const i of ids) {
-    count += fn(gamePage.tabs[i]);
+const kittycheatLoopTabs = (fn, tabs) => {
+  let count = 0;
+
+  for (const tab of tabs) {
+    count += fn(gamePage[tab]);
   }
 
   return count;
@@ -625,22 +625,18 @@ const kittycheatLoopTabs = (ids, fn) => {
 const kittycheatBuildAll = (delay) => {
   let count = 0;
 
-  // upgrades: 2:science, 3:workshop, 5:religion, 6:space
   if (isMax.upgrade.active) {
-    count += kittycheatLoopTabs([2, 3, 5, 6], kittycheatTabUnlock);
+    count += kittycheatLoopTabs(kittycheatTabUnlock, ['libraryTab', 'workshopTab', 'religionTab', 'spaceTab']);
   }
 
-  // buildings: 0:bonfire, 4:trade, 6:space
   if (isMax.build.active) {
-    count += kittycheatLoopTabs([0, 4, 6], kittycheatTabBuild);
+    count += kittycheatLoopTabs(kittycheatTabBuild, ['bldTab', 'diplomacyTab', 'spaceTab']);
   }
 
-  // religion: zigurats
   if (isMax.zig.active) {
     count += kittycheatBuildZig();
   }
 
-  // religion: cryptotheology
   if (isMax.crypto.active) {
     count += kittycheatBuildTheology();
   }
@@ -869,14 +865,14 @@ for (const group of kittycheatOpts) {
 for (const id in isMax) {
   const btn = $(`<button>${id}</button>`).click(() => {
     isMax[id].active = !isMax[id].active;
-    
+
     if (isMax[id].active && isMax[id].excl) {
       for (const o of isMax[id].excl) {
         isMax[o].active = false;
         kittycheatStyleBtn(isMax[o].btn, isMax[o]);
       }
     }
-    
+
     kittycheatStyleBtn(btn, isMax[id]);
   });
 
