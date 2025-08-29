@@ -237,15 +237,16 @@ const kittycheatTranscendCalc = () => {
 
 const kittycheatTheologyCalc = () => {
   try {
-    const relics = gamePage.resPool.get('relic').value;
-    
-    return gamePage.religionTab.ctPanel.children[0].children
+    const best = gamePage.religionTab.ctPanel.children[0].children
       .filter((a) => a.model.prices.length === 1 && a.model.prices[0].name === 'relic')
-      .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
-      .map((a) => ({ 
-        bestBuilding: a.id,
-        percent: kittycheatMakePercent(a.model.prices[0].val / relics)
-      }))[0];
+      .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)[0];
+
+    if (best) {
+      return { 
+        bestBuilding: best.id,
+        percent: kittycheatMakePercent(best.model.prices[0].val / gamePage.resPool.get('relic').value)
+      };
+    }
   } catch (e) {
     console.error('kittycheatTheologyCalc', e);
   }
