@@ -887,7 +887,7 @@ for (const id of ['kittycheatZiggurat', 'kittycheatTheology', 'kittycheatTransce
 // render clicky tabs at startup (as available)
 for (const tab of ['diplomacyTab', 'libraryTab', 'religionTab', 'timeTab']) {
   try {
-    gamePage[tab].render();
+    kittycheatRenderBgTab(gamePage[tab]);
   } catch (e) {
     console.error('initial render', tab, e);
   }
