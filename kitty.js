@@ -53,9 +53,13 @@
 
   const noop = () => {};
 
-  const clickDom = (btn) => {
+  const clickDom = (btn, withCtrl = false) => {
     if (btn?.domNode) {
-      btn.domNode.click();
+      if (withCtrl) {
+        btn.domNode.dispatchEvent(new MouseEvent('click', { ctrlKey: true, metaKey: true }));
+      } else {
+        btn.domNode.click();
+      }
 
       return 1;
     }
@@ -555,7 +559,7 @@
       return 0;
     }
 
-    return dryRun ? 1 : clickDom(btn);
+    return dryRun ? 1 : clickDom(btn, true);
   };
 
   const buildTab = (tab, dryRun) => {
