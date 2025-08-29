@@ -476,8 +476,12 @@ const kittycheatTabBuild = (tab) => {
     }
 
     // for trade, explore after clicks (when not all are there)
-    if (tab.exploreBtn && tab.racePanels?.find((r) => !r.race.unlocked)) {
-      kittycheatClickDom(tab.exploreBtn);
+    if (tab.exploreBtn && tab.racePanels) {
+      const maxRaces = tab.leviathansInfo ? 8 : 7;
+      
+      if (tab.racePanels.length !== maxRaces) {
+        kittycheatClickDom(tab.exploreBtn);
+      }
     }
   } catch (e) {
     console.error('kittycheatTabBuild', tab?.tabName, e);
