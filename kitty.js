@@ -561,7 +561,7 @@
     try {
       // for builds, we always want the tab visible & active
       if (dryRun) {
-        renderBgTab(gamePage.religionTab);
+        renderBgTab(tab);
       } else if (!tab.visible || game.ui.activeTabId !== tab.tabId) {
         return 0;
       }
