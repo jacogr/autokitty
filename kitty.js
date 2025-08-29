@@ -82,21 +82,35 @@ const kittycheatRenderBgTab = (tab) => {
   }
 };
 
-const kittycheatCombust = () => {
-  const res = Object
-    .entries(combustCycles)
-    .map(([cycle, div]) => ({
-      cycle,
-      count: Math.floor(((game.getEffect('heatMax') - game.time.heat) / div) / 10)
-    }))
-    .find((r) => r.count > 0);
+const kittycheatHasResource = (vals = {}, isTrade = false) => {
+  let cando = true;
 
-  if (res) {
-    kittycheatRenderBgTab(gamePage.timeTab);
+  for (const key in vals) {
+    if (cando) {
+      const res = gamePage.resPool.get(key);
 
-    const btn = gamePage.timeTab.cfPanel.children[0].children[0];
+      cando = res.value >= vals[key];
 
-    btn.model[res.cycle].handler.call(btn);
+      if (cando && !isTrade && res.maxValue > 0) {
+        cando = (res.value / res.maxValue) >= 0.05;
+      }
+    }
+  }
+
+  return cando;
+};
+
+const kittycheatMaxFill = (name = null) => {
+  if (!(isMax.max.active || isMax.x10.active) && !name) {
+    return;
+  }
+
+  for (const r of game.resPool.resources) {
+    const max = r.maxValue * (isMax.x10.active ? 10 : 1);
+
+    if (max && r.unlocked && r.visible && r.value < max && !['kittens', 'zebras'].includes(r.name) && (!name || r.name === name)) {
+      r.value = max;
+    }
   }
 };
 
@@ -300,22 +314,22 @@ const kittycheatReligion = (delay) => {
   setTimeout(() => kittycheatReligion(delay), delay);
 };
 
-const kittycheatHasResource = (vals = {}, isTrade = false) => {
-  let cando = true;
+const kittycheatCombust = () => {
+  const res = Object
+    .entries(combustCycles)
+    .map(([cycle, div]) => ({
+      cycle,
+      count: Math.floor(((game.getEffect('heatMax') - game.time.heat) / div) / 10)
+    }))
+    .find((r) => r.count > 0);
 
-  for (const key in vals) {
-    if (cando) {
-      const res = gamePage.resPool.get(key);
+  if (res) {
+    kittycheatRenderBgTab(gamePage.timeTab);
 
-      cando = res.value >= vals[key];
+    const btn = gamePage.timeTab.cfPanel.children[0].children[0];
 
-      if (cando && !isTrade && res.maxValue > 0) {
-        cando = (res.value / res.maxValue) >= 0.05;
-      }
-    }
+    btn.model[res.cycle].handler.call(btn);
   }
-
-  return cando;
 };
 
 const kittycheatTrade = (name) => {
@@ -334,6 +348,24 @@ const kittycheatCraft = (name) => {
   if (!iswood || (!iswinter && !isautum)) {
     gamePage.craftAll(name);
   }
+};
+
+const kittycheatFeed = () => {
+  if (gamePage.resPool.get('necrocorn').value > 1) {
+    kittycheatRenderBgTab(gamePage.diplomacyTab)
+
+    kittycheatClickDom(gamePage.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans')?.feedBtn);
+  }
+};
+
+const kittycheatAdore = () => {
+  // sadly the game always confirms here, leave for now...
+  // if (game.religion.faithRatio > game.religion._getTranscendNextPrice()) {
+  //  gamePage.religionTab?.transcendBtn?.domNode.click();
+  // }
+
+  game.religion.resetFaith(1.01, false);
+  kittycheatClickDom(gamePage.religionTab?.praiseBtn);
 };
 
 const kittycheatExec = (name, opts) => {
@@ -380,21 +412,6 @@ const kittycheatBtnClick = (btn, name, opts) => {
   kittycheatStyleBtn(btn, opts);
   kittycheatExec(name, opts);
 };
-
-const kittycheatMaxFill = (name = null) => {
-  if (!(isMax.max.active || isMax.x10.active) && !name) {
-    return;
-  }
-
-  for (const r of game.resPool.resources) {
-    const max = r.maxValue * (isMax.x10.active ? 10 : 1);
-
-    if (max && r.unlocked && r.visible && r.value < max && !['kittens', 'zebras'].includes(r.name) && (!name || r.name === name)) {
-      r.value = max;
-    }
-  }
-};
-
 
 let kittycheatBuildZigPrevTime = 0;
 
@@ -488,25 +505,6 @@ const kittycheatBuildTheology = () => {
   }
 
   return 0;
-};
-
-
-const kittycheatFeed = () => {
-  if (gamePage.resPool.get('necrocorn').value > 1) {
-    kittycheatRenderBgTab(gamePage.diplomacyTab)
-
-    kittycheatClickDom(gamePage.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans')?.feedBtn);
-  }
-};
-
-const kittycheatAdore = () => {
-  // sadly the game always confirms here, leave for now...
-  // if (game.religion.faithRatio > game.religion._getTranscendNextPrice()) {
-  //  gamePage.religionTab?.transcendBtn?.domNode.click();
-  // }
-
-  game.religion.resetFaith(1.01, false);
-  kittycheatClickDom(gamePage.religionTab?.praiseBtn);
 };
 
 const kittycheatTabUnlock = (tab) => {
