@@ -5,10 +5,10 @@ const $ = window.$;
 const isMax = {
   'build': { active: false },
   'upgrade': { active: true, end: true },
-  'max': { active: true, excl: ['x10'] },
-  'x10': { active: false, excl: ['max'], end: true },
   'zig': { active: false },
-  'crypto': { active: false }
+  'crypto': { active: false, end: true },
+  'max': { active: true, excl: ['x10'] },
+  'x10': { active: false, excl: ['max'], end: true }
 };
 
 const combustCycles = {
@@ -26,7 +26,7 @@ const kittycheatStyleBtn = (btn, opts) => {
     'border-radius': '2px',
     'border-width': '1px',
     'padding-inline': '4px',
-    'margin-right': opts.end ? '4px' : '1px',
+    'margin-right': opts.end ? '5px' : '1px',
     'margin-bottom': '1px'
   });
 };
