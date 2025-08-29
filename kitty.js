@@ -480,7 +480,7 @@ const kittycheatTabBuild = (tab) => {
     }
 
     // for trade, explore after clicks (when not all are there)
-    if (tab.exploreBtn && tab.racePanels && tab.racePanels.length < 8) {
+    if (tab.exploreBtn && tab.racePanels?.find((r) => !r.race.unlocked)) {
       kittycheatClickDom(tab.exploreBtn);
     }
   } catch (e) {
