@@ -445,9 +445,9 @@
       // only sacrifice when we do have enough available (only every 10 seconds)
       if (nowDelta > 10000 && bt && zigTears > bt.val) {
         // console.log('buildZig:', 'sacrifice');
-        buildZigPrevTime = nowTime;
-
+      
         if (!dryRun) {
+          buildZigPrevTime = nowTime;
           gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, noop, noop);
         }
 
@@ -520,7 +520,9 @@
         const maxRaces = tab.leviathansInfo ? 8 : 7;
 
         if (tab.racePanels.length !== maxRaces) {
-          count += dryRun ? 1 : clickDom(tab.exploreBtn);
+          if (tab.racePanels.length < 7 || tab.racePanels[tab.racePanels.length - 1].race.name === 'leviathans') {
+            count += dryRun ? 1 : clickDom(tab.exploreBtn);
+          }
         }
       }
     } catch (e) {
