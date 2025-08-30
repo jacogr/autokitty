@@ -345,7 +345,7 @@
     //   lastTrancendValue = nextTrancendValue;
 
     //   // sadly this pops up a modal :(
-    //   gamePage.religionTab?.transcendBtn?.domNode.click();
+    //   clickDom(gamePage.religionTab?.transcendBtn);
     // }
 
     game.religion.resetFaith(1.01, false);
