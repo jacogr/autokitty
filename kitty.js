@@ -520,7 +520,12 @@
 
         if (tab.racePanels.length !== maxRaces) {
           if (tab.racePanels.length < 7 || tab.racePanels[tab.racePanels.length - 1].race.name === 'leviathans') {
-            count += dryRun ? 1 : clickDom(tab.exploreBtn);
+            // count += dryRun ? 1 : clickDom(tab.exploreBtn);
+            if (dryRun) {
+              count++;
+            } else {
+              clickDom(tab.exploreBtn);
+            }
           }
         }
       }
