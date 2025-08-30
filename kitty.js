@@ -5,6 +5,7 @@
 
   const FRACTION_RELIC = 0.01;
   const FRACTION_VOID = 0.01;
+  const MAX_GENOCIDE = 25;
 
   const isMax = {
     'build': { active: false },
@@ -278,6 +279,11 @@
     try {
       const best = gamePage.religionTab.ctPanel.children[0].children
         .filter((a) =>
+          (
+            a.id === 'holyGenocide'
+              ? (a.model.on < MAX_GENOCIDE)
+              : true
+          ) &&
           (a.model.prices[0].name === 'relic') &&
           !a.model.prices.find((p) =>
             p.name === 'relic'
