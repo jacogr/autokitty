@@ -541,7 +541,7 @@
         // trade
         tab.racePanels?.map((r) => r.embassyButton) ||
         // time
-        tab.vsPanel?.children ||
+        tab.vsPanel?.children[0]?.children ||
         // science, workshop
         tab.buttons;
 
@@ -650,7 +650,7 @@
     let total = 0;
 
     if (isMax.upgrade.active || dryRun) {
-      total += loopTabs(dryRun, stats, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'workshopTab'], unlockTab);
+      total += loopTabs(dryRun, stats, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
     }
 
     if (isMax.build.active || dryRun) {
