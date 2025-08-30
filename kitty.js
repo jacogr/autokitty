@@ -553,13 +553,14 @@
 
     // at least something with a max
     const firstMax = model.prices.find((p) => gamePage.resPool.get(p.name).maxValue > 0);
+    const hasSome = model.metadata.on >= 1;
 
     // without a max, we only build a single
-    if (!firstMax && model.metadata.on >= 1) {
+    if (!firstMax && hasSome) {
       return 0;
     }
 
-    return dryRun ? 1 : clickDom(btn, true);
+    return dryRun ? 1 : clickDom(btn, hasSome);
   };
 
   const buildTab = (tab, dryRun) => {
