@@ -285,7 +285,7 @@
             return false;
           }
 
-          const firstInvalid = !a.model.prices.find((p) =>
+          const firstInvalid = a.model.prices.find((p) =>
             p.name === 'relic'
               ? false
               : p.name === 'void'
