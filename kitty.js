@@ -41,17 +41,19 @@
   };
 
   const toPercent = (frac) => {
-    if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
-      const raw = 100 * frac;
-
-      return {
-        frac,
-        text: raw >= 999
-          ? '>999.99%'
-          : `${raw.toFixed(2)}%`,
-        raw
-      };
+    if ((frac < 0) || (frac > Number.MAX_SAFE_INTEGER)) {
+      return;
     }
+
+    const raw = 100 * frac;
+
+    return {
+      frac,
+      text: raw >= 999
+        ? '>999.99%'
+        : `${raw.toFixed(2)}%`,
+      raw
+    };
   };
 
   const noop = () => {};
@@ -275,6 +277,16 @@
     return null;
   };
 
+  const getInvalidPrices = (prices) => {
+    return prices.filter((p) =>
+      p.name === 'relic'
+        ? ((p.val / gamePage.resPool.get(p.name).value) > FRACTION_RELIC)
+        : p.name === 'void'
+          ? ((p.val / gamePage.resPool.get(p.name).value) > FRACTION_VOID)
+          : (p.val > gamePage.resPool.get(p.name).value)
+    );
+  };
+
   const calcTheology = () => {
     try {
       const best = gamePage.religionTab.ctPanel.children[0].children
@@ -285,19 +297,9 @@
             return false;
           }
 
-          const firstInvalid = a.model.prices.find((p) =>
-            p.name === 'relic'
-              ? false
-              : p.name === 'void'
-                ? ((p.val / gamePage.resPool.get(p.name).value) > FRACTION_VOID)
-                : (p.val > gamePage.resPool.get(p.name).value)
-          );
+          const invalids = getInvalidPrices(a.model.prices);
 
-          if (firstInvalid) {
-            return false;
-          }
-
-          return true;
+          return (invalids.length === 0) || ((invalids.length === 1) && (invalids[0].name === 'relic'));
         })
         .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)[0];
 
@@ -514,15 +516,7 @@
   const unlockTabBtn = (btn, dryRun) => {
     if (!btn?.model?.enabled || !btn.model.visible || !btn.model.metadata) {
       return 0;
-    }
-
-    const firsInvalid = btn.model.prices.find((p) =>
-      p.name === 'void'
-        ? ((p.val / gamePage.resPool.get(p.name).value) > FRACTION_VOID)
-        : (p.val > gamePage.resPool.get(p.name).value)
-    );
-
-    if (firsInvalid) {
+    } else if (getInvalidPrices(btn.model.prices).length) {
       return 0;
     }
 
@@ -546,6 +540,8 @@
         tab.GCPanel?.children ||
         // trade
         tab.racePanels?.map((r) => r.embassyButton) ||
+        // time
+        tab.vsPanel?.children ||
         // science, workshop
         tab.buttons;
 
@@ -582,11 +578,7 @@
       fillResources();
     }
 
-    // get first invalid price
-    const firstInvalid = model.prices.find((p) => gamePage.resPool.get(p.name).value < p.val);
-
-    // ensure we have enough of everything
-    if (firstInvalid) {
+    if (getInvalidPrices(model.prices).length) {
       return 0;
     }
 
