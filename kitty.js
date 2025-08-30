@@ -277,11 +277,13 @@
   };
 
   const getInvalidPrices = (prices) => {
-    return prices.filter((p) =>
-      p.type === 'exotic'
-        ? ((p.val / gamePage.resPool.get(p.name).value) > FRACTION_EXOTIC)
-        : (p.val > gamePage.resPool.get(p.name).value)
-    );
+    return prices.filter((p) => {
+      const r = gamePage.resPool.get(p.name);
+
+      return r.type === 'exotic'
+        ? ((p.val / r.value) > FRACTION_EXOTIC)
+        : (p.val > r.value)
+    });
   };
 
   const calcTheology = () => {
