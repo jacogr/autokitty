@@ -926,16 +926,8 @@
 
   divCont.append(divTxGroup);
 
-  for (const id of ['kittycheatZiggurat', 'kittycheatTheology', 'kittycheatTranscend']) {
+  for (const id of ['kittycheatDryrunBuild', 'kittycheatDryrunUpgrd', 'kittycheatZiggurat', 'kittycheatTheology', 'kittycheatTranscend']) {
     divTxGroup.append(styleDiv($(`<div id="${id}"></div>`), true));
-  }
-
-  const divDryrun = styleDiv($('<div id="kittycheatDryrun"></div>'), true, { 'padding-top': '10px' });
-
-  divTxGroup.append(divDryrun);
-
-  for (const id of ['kittycheatDryrunBuild', 'kittycheatDryrunUpgrd']) {
-    divDryrun.append(styleDiv($(`<div id="${id}"></div>`), true));
   }
 
   // render clicky tabs at startup (as available)
@@ -946,6 +938,9 @@
       console.error('initial render', tab, e);
     }
   }
+
+  // switch off confirmation, i.e. we use shift clicks for building
+  game.opts.noConfirm = true;
 
   // start the loops
   execOpts(99);
