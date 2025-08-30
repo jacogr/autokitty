@@ -41,11 +41,9 @@
       const raw = 100 * frac;
 
       return {
-        text: raw >= 100.99
-          ? '>100.99%'
-          : raw <= 0.99
-            ? '<0.99%'
-            : `${raw.toFixed(2)}%`,
+        text: raw >= 199.99
+          ? '>199.99%'
+          : `${raw.toFixed(2)}%`,
         raw
       };
     }
