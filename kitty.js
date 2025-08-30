@@ -278,24 +278,27 @@
   const calcTheology = () => {
     try {
       const best = gamePage.religionTab.ctPanel.children[0].children
-        .filter((a) =>
-          (
-            a.id === 'holyGenocide'
-              ? (a.model.on < MAX_GENOCIDE)
-              : true
-          ) &&
-          (a.model.prices[0].name === 'relic') &&
-          !a.model.prices.find((p) =>
+        .filter((a) => {
+          if ((a.id === 'holyGenocide') && (a.model.on >= MAX_GENOCIDE)) {
+            return false;
+          } else if (a.model.prices[0].name !== 'relic') {
+            return false;
+          }
+
+          const firstInvalid = !a.model.prices.find((p) =>
             p.name === 'relic'
-              // always valid
               ? false
               : p.name === 'void'
-                // invalid when we need to spend more than fraction
                 ? ((p.val / gamePage.resPool.get(p.name).value) > FRACTION_VOID)
-                // invalid when we don't have enough
                 : (p.val > gamePage.resPool.get(p.name).value)
-          )
-        )
+          );
+
+          if (firstInvalid) {
+            return false;
+          }
+
+          return true;
+        })
         .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)[0];
 
       if (best) {
