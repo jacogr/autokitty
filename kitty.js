@@ -3,7 +3,10 @@
   const gamePage = window.gamePage;
   const $ = window.$;
 
+  // spend a maxiumum of 1% of an exotic resource
   const FRACTION_EXOTIC = 0.01;
+
+  // build at most 25 HGs - this is optimal for paragon
   const MAX_GENOCIDE = 25;
 
   const isMax = {
@@ -90,6 +93,16 @@
     if (game.ui.activeTabId !== tab.tabId) {
       tab.render();
     }
+  };
+
+  const getInvalidPrices = (prices) => {
+    return prices.filter((p) => {
+      const r = gamePage.resPool.get(p.name);
+
+      return r.type === 'exotic'
+        ? ((p.val / r.value) > FRACTION_EXOTIC)
+        : (p.val > r.value)
+    });
   };
 
   const hasResource = (vals = {}, isTrade = false) => {
@@ -274,16 +287,6 @@
     }
 
     return null;
-  };
-
-  const getInvalidPrices = (prices) => {
-    return prices.filter((p) => {
-      const r = gamePage.resPool.get(p.name);
-
-      return r.type === 'exotic'
-        ? ((p.val / r.value) > FRACTION_EXOTIC)
-        : (p.val > r.value)
-    });
   };
 
   const calcTheology = () => {
@@ -948,15 +951,6 @@
 
   for (const id of ['kittycheatDryrunBuild', 'kittycheatDryrunUpgrd', 'kittycheatZiggurat', 'kittycheatTheology', 'kittycheatTranscend']) {
     divTxGroup.append(styleDiv($(`<div id="${id}"></div>`), true));
-  }
-
-  // render clicky tabs at startup (as available)
-  for (const tab of ['diplomacyTab', 'libraryTab', 'religionTab', 'timeTab']) {
-    try {
-      renderBgTab(gamePage[tab]);
-    } catch (e) {
-      console.error('initial render', tab, e);
-    }
   }
 
   // switch off confirmation, i.e. we use shift clicks for building
