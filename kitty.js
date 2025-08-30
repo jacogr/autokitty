@@ -517,18 +517,12 @@
       }
 
       // for trade, unlock new races to trade with
-      if (tab.exploreBtn && tab.racePanels) {
+      if (tab.exploreBtn && tab.racePanels && count) {
         const maxRaces = tab.leviathansInfo ? 8 : 7;
 
         if (tab.racePanels.length !== maxRaces) {
-          if (tab.racePanels.length < 7 || tab.racePanels[tab.racePanels.length - 1].race.name === 'leviathans') {
-            // count += dryRun ? 1 : clickDom(tab.exploreBtn);
-            if (dryRun) {
-              count++;
-            } else {
-              clickDom(tab.exploreBtn);
-            }
-          }
+          // count += dryRun ? 1 :
+          clickDom(tab.exploreBtn);
         }
       }
     } catch (e) {
