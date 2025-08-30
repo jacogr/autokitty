@@ -336,11 +336,17 @@
     }
   };
 
+  let lastTrancendValue = 0;
+
   const fnAdore = () => {
-    // sadly the game always confirms here, leave for now...
-    // if (game.religion.faithRatio > game.religion._getTranscendNextPrice()) {
-    //  gamePage.religionTab?.transcendBtn?.domNode.click();
-    // }
+    const nextTrancendValue = game.religion._getTranscendNextPrice()
+
+    if ((game.religion.faithRatio > nextTrancendValue) && (nextTrancendValue !== lastTrancendValue)) {
+      lastTrancendValue = nextTrancendValue;
+
+      // sadly this pops up a modal :(
+      gamePage.religionTab?.transcendBtn?.domNode.click();
+    }
 
     game.religion.resetFaith(1.01, false);
     clickDom(gamePage.religionTab?.praiseBtn);
