@@ -53,10 +53,11 @@
 
   const noop = () => {};
 
-  const clickDom = (btn, withCtrl = false) => {
+  const clickDom = (btn, isMulti = false) => {
     if (btn?.domNode) {
-      if (withCtrl) {
-        btn.domNode.dispatchEvent(new MouseEvent('click', { ctrlKey: true, metaKey: true }));
+      if (isMulti) {
+        // { ctrlKey: true, metaKey: true }
+        btn.domNode.dispatchEvent(new MouseEvent('click', { shiftKey: true }));
       } else {
         btn.domNode.click();
       }
