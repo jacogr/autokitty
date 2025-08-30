@@ -3,6 +3,9 @@
   const gamePage = window.gamePage;
   const $ = window.$;
 
+  const FRACTION_RELIC = 0.01;
+  const FRACTION_VOID = 0.01;
+
   const isMax = {
     'build': { active: false },
     'upgrade': { active: false, end: true },
@@ -41,6 +44,7 @@
       const raw = 100 * frac;
 
       return {
+        frac,
         text: raw >= 999
           ? '>999.99%'
           : `${raw.toFixed(2)}%`,
@@ -273,7 +277,19 @@
   const calcTheology = () => {
     try {
       const best = gamePage.religionTab.ctPanel.children[0].children
-        .filter((a) => a.model.prices.length === 1 && a.model.prices[0].name === 'relic')
+        .filter((a) =>
+          (a.model.prices[0].name === 'relic') &&
+          !a.model.prices.find((p) =>
+            p.name === 'relic'
+              // always valid
+              ? false
+              : p.name === 'void'
+                // invalid when we need to spend more than fraction
+                ? ((p.val / gamePage.resPool.get(p.name).value) > FRACTION_VOID)
+                // invalid when we don't have enough
+                : (p.val > gamePage.resPool.get(p.name).value)
+          )
+        )
         .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)[0];
 
       if (best) {
@@ -467,7 +483,7 @@
 
       const best = calcTheology();
 
-      if (!best || !best.percent || best.percent.raw > 1) {
+      if (!best || !best.percent || best.percent.frac > FRACTION_RELIC) {
         return 0;
       }
 
@@ -484,6 +500,24 @@
     }
 
     return 0;
+  };
+
+  const unlockTabBtn = (btn, dryRun) => {
+    if (!btn?.model?.enabled || !btn.model.visible || !btn.model.metadata) {
+      return 0;
+    }
+
+    const firsInvalid = btn.model.prices.find((p) =>
+      p.name === 'void'
+        ? ((p.val / gamePage.resPool.get(p.name).value) > FRACTION_VOID)
+        : (p.val > gamePage.resPool.get(p.name).value)
+    );
+
+    if (firsInvalid) {
+      return 0;
+    }
+
+    return  dryRun ? 1 : clickDom(btn);
   };
 
   const unlockTab = (tab, dryRun) => {
@@ -507,13 +541,7 @@
         tab.buttons;
 
       for (const btn of buttons) {
-        try {
-          if (btn?.model?.enabled && btn.model.visible && btn.model.metadata && !btn.model.prices.find((p) => p.name === 'void')) {
-            count += dryRun ? 1 : clickDom(btn);
-          }
-        } catch (e) {
-          console.error('unlockTab', tab.tabName, e);
-        }
+        count += unlockTabBtn(btn, dryRun);
       }
 
       // for trade, unlock new races to trade with
@@ -586,11 +614,7 @@
 
       for (const area of areas) {
         for (const child of area.children) {
-          try {
-            count += buildTabBtn(child, dryRun);
-          } catch (e) {
-            console.error('buildTab', tab.tabName, e);
-          }
+          count += buildTabBtn(child, dryRun);
         }
       }
     } catch (e) {
