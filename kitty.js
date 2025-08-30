@@ -3,8 +3,7 @@
   const gamePage = window.gamePage;
   const $ = window.$;
 
-  const FRACTION_RELIC = 0.01;
-  const FRACTION_VOID = 0.01;
+  const FRACTION_EXOTIC = 0.01;
   const MAX_GENOCIDE = 25;
 
   const isMax = {
@@ -279,11 +278,9 @@
 
   const getInvalidPrices = (prices) => {
     return prices.filter((p) =>
-      p.name === 'relic'
-        ? ((p.val / gamePage.resPool.get(p.name).value) > FRACTION_RELIC)
-        : p.name === 'void'
-          ? ((p.val / gamePage.resPool.get(p.name).value) > FRACTION_VOID)
-          : (p.val > gamePage.resPool.get(p.name).value)
+      p.type === 'exotic'
+        ? ((p.val / gamePage.resPool.get(p.name).value) > FRACTION_EXOTIC)
+        : (p.val > gamePage.resPool.get(p.name).value)
     );
   };
 
@@ -494,7 +491,7 @@
 
       const best = calcTheology();
 
-      if (!best || !best.percent || best.percent.frac > FRACTION_RELIC) {
+      if (!best || !best.percent || best.percent.frac > FRACTION_EXOTIC) {
         return 0;
       }
 
