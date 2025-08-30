@@ -336,17 +336,17 @@
     }
   };
 
-  let lastTrancendValue = 0;
+  // let lastTrancendValue = 0;
 
   const fnAdore = () => {
-    const nextTrancendValue = game.religion._getTranscendNextPrice()
+    // const nextTrancendValue = game.religion._getTranscendNextPrice()
 
-    if ((game.religion.faithRatio > nextTrancendValue) && (nextTrancendValue !== lastTrancendValue)) {
-      lastTrancendValue = nextTrancendValue;
+    // if ((game.religion.faithRatio > nextTrancendValue) && (nextTrancendValue !== lastTrancendValue)) {
+    //   lastTrancendValue = nextTrancendValue;
 
-      // sadly this pops up a modal :(
-      gamePage.religionTab?.transcendBtn?.domNode.click();
-    }
+    //   // sadly this pops up a modal :(
+    //   gamePage.religionTab?.transcendBtn?.domNode.click();
+    // }
 
     game.religion.resetFaith(1.01, false);
     clickDom(gamePage.religionTab?.praiseBtn);
