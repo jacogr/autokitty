@@ -444,7 +444,7 @@
       // only sacrifice when we do have enough available (only every 10 seconds)
       if (nowDelta > 10000 && bt && zigTears > bt.val) {
         // console.log('buildZig:', 'sacrifice');
-      
+
         if (!dryRun) {
           buildZigPrevTime = nowTime;
           gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, noop, noop);
@@ -501,6 +501,8 @@
         tab.rUpgradeButtons ||
         // space
         tab.GCPanel?.children ||
+        // trade
+        tab.racePanels?.map((r) => r.embassyButton) ||
         // science, workshop
         tab.buttons;
 
@@ -585,8 +587,6 @@
       const areas =
         // space
         tab.planetPanels ||
-        // trade
-        tab.racePanels?.map((r) => ({ children: [r.embassyButton] })) ||
         // others
         [tab];
 
@@ -635,7 +635,7 @@
     }
 
     if (isMax.build.active || dryRun) {
-      total += loopTabs(dryRun, stats, 'build', ['bldTab', 'diplomacyTab', 'spaceTab'], buildTab);
+      total += loopTabs(dryRun, stats, 'build', ['bldTab', 'spaceTab'], buildTab);
     }
 
     if (!dryRun) {
@@ -657,7 +657,6 @@
 
   const execTextInfo = (delay) => {
     const concatNext = (s) =>
-      // `${e.name}(${e.count})`
       s?.indv.map((e) => e.name).join(', ');
 
     renderBgTab(gamePage.religionTab);
