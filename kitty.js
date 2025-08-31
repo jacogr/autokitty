@@ -327,6 +327,9 @@
     return null;
   };
 
+  const findTheoBld = (id) =>
+    gamePage.religionTab.ctPanel.children[0].children.find((b) => b.id === id);
+
   const calcTheology = () => {
     try {
       const best = gamePage.religionTab.ctPanel.children[0].children
@@ -755,11 +758,11 @@
       const unicornPrice = calcZigguratsPrices(zig.bestPrices, zigguratRatio);
       const calc = toPercent(unicornTotal / unicornPrice);
 
-      zigText = zig.bestBuilding + (calc ? `, ${calc.text}` : '');
+      zigText = findZigBld(zig.bestBuilding).opts.name + (calc ? `, ${calc.text}` : '');
     }
 
     const cryText = cry && (
-      (cry.bestBuilding === 'singularity' ? 'eventHorizon' : cry.bestBuilding) +
+      findTheoBld(cry.bestBuilding).opts.name +
       (cry.percent ? `, ${cry.percent.text}` : '')
     );
 
