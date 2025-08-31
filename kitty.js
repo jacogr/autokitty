@@ -555,6 +555,8 @@
       return 0;
     } else if (getInvalidPrices(btn.model.prices).length) {
       return 0;
+    } else if (btn.id === 'cryochambers' && btn.model.on >= gamePage.bld.getBuildingExt('chronosphere').meta.on) {
+      return 0;
     }
 
     return  dryRun ? 1 : clickDom(btn);
