@@ -574,8 +574,10 @@
       }
 
       // for trade, unlock new races to trade with
-      if (tab.exploreBtn && tab.racePanels) {
-        const maxRaces = tab.leviathansInfo ? 8 : 7;
+      if (tab.exploreBtn && tab.racePanels && tab.racePanels.length !== 8) {
+        const maxRaces = tab.leviathansInfo
+          ? 8 - (tab.racePanels.find((r) => r.race.name === 'leviathans') ? 0 : 1)
+          : 7;
 
         if (tab.racePanels.length !== maxRaces) {
           const nowTime = Date.now();
