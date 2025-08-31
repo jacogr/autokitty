@@ -365,8 +365,16 @@
   };
 
   const fnAdore = () => {
+    renderBgTab(gamePage.religionTab);
+
     game.religion.resetFaith(1.01, false);
     clickDom(gamePage.religionTab?.praiseBtn);
+  };
+
+  const fnPromote = () => {
+    renderBgTab(gamePage.villageTab);
+
+    clickDom(gamePage.villageTab?.promoteKittensBtn);
   };
 
   const fnCombust = () => {
@@ -893,6 +901,11 @@
           gamePage.village.huntAll();
         },
         active: true
+      },
+      'promote': {
+        func: fnPromote,
+        active: true,
+        delay: 90000
       },
       'tc combust': {
         func: fnCombust,
