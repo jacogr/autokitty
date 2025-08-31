@@ -703,11 +703,20 @@
       (cry.percent ? `, ${cry.percent.text}` : '')
     );
 
+    const bcoinText = game.calendar.cryptoPrice && (
+      game.calendar.cryptoPrice >= 1025
+        ? `Sell, ${game.calendar.cryptoPrice.toFixed(3)}`
+        : game.calendar.cryptoPrice <= 880
+          ? `Buy, ${game.calendar.cryptoPrice.toFixed(3)}`
+          : `Hold, ${game.calendar.cryptoPrice.toFixed(3)}`
+    );
+
+    $('div#kittycheatDryrunBuild').html(`Buildings: ${concatNext(next.stats.build) || '-'}`);
+    $('div#kittycheatDryrunUpgrd').html(`Upgrades : ${concatNext(next.stats.upgrade) || '-'}`);
     $('div#kittycheatZiggurat').html(`Ziggurat : ${zigText || zig.err || '-'}`);
     $('div#kittycheatTheology').html(`Theology : ${cryText || '-'}`);
     $('div#kittycheatTranscend').html(`Transcend: ${trd?.text || '-'}`);
-    $('div#kittycheatDryrunBuild').html(`Buildings: ${concatNext(next.stats.build) || '-'}`);
-    $('div#kittycheatDryrunUpgrd').html(`Upgrades : ${concatNext(next.stats.upgrade) || '-'}`);
+    $('div#kittycheatBlackcoin').html(`Blackcoin: ${bcoinText || '-'}`);
 
     setTimeout(() => execTextInfo(delay), delay);
   };
@@ -950,8 +959,8 @@
 
   divCont.append(divTxGroup);
 
-  for (const id of ['kittycheatDryrunBuild', 'kittycheatDryrunUpgrd', 'kittycheatZiggurat', 'kittycheatTheology', 'kittycheatTranscend']) {
-    divTxGroup.append(styleDiv($(`<div id="${id}"></div>`), true));
+  for (const id of ['DryrunBuild', 'DryrunUpgrd', 'Ziggurat', 'Theology', 'Transcend', 'Blackcoin']) {
+    divTxGroup.append(styleDiv($(`<div id="kittycheat${id}"></div>`), true));
   }
 
   // switch off confirmation, i.e. we use shift clicks for building
