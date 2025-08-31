@@ -741,7 +741,7 @@
 
   const execTextInfo = (delay) => {
     const concatNext = (s) =>
-      s?.indv.map((e) => e.name).join(', ');
+      s?.indv.map((e) => `${e.name} (${e.count})`).join(', ');
 
     renderBgTab(gamePage.religionTab);
 
