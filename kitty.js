@@ -296,7 +296,7 @@
         const action = (
           price >= 1050
             ? 'sell'
-            : price <= 925
+            : price <= 950
               ? 'buy'
               : 'hold'
         );
