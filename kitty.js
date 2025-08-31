@@ -281,6 +281,28 @@
     }
   };
 
+  const calcBcoin = () => {
+    try {
+      const cryptoPrice = game.calendar.cryptoPrice;
+
+      return (cryptoPrice && ({
+        cryptoPrice,
+        format: `${cryptoPrice.toFixed(3)}R`,
+        action: (
+          cryptoPrice >= 1025
+            ? 'sell'
+            : cryptoPrice <= 925
+              ? 'buy'
+              : 'hold'
+        )
+      })) || null;
+    } catch (e) {
+      console.error('calcBcoin', e);
+    }
+
+    return null;
+  };
+
   const calcTranscend = () => {
     try {
       return toPercent(game.religion.faithRatio / game.religion._getTranscendNextPrice());
@@ -687,6 +709,7 @@
     const zig = calcZiggurats();
     const cry = calcTheology();
     const trd = calcTranscend();
+    const bcoin = calcBcoin();
     let zigText = zig.bestBuilding;
 
     if (zig.bestBuilding && zig.bestPrices) {
@@ -703,13 +726,7 @@
       (cry.percent ? `, ${cry.percent.text}` : '')
     );
 
-    const bcoinText = game.calendar.cryptoPrice && (
-      game.calendar.cryptoPrice >= 1025
-        ? `Sell, ${game.calendar.cryptoPrice.toFixed(3)}`
-        : game.calendar.cryptoPrice <= 925
-          ? `Buy, ${game.calendar.cryptoPrice.toFixed(3)}`
-          : `Hold, ${game.calendar.cryptoPrice.toFixed(3)}`
-    );
+    const bcoinText = bcoin && `${bcoin.action}, ${bcoin.format}`;
 
     $('div#kittycheatDryrunBuild').html(`Buildings: ${concatNext(next.stats.build) || '-'}`);
     $('div#kittycheatDryrunUpgrd').html(`Upgrades : ${concatNext(next.stats.upgrade) || '-'}`);
