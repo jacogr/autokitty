@@ -6,6 +6,9 @@
   // spend a maxiumum of 1% of an exotic resource
   const FRACTION_EXOTIC = 0.01;
 
+  // don't convert if we have less than 5% of the max
+  const FRACTION_CRAFT = 0.05;
+
   // build at most 25 HGs - this is optimal for paragon
   const MAX_GENOCIDE = 25;
 
@@ -121,7 +124,7 @@
         cando = res.value >= vals[key];
 
         if (cando && !isTrade && res.maxValue > 0) {
-          cando = (res.value / res.maxValue) >= 0.05;
+          cando = (res.value / res.maxValue) >= FRACTION_CRAFT;
         }
       }
     }
