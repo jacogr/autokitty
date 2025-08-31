@@ -989,17 +989,20 @@
   const clickOptBtn = (btn, group, name, opts) => {
     opts.active = !opts.active;
 
-    if (opts.active && opts.excl) {
-      for (const n of opts.excl) {
-        const o = kittycheatOptsMap[group][n];
-
-        o.active = false;
-        styleBtn(o.btn, o);
-      }
-    }
-
     styleBtn(btn, opts);
-    execOpt(name, opts);
+
+    if (opts.active) {
+      if (opts.excl) {
+        for (const n of opts.excl) {
+          const o = kittycheatOptsMap[group][n];
+
+          o.active = false;
+          styleBtn(o.btn, o);
+        }
+      }
+
+      execOpt(name, opts);
+    }
   };
 
   const divCont = $('<div></div>').css({
