@@ -706,7 +706,7 @@
     const bcoinText = game.calendar.cryptoPrice && (
       game.calendar.cryptoPrice >= 1025
         ? `Sell, ${game.calendar.cryptoPrice.toFixed(3)}`
-        : game.calendar.cryptoPrice <= 880
+        : game.calendar.cryptoPrice <= 900
           ? `Buy, ${game.calendar.cryptoPrice.toFixed(3)}`
           : `Hold, ${game.calendar.cryptoPrice.toFixed(3)}`
     );
