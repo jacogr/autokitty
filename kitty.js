@@ -3,8 +3,11 @@
   const gamePage = window.gamePage;
   const $ = window.$;
 
-  // spend a maxiumum of 1% of an exotic resource
+  // spend 1% maximum on any exotic
   const FRACTION_EXOTIC = 0.01;
+
+  // spend 50% maximum on karma
+  const FRACTION_KARMA = 0.5;
 
   // don't convert if we have less than 5% of the max
   const FRACTION_CRAFT = 0.05;
@@ -111,9 +114,13 @@
     return prices.filter((p) => {
       const r = gamePage.resPool.get(p.name);
 
-      return r.type === 'exotic'
-        ? ((p.val / r.value) > FRACTION_EXOTIC)
-        : (p.val > r.value)
+      return (p.val / r.value) > (
+        r.type === 'exotic'
+          ?  FRACTION_EXOTIC
+          : r.name === 'karma'
+            ? FRACTION_KARMA
+            : 1
+      );
     });
   };
 
