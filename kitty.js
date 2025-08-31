@@ -45,7 +45,7 @@
       'border-radius': '2px',
       'border-width': '1px',
       'padding-inline': '4px',
-      'margin-right': opts.end ? '5px' : '1px',
+      'margin-right': opts.end ? '5px' : (opts.excl ? '-2px' : '1px'),
       'margin-bottom': '1px'
     });
   };
