@@ -57,9 +57,9 @@
 
     return {
       frac,
-      text: raw >= 999
-        ? '>999.99%'
-        : `${raw.toFixed(2)}%`,
+      text: raw >= 999.999
+        ? '>999.999%'
+        : `${raw.toFixed(3)}%`,
       raw
     };
   };
