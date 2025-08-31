@@ -77,19 +77,23 @@
     return 0;
   };
 
-  const clickSpan = (label) => {
-    const span = $('span').filter(function() {
-      return $(this).text().indexOf(label) === 0;
-    });
+  const clickElement = (type) => {
+    return (label) => {
+      const elem = $(type).filter(function() {
+        return $(this).text().indexOf(label) === 0;
+      });
 
-    if (span.length) {
-      span.click();
+      if (elem.length) {
+        elem.click();
 
-      return 1;
-    }
+        return 1;
+      }
 
-    return 0;
+      return 0;
+    };
   };
+
+  const clickSpan = clickElement('span');
 
   const renderBgTab = (tab) => {
     if (game.ui.activeTabId !== tab.tabId) {
