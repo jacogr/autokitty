@@ -9,6 +9,9 @@
   // build at most 25 HGs - this is optimal for paragon
   const MAX_GENOCIDE = 25;
 
+  const INTERVAL_EXPLORE = 5000;
+  const INTERVAL_SACRIFICE = 10000;
+
   const isMax = {
     'build': { active: false },
     'upgrade': { active: false, end: true },
@@ -63,7 +66,6 @@
   const clickDom = (btn, isMulti = false) => {
     if (btn?.domNode) {
       if (isMulti) {
-        // { ctrlKey: true, metaKey: true }
         btn.domNode.dispatchEvent(new MouseEvent('click', { shiftKey: true }));
       } else {
         btn.domNode.click();
@@ -336,18 +338,7 @@
     }
   };
 
-  // let lastTrancendValue = 0;
-
   const fnAdore = () => {
-    // const nextTrancendValue = game.religion._getTranscendNextPrice()
-
-    // if ((game.religion.faithRatio > nextTrancendValue) && (nextTrancendValue !== lastTrancendValue)) {
-    //   lastTrancendValue = nextTrancendValue;
-
-    //   // sadly this pops up a modal :(
-    //   clickDom(gamePage.religionTab?.transcendBtn);
-    // }
-
     game.religion.resetFaith(1.01, false);
     clickDom(gamePage.religionTab?.praiseBtn);
   };
@@ -423,7 +414,7 @@
     execOpt(name, opts);
   };
 
-  let buildZigPrevTime = 0;
+  let lastSacrificeTime = 0;
 
   const getTearsPrice = (bld) =>
     bld?.model.prices.find((p) => p.name === 'tears');
@@ -450,7 +441,6 @@
       const blck = findZigBld('blackPyramid');
 
       if (isBuildable(blck)) {
-        // console.log('buildZig:', 'blackPyramid');
         return dryRun ? 1 : clickDom(blck);
       }
 
@@ -468,20 +458,18 @@
           ? ((mt.val <= bt.val) ? mark : best)
           : (mv ? mark : best);
 
-        // console.log('buildZig:', next.id);
         return dryRun ? 1 : clickDom(next);
       }
 
       const zigTears = gamePage.resPool.get('tears').value + (gamePage.bld.getBuildingExt('ziggurat').meta.on * gamePage.resPool.get('unicorns').value / 2500);
-      const nowTime = Date.now();
-      const nowDelta = nowTime - buildZigPrevTime;
 
       // only sacrifice when we do have enough available (only every 10 seconds)
-      if (nowDelta > 10000 && bt && zigTears > bt.val) {
-        // console.log('buildZig:', 'sacrifice');
+      if (bt && zigTears > bt.val) {
+        const nowTime = Date.now();
+        const nowDelta = nowTime - lastSacrificeTime;
 
-        if (!dryRun) {
-          buildZigPrevTime = nowTime;
+        if (!dryRun && nowDelta > INTERVAL_SACRIFICE) {
+          lastSacrificeTime = nowTime;
           gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, noop, noop);
         }
 
@@ -531,6 +519,8 @@
     return  dryRun ? 1 : clickDom(btn);
   };
 
+  let lastExploreTime = 0;
+
   const unlockTab = (tab, dryRun) => {
     let count = 0;
 
@@ -558,12 +548,17 @@
       }
 
       // for trade, unlock new races to trade with
-      if (tab.exploreBtn && tab.racePanels && count) {
+      if (tab.exploreBtn && tab.racePanels) {
         const maxRaces = tab.leviathansInfo ? 8 : 7;
 
         if (tab.racePanels.length !== maxRaces) {
-          // count += dryRun ? 1 :
-          clickDom(tab.exploreBtn);
+          const nowTime = Date.now();
+          const nowDelta = nowTime - lastExploreTime;
+
+          if (nowDelta > INTERVAL_EXPLORE) {
+            lastExploreTime = nowTime;
+            count += dryRun ? 1 : clickDom(tab.exploreBtn);
+          }
         }
       }
     } catch (e) {
