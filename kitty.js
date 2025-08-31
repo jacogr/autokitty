@@ -744,7 +744,7 @@
     }
 
     if (delay) {
-      setTimeout(() => execBuildAll(delay), Math.ceil(delay / (total ? 5 : 1)));
+      setTimeout(() => execBuildAll(delay), Math.ceil(delay / (total ? 3 : 1)));
     }
 
     return { stats, total };
