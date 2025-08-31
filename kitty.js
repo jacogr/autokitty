@@ -340,7 +340,7 @@
       if (best) {
         return {
           bestBuilding: best.id,
-          percent: toPercent(best.model.prices[0].val / gamePage.resPool.get('relic').value)
+          percent: toPercent(gamePage.resPool.get('relic').value / (best.model.prices[0].val * (1 / FRACTION_EXOTIC)))
         };
       }
     } catch (e) {
@@ -528,7 +528,7 @@
 
       const best = calcTheology();
 
-      if (!best || !best.percent || best.percent.frac > FRACTION_EXOTIC) {
+      if (!best || !best.percent || best.percent.frac < 1) {
         return 0;
       }
 
