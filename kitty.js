@@ -283,19 +283,23 @@
 
   const calcBcoin = () => {
     try {
-      const cryptoPrice = game.calendar.cryptoPrice;
+      const price = game.calendar.cryptoPrice;
 
-      return (cryptoPrice && ({
-        cryptoPrice,
-        format: `${cryptoPrice.toFixed(3)}R`,
-        action: (
-          cryptoPrice >= 1025
+      if (price) {
+        const action = (
+          price >= 1025
             ? 'sell'
-            : cryptoPrice <= 925
+            : price <= 925
               ? 'buy'
               : 'hold'
-        )
-      })) || null;
+        );
+
+        return {
+          action,
+          price,
+          text: `${action}, ${price.toFixed(3)}R`
+        };
+      }
     } catch (e) {
       console.error('calcBcoin', e);
     }
@@ -726,14 +730,12 @@
       (cry.percent ? `, ${cry.percent.text}` : '')
     );
 
-    const bcoinText = bcoin && `${bcoin.action}, ${bcoin.format}`;
-
     $('div#kittycheatDryrunBuild').html(`Buildings: ${concatNext(next.stats.build) || '-'}`);
     $('div#kittycheatDryrunUpgrd').html(`Upgrades : ${concatNext(next.stats.upgrade) || '-'}`);
     $('div#kittycheatZiggurat').html(`Ziggurat : ${zigText || zig.err || '-'}`);
     $('div#kittycheatTheology').html(`Theology : ${cryText || '-'}`);
     $('div#kittycheatTranscend').html(`Transcend: ${trd?.text || '-'}`);
-    $('div#kittycheatBlackcoin').html(`Blackcoin: ${bcoinText || '-'}`);
+    $('div#kittycheatBlackcoin').html(`Blackcoin: ${bcoin?.text || '-'}`);
 
     setTimeout(() => execTextInfo(delay), delay);
   };
