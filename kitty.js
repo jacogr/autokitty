@@ -307,7 +307,7 @@
         return {
           action,
           price,
-          text: `${action}, ${price.toFixed(3)}R`
+          text: `${action} @ ${price.toFixed(3)}R`
         };
       }
     } catch (e) {
