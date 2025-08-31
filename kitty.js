@@ -294,7 +294,7 @@
 
       if (price) {
         const action = (
-          price >= 1025
+          price >= 1050
             ? 'sell'
             : price <= 925
               ? 'buy'
