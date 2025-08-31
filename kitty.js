@@ -415,6 +415,17 @@
     }
   };
 
+  const fnCombust40k = () => {
+    if (game.calendar.year < 40000) {
+      fnCombust();
+    } else {
+      const opts = kittycheatOptsMap.actions['40k'];
+
+      opts.active = false;
+      styleBtn(opts.btn, opts);
+    }
+  };
+
   const fnFeed = () => {
     if (gamePage.resPool.get('necrocorn').value > 1) {
       renderBgTab(gamePage.diplomacyTab)
@@ -459,13 +470,6 @@
     }
 
     setTimeout(() => execOptTimer(name, opts), opts.delay);
-  };
-
-  const clickOptBtn = (btn, name, opts) => {
-    opts.active = !opts.active;
-
-    styleBtn(btn, opts);
-    execOpt(name, opts);
   };
 
   let lastSacrificeTime = 0;
@@ -783,7 +787,7 @@
     setTimeout(() => execTextInfo(delay), delay);
   };
 
-  const kittycheatOpts = Object.values({
+  const kittycheatOptsMap = {
     'crafting': {
       //'wood': {
       //  res: { 'catnip': 250 }
@@ -907,13 +911,8 @@
           clickSpan('Refine catnip');
         },
         active: true,
-        delay: 1000
-      },
-      'observe': {
-        func: () => {
-          $('input#observeBtn').click();
-        },
-        active: true
+        delay: 1000,
+        end: true
       },
       'praise': {
         func: () => {
@@ -926,7 +925,14 @@
       'adore': {
         func: fnAdore,
         active: true,
-        delay: 120000
+        delay: 120000,
+        end: true
+      },
+      'observe': {
+        func: () => {
+          $('input#observeBtn').click();
+        },
+        active: true
       },
       'hunt': {
         func: () => {
@@ -938,12 +944,21 @@
       'promote': {
         func: fnPromote,
         active: true,
-        delay: 90000
+        delay: 90000,
+        end: true
       },
-      'tc combust': {
+      'combust': {
         func: fnCombust,
         active: false,
-        delay: 1000
+        delay: 1000,
+        excl: ['40k']
+      },
+      '40k': {
+        func: fnCombust40k,
+        active: false,
+        delay: 1000,
+        excl: ['combust'],
+        end: true
       },
       'feeding': {
         func: fnFeed,
@@ -951,10 +966,11 @@
         delay: 60000
       }
     }
-  });
+  };
+  const kittycheatOpts = Object.entries(kittycheatOptsMap);
 
   const execOpts = (delay) => {
-    for (const group of kittycheatOpts) {
+    for (const [, group] of kittycheatOpts) {
       for (const n in group) {
         const o = group[n];
 
@@ -970,6 +986,22 @@
     setTimeout(() => execOpts(delay), delay);
   };
 
+  const clickOptBtn = (btn, group, name, opts) => {
+    opts.active = !opts.active;
+
+    if (opts.active && opts.excl) {
+      for (const n of opts.excl) {
+        const o = kittycheatOptsMap[group][n];
+
+        o.active = false;
+        styleBtn(o.btn, o);
+      }
+    }
+
+    styleBtn(btn, opts);
+    execOpt(name, opts);
+  };
+
   const divCont = $('<div></div>').css({
     'padding-bottom': '30px',
     'font-family': 'monospace',
@@ -983,7 +1015,7 @@
   divCont.append(divIwGroup);
 
   // add groups for all the options
-  for (const group of kittycheatOpts) {
+  for (const [groupname, group] of kittycheatOpts) {
     const divGroup = styleDiv($('<div></div>'));
 
     divCont.append(divGroup);
@@ -994,9 +1026,10 @@
       opts.active = opts.active || false;
 
       const btn = $(`<button>${optname}</button>`).click(() => {
-        clickOptBtn(btn, optname, opts);
+        clickOptBtn(btn, groupname, optname, opts);
       });
 
+      opts.btn = btn;
       divGroup.append(styleBtn(btn, opts));
 
       if (opts.delay) {
