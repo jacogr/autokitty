@@ -3,29 +3,35 @@
   const gamePage = window.gamePage;
   const $ = window.$;
 
-  // spend 1% maximum on any exotic
-  const FRACTION_EXOTIC = 0.01;
+  const FRACTION = {
+    // spend 1% maximum on any exotic
+    EXOTIC: 0.01,
+    // spend 50% maximum on karma
+    KARMA: 0.5,
+    // don't convert if we have less than 5% of the max
+    CRAFT: 0.05,
+    // build uncapped buildings when we use only 10% of resources
+    UNCAPPED: 0.1
+  };
 
-  // spend 50% maximum on karma
-  const FRACTION_KARMA = 0.5;
+  const MAXBUILD = {
+    // build at most 25 HGs - this is optimal for paragon
+    GENOCIDE: 25
+  };
 
-  // don't convert if we have less than 5% of the max
-  const FRACTION_CRAFT = 0.05;
+  const INTERVAL = {
+    COMBUST: 250,
+    EXPLORE: 5000,
+    SACRIFICE: 10000
+  };
 
-  // build uncapped buildings when we use only 10% of resources
-  const FRACTION_UNCAPPED = 0.1;
-
-  // build at most 25 HGs - this is optimal for paragon
-  const MAX_GENOCIDE = 25;
-
-  const INTERVAL_EXPLORE = 5000;
-  const INTERVAL_SACRIFICE = 10000;
-
-  const combustCycles = {
-    tenErasLink: 500,
+  // we exclude the 500 year link, slightly slower on 45, but potentially better
+  // with resource retrievals (at 500, INTERVAL.COMBUST should be 1000)
+  const combustCycles = Object.entries({
+    // tenErasLink: 500,
     previousCycleLink: 45,
     nextCycleLink: 5
-  };
+  });
 
   const capitalizeFirst = (val) =>
     val.charAt(0).toUpperCase() + val.slice(1);
@@ -116,9 +122,9 @@
 
       return (p.val / r.value) > (
         r.type === 'exotic'
-          ?  FRACTION_EXOTIC
+          ?  FRACTION.EXOTIC
           : r.name === 'karma' // type=rare, also affects neocorns
-            ? FRACTION_KARMA
+            ? FRACTION.KARMA
             : 1
       );
     });
@@ -134,7 +140,7 @@
         cando = res.value >= vals[key];
 
         if (cando && !isTrade && res.maxValue > 0) {
-          cando = (res.value / res.maxValue) >= FRACTION_CRAFT;
+          cando = (res.value / res.maxValue) >= FRACTION.CRAFT;
         }
       }
     }
@@ -341,7 +347,7 @@
     try {
       const best = gamePage.religionTab.ctPanel.children[0].children
         .filter((a) => {
-          if ((a.id === 'holyGenocide') && (a.model.on >= MAX_GENOCIDE)) {
+          if ((a.id === 'holyGenocide') && (a.model.on >= MAXBUILD.GENOCIDE)) {
             return false;
           } else if (a.model.prices[0].name !== 'relic') {
             return false;
@@ -356,7 +362,7 @@
       if (best) {
         return {
           bestBuilding: best.id,
-          percent: toPercent(gamePage.resPool.get('relic').value / (best.model.prices[0].val * (1 / FRACTION_EXOTIC)))
+          percent: toPercent(gamePage.resPool.get('relic').value / (best.model.prices[0].val * (1 / FRACTION.EXOTIC)))
         };
       }
     } catch (e) {
@@ -398,8 +404,7 @@
   };
 
   const fnCombust = () => {
-    const res = Object
-      .entries(combustCycles)
+    const res = combustCycles
       .map(([cycle, div]) => ({
         cycle,
         count: Math.floor(((game.getEffect('heatMax') - game.time.heat) / div) / 10)
@@ -526,7 +531,7 @@
         const nowTime = Date.now();
         const nowDelta = nowTime - lastSacrificeTime;
 
-        if (!dryRun && nowDelta > INTERVAL_SACRIFICE) {
+        if (!dryRun && nowDelta > INTERVAL.SACRIFICE) {
           lastSacrificeTime = nowTime;
           gamePage.religionTab.sacrificeBtn.model.allLink.handler.call(gamePage.religionTab.sacrificeBtn, noop, noop);
         }
@@ -617,7 +622,7 @@
           const nowTime = Date.now();
           const nowDelta = nowTime - lastExploreTime;
 
-          if (nowDelta > INTERVAL_EXPLORE) {
+          if (nowDelta > INTERVAL.EXPLORE) {
             lastExploreTime = nowTime;
             count += dryRun ? 1 : clickDom(tab.exploreBtn);
           }
@@ -656,7 +661,7 @@
       const fistInvalid = model.prices.find((p) => {
         const r = gamePage.resPool.get(p.name);
 
-        return !r.maxValue && ((p.val / r.value) > FRACTION_UNCAPPED);
+        return !r.maxValue && ((p.val / r.value) > FRACTION.UNCAPPED);
       });
 
       if (fistInvalid) {
@@ -958,13 +963,13 @@
       'combust': {
         func: fnCombust,
         active: false,
-        delay: 1000,
+        delay: INTERVAL.COMBUST,
         excl: ['40k']
       },
       '40k': {
         func: fnCombust40k,
         active: false,
-        delay: 1000,
+        delay: INTERVAL.COMBUST,
         excl: ['combust'],
         end: true
       },
