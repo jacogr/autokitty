@@ -26,7 +26,7 @@
     ADORE: 120000,
     CATNIP_GATHER: 5,
     CATNIP_REFINE: 1000,
-    COMBUST: 250,
+    COMBUST: 1000,
     EXPLORE: 5000,
     FEED: 60000,
     PRAISE: 25,
@@ -34,10 +34,8 @@
     SACRIFICE: 10000
   };
 
-  // we exclude the 500 year link, slightly slower on 45, but potentially better
-  // with resource retrievals (at 500, INTERVAL.COMBUST should be 1000)
   const combustCycles = Object.entries({
-    // tenErasLink: 500,
+    tenErasLink: 500,
     previousCycleLink: 45,
     nextCycleLink: 5
   });
