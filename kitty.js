@@ -14,9 +14,11 @@
     UNCAPPED: 0.1
   };
 
-  const MAXBUILD = {
+  const MAXVAL = {
+    // sell bcoin when it hits this amount (1100 is a crash)
+    BCOIN_PRICE: 1050,
     // build at most 25 HGs - this is optimal for paragon
-    GENOCIDE: 25
+    BLDG_GENOCIDE: 25
   };
 
   const INTERVAL = {
@@ -24,6 +26,7 @@
     ALL_BLD: 999,
     ALL_TXT: 999,
     ADORE: 120000,
+    BCOIN: 60000,
     CATNIP_GATHER: 5,
     CATNIP_REFINE: 1000,
     COMBUST: 1000,
@@ -318,7 +321,7 @@
 
       if (price) {
         const action = (
-          price >= 1050
+          price >= MAXVAL.BCOIN_PRICE
             ? 'sell'
             : price <= 950
               ? 'buy'
@@ -356,7 +359,7 @@
     try {
       const best = gamePage.religionTab.ctPanel.children[0].children
         .filter((a) => {
-          if ((a.id === 'holyGenocide') && (a.model.on >= MAXBUILD.GENOCIDE)) {
+          if ((a.id === 'holyGenocide') && (a.model.on >= MAXVAL.BLDG_GENOCIDE)) {
             return false;
           } else if (a.model.prices[0].name !== 'relic') {
             return false;
@@ -440,11 +443,27 @@
     }
   };
 
+  const findLeviathans = () => {
+    return gamePage.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans');
+  };
+
   const fnFeed = () => {
     if (gamePage.resPool.get('necrocorn').value > 1) {
       renderBgTab(gamePage.diplomacyTab)
+      clickDom(findLeviathans()?.feedBtn);
+    }
+  };
 
-      clickDom(gamePage.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans')?.feedBtn);
+  const fnSellBcoin = () => {
+    const info = calcBcoin();
+
+    if (info?.price >= MAXVAL.BCOIN_PRICE) {
+      const res = gamePage.resPool.get('blackcoin');
+
+      if (res.value > 0) {
+        renderBgTab(gamePage.diplomacyTab);
+        clickDom(findLeviathans()?.sellBcoin);
+      }
     }
   };
 
@@ -994,6 +1013,11 @@
         func: fnFeed,
         active: false,
         delay: INTERVAL.FEED
+      },
+      'bcoin': {
+        func: fnSellBcoin,
+        active: true,
+        delay: INTERVAL.BCOIN
       }
     }
   };
