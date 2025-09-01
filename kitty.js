@@ -21,20 +21,14 @@
   const INTERVAL_EXPLORE = 5000;
   const INTERVAL_SACRIFICE = 10000;
 
-  const isMax = {
-    'build': { active: false },
-    'upgrade': { active: false, end: true },
-    'zig': { active: false },
-    'crypto': { active: false, end: true },
-    'max': { active: false, excl: ['x10'] },
-    'x10': { active: false, excl: ['max'], end: true }
-  };
-
   const combustCycles = {
     tenErasLink: 500,
     previousCycleLink: 45,
     nextCycleLink: 5
   };
+
+  const capitalizeFirst = (val) =>
+    val.charAt(0).toUpperCase() + val.slice(1);
 
   const styleBtn = (btn, opts) => {
     return btn.css({
@@ -117,7 +111,7 @@
       return (p.val / r.value) > (
         r.type === 'exotic'
           ?  FRACTION_EXOTIC
-          : r.name === 'karma'
+          : r.name === 'karma' // type=rare, also affects neocorns
             ? FRACTION_KARMA
             : 1
       );
@@ -143,12 +137,12 @@
   };
 
   const fillResources = (name = null) => {
-    if (!(isMax.max.active || isMax.x10.active) && !name) {
+    if (!(kittycheatMap.control.max.active || kittycheatMap.control.x10.active) && !name) {
       return;
     }
 
     for (const r of game.resPool.resources) {
-      const max = r.maxValue * (isMax.x10.active ? 10 : 1);
+      const max = r.maxValue * (kittycheatMap.control.x10.active ? 10 : 1);
 
       if (max && r.unlocked && r.visible && r.value < max && !['kittens', 'zebras'].includes(r.name) && (!name || r.name === name)) {
         r.value = max;
@@ -419,7 +413,7 @@
     if (game.calendar.year < 40000) {
       fnCombust();
     } else {
-      const opts = kittycheatOptsMap.actions['40k'];
+      const opts = kittycheatMap.actions['40k'];
 
       opts.active = false;
       styleBtn(opts.btn, opts);
@@ -725,20 +719,20 @@
     const stats = {};
     let total = 0;
 
-    if (isMax.upgrade.active || dryRun) {
+    if (kittycheatMap.control.upgrade.active || dryRun) {
       total += loopTabs(dryRun, stats, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
     }
 
-    if (isMax.build.active || dryRun) {
+    if (kittycheatMap.control.build.active || dryRun) {
       total += loopTabs(dryRun, stats, 'build', ['bldTab', 'spaceTab'], buildTab);
     }
 
     if (!dryRun) {
-      if (isMax.zig.active) {
+      if (kittycheatMap.control.zig.active) {
         total += loopTabs(dryRun, stats, 'zig', ['religionTab'], (_, dryRun) => buildZig(dryRun));
       }
 
-      if (isMax.crypto.active) {
+      if (kittycheatMap.control.crypto.active) {
         total += loopTabs(dryRun, stats, 'crypto', ['religionTab'], (_, dryRun) => buildTheology(dryRun));
       }
     }
@@ -777,17 +771,25 @@
       (cry.percent ? `, ${cry.percent.text}` : '')
     );
 
-    $('div#kittycheatDryrunBuild').html(`Buildings: ${concatNext(next.stats.build) || '-'}`);
-    $('div#kittycheatDryrunUpgrd').html(`Upgrades : ${concatNext(next.stats.upgrade) || '-'}`);
-    $('div#kittycheatZiggurat').html(`Ziggurat : ${zigText || zig.err || '-'}`);
-    $('div#kittycheatTheology').html(`Theology : ${cryText || '-'}`);
-    $('div#kittycheatTranscend').html(`Transcend: ${trd?.text || '-'}`);
-    $('div#kittycheatBlackcoin').html(`Blackcoin: ${bcoin?.text || '-'}`);
+    $('div#kittycheatTxtDryBld').html(`Buildings: ${concatNext(next.stats.build) || '-'}`);
+    $('div#kittycheatTxtDryUpg').html(`Upgrades : ${concatNext(next.stats.upgrade) || '-'}`);
+    $('div#kittycheatTxtRelZig').html(`Ziggurat : ${zigText || zig.err || '-'}`);
+    $('div#kittycheatTxtRelCry').html(`Theology : ${cryText || '-'}`);
+    $('div#kittycheatTxtRelLvl').html(`Transcend: ${trd?.text || '-'}`);
+    $('div#kittycheatTxtBcoins').html(`Blackcoin: ${bcoin?.text || '-'}`);
 
     setTimeout(() => execTextInfo(delay), delay);
   };
 
-  const kittycheatOptsMap = {
+  const kittycheatMap = {
+    'control': {
+      'build': { active: false },
+      'upgrade': { active: false, end: true },
+      'zig': { active: false },
+      'crypto': { active: false, end: true },
+      'max': { active: false, excl: ['x10'] },
+      'x10': { active: false, excl: ['max'], end: true }
+    },
     'crafting': {
       //'wood': {
       //  res: { 'catnip': 250 }
@@ -967,16 +969,18 @@
       }
     }
   };
-  const kittycheatOpts = Object.entries(kittycheatOptsMap);
+  const kittycheatArr = Object.entries(kittycheatMap);
 
   const execOpts = (delay) => {
-    for (const [, group] of kittycheatOpts) {
-      for (const n in group) {
-        const o = group[n];
+    for (const [groupname, group] of kittycheatArr) {
+      if (groupname !== 'control') {
+        for (const n in group) {
+          const o = group[n];
 
-        if (o.active && !o.delay) {
-          fillResources();
-          execOpt(n, o);
+          if (o.active && !o.delay) {
+            fillResources();
+            execOpt(n, o);
+          }
         }
       }
     }
@@ -993,35 +997,37 @@
 
     if (opts.active) {
       if (opts.excl) {
-        for (const n of opts.excl) {
-          const o = kittycheatOptsMap[group][n];
+        for (const excl of opts.excl) {
+          const o = kittycheatMap[group][excl];
 
           o.active = false;
           styleBtn(o.btn, o);
         }
       }
 
-      execOpt(name, opts);
+      if (group !== 'control') {
+        execOpt(name, opts);
+      }
     }
   };
 
-  const divCont = $('<div></div>').css({
+  const divCont = $('<div id="kittycheat"></div>').css({
     'padding-bottom': '30px',
     'font-family': 'monospace',
     'font-size': 'small'
   });
-  const divIwGroup = styleDiv($('<div></div>'));
-  const divTxGroup = styleDiv($('<div></div>'));
+  const divActGroup = styleDiv($('<div id="kittycheatAct"></div>'));
+  const divTxtGroup = styleDiv($('<div id="kittycheatTxt"></div>'));
 
   $('div#leftColumn').append(divCont);
-
-  divCont.append(divIwGroup);
+  divCont.append(divActGroup);
+  divCont.append(divTxtGroup);
 
   // add groups for all the options
-  for (const [groupname, group] of kittycheatOpts) {
-    const divGroup = styleDiv($('<div></div>'));
+  for (const [groupname, group] of kittycheatArr) {
+    const divGroup = styleDiv($(`<div id="kittycheatAct${capitalizeFirst(groupname).substr(0, 6)}"></div>`));
 
-    divCont.append(divGroup);
+    divActGroup.append(divGroup);
 
     for (const optname in group) {
       const opts = group[optname];
@@ -1041,29 +1047,8 @@
     }
   }
 
-  // building setup
-  for (const id in isMax) {
-    const btn = $(`<button>${id}</button>`).click(() => {
-      isMax[id].active = !isMax[id].active;
-
-      if (isMax[id].active && isMax[id].excl) {
-        for (const o of isMax[id].excl) {
-          isMax[o].active = false;
-          styleBtn(isMax[o].btn, isMax[o]);
-        }
-      }
-
-      styleBtn(btn, isMax[id]);
-    });
-
-    isMax[id].btn = btn;
-    divIwGroup.append(styleBtn(btn, isMax[id]));
-  }
-
-  divCont.append(divTxGroup);
-
-  for (const id of ['DryrunBuild', 'DryrunUpgrd', 'Ziggurat', 'Theology', 'Transcend', 'Blackcoin']) {
-    divTxGroup.append(styleDiv($(`<div id="kittycheat${id}"></div>`), true));
+  for (const id of ['DryBld', 'DryUpg', 'RelZig', 'RelCry', 'RelLvl', 'Bcoins']) {
+    divTxtGroup.append(styleDiv($(`<div id="kittycheatTxt${id}"></div>`), true));
   }
 
   // switch off confirmation, i.e. we use shift clicks for building
