@@ -30,8 +30,14 @@
   const capitalizeFirst = (val) =>
     val.charAt(0).toUpperCase() + val.slice(1);
 
-  const styleBtn = (btn, opts) => {
-    return btn.css({
+  const jqAppend = (parent, child) => {
+     parent.append(child);
+
+     return child;
+  };
+
+  const styleBtn = (opts) => {
+    return opts.btn.css({
       'background': opts.active ? 'red' : 'white',
       'color': opts.active ? 'white' : 'black',
       'font-family': 'monospace',
@@ -416,7 +422,7 @@
       const opts = kittycheatMap.actions['40k'];
 
       opts.active = false;
-      styleBtn(opts.btn, opts);
+      styleBtn(opts);
     }
   };
 
@@ -990,10 +996,10 @@
     setTimeout(() => execOpts(delay), delay);
   };
 
-  const clickOptBtn = (btn, group, name, opts) => {
+  const clickOptBtn = (group, name, opts) => {
     opts.active = !opts.active;
 
-    styleBtn(btn, opts);
+    styleBtn(opts);
 
     if (opts.active) {
       if (opts.excl) {
@@ -1001,7 +1007,7 @@
           const o = kittycheatMap[group][excl];
 
           o.active = false;
-          styleBtn(o.btn, o);
+          styleBtn(o);
         }
       }
 
@@ -1011,35 +1017,27 @@
     }
   };
 
-  const divCont = $('<div id="kittycheat"></div>').css({
+  const divCont = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>').css({
     'padding-bottom': '30px',
     'font-family': 'monospace',
     'font-size': 'small'
-  });
-  const divActGroup = styleDiv($('<div id="kittycheatAct"></div>'));
-  const divTxtGroup = styleDiv($('<div id="kittycheatTxt"></div>'));
-
-  $('div#leftColumn').append(divCont);
-  divCont.append(divActGroup);
-  divCont.append(divTxtGroup);
+  }));
+  const divActGroup = jqAppend(divCont, styleDiv($('<div id="kittycheatAct"></div>')));
+  const divTxtGroup = jqAppend(divCont, styleDiv($('<div id="kittycheatTxt"></div>')));
 
   // add groups for all the options
   for (const [groupname, group] of kittycheatArr) {
-    const divGroup = styleDiv($(`<div id="kittycheatAct${capitalizeFirst(groupname).substr(0, 6)}"></div>`));
-
-    divActGroup.append(divGroup);
+    const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="kittycheatAct${capitalizeFirst(groupname).substr(0, 6)}"></div>`)));
 
     for (const optname in group) {
       const opts = group[optname];
 
       opts.active = opts.active || false;
+      opts.btn = jqAppend(divGroup, $(`<button>${optname}</button>`).click(() => {
+        clickOptBtn(groupname, optname, opts);
+      }));
 
-      const btn = $(`<button>${optname}</button>`).click(() => {
-        clickOptBtn(btn, groupname, optname, opts);
-      });
-
-      opts.btn = btn;
-      divGroup.append(styleBtn(btn, opts));
+      styleBtn(opts);
 
       if (opts.delay) {
         execOptTimer(optname, opts);
@@ -1048,7 +1046,7 @@
   }
 
   for (const id of ['DryBld', 'DryUpg', 'RelZig', 'RelCry', 'RelLvl', 'Bcoins']) {
-    divTxtGroup.append(styleDiv($(`<div id="kittycheatTxt${id}"></div>`), true));
+    jqAppend(divTxtGroup, styleDiv($(`<div id="kittycheatTxt${id}"></div>`), true));
   }
 
   // switch off confirmation, i.e. we use shift clicks for building
