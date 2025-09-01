@@ -160,7 +160,7 @@
   };
 
   const fillResources = (name = null) => {
-    if (!(kittycheatMap.control.max.active || kittycheatMap.control.x10.active) && !name) {
+    if (!(kittycheatMap.control.resources.active || kittycheatMap.control.x10.active) && !name) {
       return;
     }
 
@@ -830,14 +830,18 @@
 
   const kittycheatMap = {
     'control': {
+      active: true,
       'build': { active: false },
       'upgrade': { active: false, end: true },
+      'craft': { active: false, group: 'crafting' },
+      'trade': { active: false, group: 'trading', end: true },
       'zig': { active: false },
       'crypto': { active: false, end: true },
-      'max': { active: false, excl: ['x10'] },
-      'x10': { active: false, excl: ['max'], end: true }
+      'resources': { active: false, excl: ['x10'] },
+      'x10': { active: false, excl: ['resources'], end: true }
     },
     'crafting': {
+      active: false,
       //'wood': {
       //  res: { 'catnip': 250 }
       //},
@@ -907,6 +911,7 @@
       }
     },
     'trading': {
+      active: false,
       'leviathans': {
         res: { 'unobtainium': 5000 },
         trade: true,
@@ -947,6 +952,7 @@
       }
     },
     'actions': {
+      active: true,
       'catnip': {
         func: () => {
           clickSpan('Gather catnip');
@@ -1026,7 +1032,7 @@
 
   const execOpts = (delay) => {
     for (const [groupname, group] of kittycheatArr) {
-      if (groupname !== 'control') {
+      if (groupname !== 'control' && kittycheatMap[groupname].active) {
         for (const n in group) {
           const o = group[n];
 
@@ -1043,23 +1049,36 @@
     setTimeout(() => execOpts(delay), delay);
   };
 
+  const getGroupId = (groupname) => {
+    return `kittycheatAct${capitalizeFirst(groupname)}`;
+  };
+
+  const activateGroup = (groupname, active) => {
+    kittycheatMap[groupname].active = active;
+    $(`div#${getGroupId(groupname)}`).animate({ opacity: active ? 1 : 0.33 }, 100);
+  };
+
   const clickOptBtn = (group, name, opts) => {
-    opts.active = !opts.active;
+    if (kittycheatMap[group].active) {
+      opts.active = !opts.active;
 
-    styleBtn(opts);
+      styleBtn(opts);
 
-    if (opts.active) {
-      if (opts.excl) {
-        for (const excl of opts.excl) {
-          const o = kittycheatMap[group][excl];
+      if (opts.group) {
+        activateGroup(opts.group, opts.active);
+      } else if (opts.active) {
+        if (opts.excl) {
+          for (const excl of opts.excl) {
+            const o = kittycheatMap[group][excl];
 
-          o.active = false;
-          styleBtn(o);
+            o.active = false;
+            styleBtn(o);
+          }
         }
-      }
 
-      if (group !== 'control') {
-        execOpt(name, opts);
+        if (group !== 'control') {
+          execOpt(name, opts);
+        }
       }
     }
   };
@@ -1074,20 +1093,24 @@
 
   // add groups for all the options
   for (const [groupname, group] of kittycheatArr) {
-    const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="kittycheatAct${capitalizeFirst(groupname)}"></div>`)));
+    const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="${getGroupId(groupname)}"></div>`)));
 
     for (const optname in group) {
       const opts = group[optname];
 
-      opts.active = opts.active || false;
-      opts.btn = jqAppend(divGroup, $(`<button>${optname}</button>`).click(() => {
-        clickOptBtn(groupname, optname, opts);
-      }));
+      if (optname === 'active') {
+        activateGroup(groupname, opts);
+      } else {
+        opts.active = opts.active || false;
+        opts.btn = jqAppend(divGroup, $(`<button>${optname}</button>`).click(() => {
+          clickOptBtn(groupname, optname, opts);
+        }));
 
-      styleBtn(opts);
+        styleBtn(opts);
 
-      if (opts.delay) {
-        execOptTimer(optname, opts);
+        if (opts.delay) {
+          execOptTimer(optname, opts);
+        }
       }
     }
   }
