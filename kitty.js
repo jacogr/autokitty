@@ -42,8 +42,9 @@
     nextCycleLink: 5
   });
 
-  const capitalizeFirst = (val) =>
-    val.charAt(0).toUpperCase() + val.slice(1);
+  const capitalizeFirst = (val) => {
+    return val.charAt(0).toUpperCase() + val.slice(1);
+  };
 
   const jqAppend = (parent, child) => {
      parent.append(child);
@@ -349,8 +350,9 @@
     return null;
   };
 
-  const findTheoBld = (id) =>
-    gamePage.religionTab.ctPanel.children[0].children.find((b) => b.id === id);
+  const findTheologyBld = (id) => {
+    return gamePage.religionTab.ctPanel.children[0].children.find((b) => b.id === id);
+  };
 
   const calcTheology = () => {
     try {
@@ -488,15 +490,18 @@
 
   let lastSacrificeTime = 0;
 
-  const getTearsPrice = (bld) =>
-    bld?.model.prices.find((p) => p.name === 'tears');
+  const getTearsPrice = (bld) => {
+    return bld?.model.prices.find((p) => p.name === 'tears');
+  };
 
-  const findZigBld = (id) =>
-    gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id);
+  const findZigBld = (id) => {
+    return gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id);
+  };
 
-  const isBuildable = (bld) =>
-    !!(bld && bld.model.visible) &&
+  const isZigBuildable = (bld) => {
+    return !!(bld && bld.model.visible) &&
     hasResource(bld.model.prices.reduce((o, { name, val }) => ({ ...o, [name]: val }), {}), true);
+  };
 
   const buildZig = (dryRun) => {
     try {
@@ -512,15 +517,15 @@
       // first we see if we can do a black pyramid
       const blck = findZigBld('blackPyramid');
 
-      if (isBuildable(blck)) {
+      if (isZigBuildable(blck)) {
         return dryRun ? 1 : clickDom(blck);
       }
 
       const best = findZigBld(uni.bestBuilding);
       const mark = findZigBld('marker');
 
-      const bv = isBuildable(best);
-      const mv = isBuildable(mark);
+      const bv = isZigBuildable(best);
+      const mv = isZigBuildable(mark);
 
       const bt = getTearsPrice(best);
       const mt = getTearsPrice(mark);
@@ -619,6 +624,10 @@
 
       for (const btn of buttons) {
         count += unlockTabBtn(btn, dryRun);
+
+        if (dryRun && count) {
+          return count;
+        }
       }
 
       // for trade, unlock new races to trade with
@@ -706,6 +715,10 @@
       for (const area of areas) {
         for (const child of area.children) {
           count += buildTabBtn(child, dryRun);
+
+          if (dryRun && count) {
+            return count;
+          }
         }
       }
     } catch (e) {
@@ -723,13 +736,13 @@
       const count = fn(gamePage[tab], dryRun);
 
       if (count) {
-        indv.push({ name: gamePage[tab].tabId, count });
+        indv.push(gamePage[tab].tabId);
         total += count;
       }
     }
 
     if (total) {
-      stats[statsType] = { total, indv };
+      stats[statsType] = indv;
     }
 
     return total;
@@ -761,13 +774,10 @@
       setTimeout(() => execBuildAll(delay), Math.ceil(delay / (total ? 3 : 1)));
     }
 
-    return { stats, total };
+    return stats;
   };
 
   const execTextInfo = (delay) => {
-    const concatNext = (s) =>
-      s?.indv.map((e) => `${e.name} (${e.count})`).join(', ');
-
     renderBgTab(gamePage.religionTab);
 
     const next = execBuildAll(0, true);
@@ -787,12 +797,12 @@
     }
 
     const cryText = cry && (
-      findTheoBld(cry.bestBuilding).opts.name +
+      findTheologyBld(cry.bestBuilding).opts.name +
       (cry.percent ? `, ${cry.percent.text}` : '')
     );
 
-    $('div#kittycheatTxtDryBld').html(`Buildings: ${concatNext(next.stats.build) || '-'}`);
-    $('div#kittycheatTxtDryUpg').html(`Upgrades : ${concatNext(next.stats.upgrade) || '-'}`);
+    $('div#kittycheatTxtDryBld').html(`Buildings: ${next.build?.join(', ') || '-'}`);
+    $('div#kittycheatTxtDryUpg').html(`Upgrades : ${next.upgrade?.join(', ') || '-'}`);
     $('div#kittycheatTxtRelZig').html(`Ziggurat : ${zigText || zig.err || '-'}`);
     $('div#kittycheatTxtRelCry').html(`Theology : ${cryText || '-'}`);
     $('div#kittycheatTxtRelLvl').html(`Transcend: ${trd?.text || '-'}`);
