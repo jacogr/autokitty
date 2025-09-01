@@ -996,6 +996,17 @@
         delay: INTERVAL.PROMOTE,
         end: true
       },
+      'feed': {
+        func: fnFeed,
+        active: false,
+        delay: INTERVAL.FEED
+      },
+      'bcoin': {
+        func: fnSellBcoin,
+        active: true,
+        delay: INTERVAL.BCOIN,
+        end: true
+      },
       'combust': {
         func: fnCombust,
         active: false,
@@ -1008,16 +1019,6 @@
         delay: INTERVAL.COMBUST,
         excl: ['combust'],
         end: true
-      },
-      'feeding': {
-        func: fnFeed,
-        active: false,
-        delay: INTERVAL.FEED
-      },
-      'bcoin': {
-        func: fnSellBcoin,
-        active: true,
-        delay: INTERVAL.BCOIN
       }
     }
   };
