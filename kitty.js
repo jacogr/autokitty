@@ -20,8 +20,17 @@
   };
 
   const INTERVAL = {
+    ALL_OPT: 99,
+    ALL_BLD: 999,
+    ALL_TXT: 999,
+    ADORE: 120000,
+    CATNIP_GATHER: 5,
+    CATNIP_REFINE: 1000,
     COMBUST: 250,
     EXPLORE: 5000,
+    FEED: 60000,
+    PRAISE: 25,
+    PROMOTE: 90000,
     SACRIFICE: 10000
   };
 
@@ -916,7 +925,7 @@
           clickSpan('Gather catnip');
         },
         active: true,
-        delay: 5
+        delay: INTERVAL.CATNIP_GATHER
       },
       'refine': {
         func: () => {
@@ -924,7 +933,7 @@
           clickSpan('Refine catnip');
         },
         active: true,
-        delay: 1000,
+        delay: INTERVAL.CATNIP_REFINE,
         end: true
       },
       'praise': {
@@ -933,12 +942,12 @@
           gamePage.religion.praise();
         },
         active: true,
-        delay: 25
+        delay: INTERVAL.PRAISE
       },
       'adore': {
         func: fnAdore,
         active: true,
-        delay: 120000,
+        delay: INTERVAL.ADORE,
         end: true
       },
       'observe': {
@@ -957,7 +966,7 @@
       'promote': {
         func: fnPromote,
         active: true,
-        delay: 90000,
+        delay: INTERVAL.PROMOTE,
         end: true
       },
       'combust': {
@@ -976,7 +985,7 @@
       'feeding': {
         func: fnFeed,
         active: false,
-        delay: 60000
+        delay: INTERVAL.FEED
       }
     }
   };
@@ -1058,7 +1067,7 @@
   game.opts.noConfirm = true;
 
   // start the loops
-  execOpts(99);
-  execTextInfo(999);
-  execBuildAll(999);
+  execOpts(INTERVAL.ALL_OPT);
+  execTextInfo(INTERVAL.ALL_TXT);
+  execBuildAll(INTERVAL.ALL_BLD);
 })();
