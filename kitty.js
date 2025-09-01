@@ -160,12 +160,12 @@
   };
 
   const fillResources = (name = null) => {
-    if (!(kittycheatMap.control.resources.active || kittycheatMap.control.x10.active) && !name) {
+    if (!(cheatMap.control.resources.active || cheatMap.control.x10.active) && !name) {
       return;
     }
 
     for (const r of game.resPool.resources) {
-      const max = r.maxValue * (kittycheatMap.control.x10.active ? 10 : 1);
+      const max = r.maxValue * (cheatMap.control.x10.active ? 10 : 1);
 
       if (max && r.unlocked && r.visible && r.value < max && !['kittens', 'zebras'].includes(r.name) && (!name || r.name === name)) {
         r.value = max;
@@ -436,7 +436,7 @@
     if (game.calendar.year < 40000) {
       fnCombust();
     } else {
-      const opts = kittycheatMap.actions['40k'];
+      const opts = cheatMap.actions['40k'];
 
       opts.active = false;
       styleBtn(opts);
@@ -483,9 +483,9 @@
     }
   };
 
-  const execOptTimer = (name, opts) => {
+  const execOptTimer = (group, name, opts) => {
     try {
-      if (opts.active) {
+      if (opts.active && cheatMap[group].active) {
         const isFillable = ['hunt', 'praise'].includes(name);
 
         if (isFillable) {
@@ -502,7 +502,7 @@
       console.error('execOptTimer', name, e);
     }
 
-    setTimeout(() => execOptTimer(name, opts), opts.delay);
+    setTimeout(() => execOptTimer(group, name, opts), opts.delay);
   };
 
   let lastSacrificeTime = 0;
@@ -769,20 +769,20 @@
     const stats = {};
     let total = 0;
 
-    if (kittycheatMap.control.upgrade.active || dryRun) {
+    if (cheatMap.control.upgrade.active || dryRun) {
       total += loopTabs(dryRun, stats, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
     }
 
-    if (kittycheatMap.control.build.active || dryRun) {
+    if (cheatMap.control.build.active || dryRun) {
       total += loopTabs(dryRun, stats, 'build', ['bldTab', 'spaceTab'], buildTab);
     }
 
     if (!dryRun) {
-      if (kittycheatMap.control.zig.active) {
+      if (cheatMap.control.zig.active) {
         total += loopTabs(dryRun, stats, 'zig', ['religionTab'], (_, dryRun) => buildZig(dryRun));
       }
 
-      if (kittycheatMap.control.crypto.active) {
+      if (cheatMap.control.crypto.active) {
         total += loopTabs(dryRun, stats, 'crypto', ['religionTab'], (_, dryRun) => buildTheology(dryRun));
       }
     }
@@ -828,13 +828,14 @@
     setTimeout(() => execTextInfo(delay), delay);
   };
 
-  const kittycheatMap = {
+  const cheatMap = {
     'control': {
       active: true,
       'build': { active: false },
       'upgrade': { active: false, end: true },
       'craft': { active: false, group: 'crafting' },
-      'trade': { active: false, group: 'trading', end: true },
+      'trade': { active: false, group: 'trading' },
+      'exec': { active: false, group: 'actions', end: true },
       'zig': { active: false },
       'crypto': { active: false, end: true },
       'resources': { active: false, excl: ['x10'] },
@@ -952,7 +953,7 @@
       }
     },
     'actions': {
-      active: true,
+      active: false,
       'catnip': {
         func: () => {
           clickSpan('Gather catnip');
@@ -1028,13 +1029,13 @@
       }
     }
   };
-  const kittycheatArr = Object.entries(kittycheatMap);
+  const cheatArr = Object.entries(cheatMap);
 
   const execOpts = (delay) => {
-    for (const [groupname, group] of kittycheatArr) {
-      if (groupname !== 'control' && kittycheatMap[groupname].active) {
-        for (const n in group) {
-          const o = group[n];
+    for (const [group, maps] of cheatArr) {
+      if (group !== 'control' && cheatMap[group].active) {
+        for (const n in maps) {
+          const o = maps[n];
 
           if (o.active && !o.delay) {
             fillResources();
@@ -1054,22 +1055,22 @@
   };
 
   const activateGroup = (groupname, active) => {
-    kittycheatMap[groupname].active = active;
+    cheatMap[groupname].active = active;
     $(`div#${getGroupId(groupname)}`).animate({ opacity: active ? 1 : 0.33 }, 100);
   };
 
   const clickOptBtn = (group, name, opts) => {
-    if (kittycheatMap[group].active) {
-      opts.active = !opts.active;
+    opts.active = !opts.active;
 
-      styleBtn(opts);
+    styleBtn(opts);
 
+    if (cheatMap[group].active) {
       if (opts.group) {
         activateGroup(opts.group, opts.active);
       } else if (opts.active) {
         if (opts.excl) {
           for (const excl of opts.excl) {
-            const o = kittycheatMap[group][excl];
+            const o = cheatMap[group][excl];
 
             o.active = false;
             styleBtn(o);
@@ -1092,7 +1093,7 @@
   const divTxtGroup = jqAppend(divCont, styleDiv($('<div id="kittycheatTxt"></div>')));
 
   // add groups for all the options
-  for (const [groupname, group] of kittycheatArr) {
+  for (const [groupname, group] of cheatArr) {
     const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="${getGroupId(groupname)}"></div>`)));
 
     for (const optname in group) {
@@ -1109,7 +1110,7 @@
         styleBtn(opts);
 
         if (opts.delay) {
-          execOptTimer(optname, opts);
+          execOptTimer(groupname, optname, opts);
         }
       }
     }
