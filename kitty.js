@@ -1,3 +1,4 @@
+
 (() => {
   const game = window.game;
   const gamePage = window.gamePage;
@@ -110,23 +111,19 @@
     return 0;
   };
 
-  const clickElement = (type) => {
-    return (label) => {
-      const elem = $(type).filter(function() {
-        return $(this).text().indexOf(label) === 0;
-      });
+  const clickSpan = (label) => {
+    const elem = $('span').filter(function() {
+      return $(this).text().indexOf(label) === 0;
+    });
 
-      if (elem.length) {
-        elem.click();
+    if (elem.length) {
+      elem.click();
 
-        return 1;
-      }
+      return 1;
+    }
 
-      return 0;
-    };
+    return 0;
   };
-
-  const clickSpan = clickElement('span');
 
   const renderBgTab = (tab) => {
     if (game.ui.activeTabId !== tab.tabId) {
@@ -307,7 +304,12 @@
         const amortization = unicornPrice / buildingProduction;
 
         if (amortization < bestAmortization) {
-          if (0 < riftBonus || (religionRatio < religionBonus && 0 < unicornPrice)) {
+          const isValid = !buildingImpl.model.prices.find((p) =>
+            (p.name !== 'unicorns' && p.name !== 'tears') &&
+            (p.val > gamePage.resPool.get(p.name).value)
+          );
+
+          if (isValid && (0 < riftBonus || (religionRatio < religionBonus && 0 < unicornPrice))) {
             bestAmortization = amortization;
             bestBuilding = building;
             bestPrices = buildingImpl.model.prices;
