@@ -77,8 +77,8 @@
 
     return {
       frac,
-      text: raw >= 999.999
-        ? '>999.999%'
+      text: raw >= 100
+        ? '>> 100%'
         : `${raw.toFixed(3)}%`,
       raw
     };
