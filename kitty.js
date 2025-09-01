@@ -1027,7 +1027,7 @@
 
   // add groups for all the options
   for (const [groupname, group] of kittycheatArr) {
-    const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="kittycheatAct${capitalizeFirst(groupname).substr(0, 6)}"></div>`)));
+    const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="kittycheatAct${capitalizeFirst(groupname)}"></div>`)));
 
     for (const optname in group) {
       const opts = group[optname];
