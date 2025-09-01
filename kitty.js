@@ -53,10 +53,17 @@
      return child;
   };
 
-  const styleBtn = (opts) => {
+  const activateGroup = (groupname, active = false) => {
+    cheatMap[groupname].active = active;
+    $(`div#${getGroupId(groupname)}`).animate({ opacity: active ? 1 : 0.33 }, 100);
+  };
+
+  const activateBtn = (opts, active = false) => {
+    opts.active = active;
+
     return opts.btn.css({
-      'background': opts.active ? 'red' : 'white',
-      'color': opts.active ? 'white' : 'black',
+      'background': active ? 'red' : 'white',
+      'color': active ? 'white' : 'black',
       'font-family': 'monospace',
       'font-size': 'small',
       'border-radius': '2px',
@@ -436,10 +443,7 @@
     if (game.calendar.year < 40000) {
       fnCombust();
     } else {
-      const opts = cheatMap.actions['40k'];
-
-      opts.active = false;
-      styleBtn(opts);
+      activateBtn(cheatMap.actions['40k'], false);
     }
   };
 
@@ -1054,15 +1058,8 @@
     return `kittycheatAct${capitalizeFirst(groupname)}`;
   };
 
-  const activateGroup = (groupname, active) => {
-    cheatMap[groupname].active = active;
-    $(`div#${getGroupId(groupname)}`).animate({ opacity: active ? 1 : 0.33 }, 100);
-  };
-
   const clickOptBtn = (group, name, opts) => {
-    opts.active = !opts.active;
-
-    styleBtn(opts);
+    activateBtn(opts, !opts.active);
 
     if (cheatMap[group].active) {
       if (opts.group) {
@@ -1070,10 +1067,7 @@
       } else if (opts.active) {
         if (opts.excl) {
           for (const excl of opts.excl) {
-            const o = cheatMap[group][excl];
-
-            o.active = false;
-            styleBtn(o);
+            activateBtn(cheatMap[group][excl], false);
           }
         }
 
@@ -1102,12 +1096,11 @@
       if (optname === 'active') {
         activateGroup(groupname, opts);
       } else {
-        opts.active = opts.active || false;
         opts.btn = jqAppend(divGroup, $(`<button>${optname}</button>`).click(() => {
           clickOptBtn(groupname, optname, opts);
         }));
 
-        styleBtn(opts);
+        activateBtn(opts, opts.active || false);
 
         if (opts.delay) {
           execOptTimer(groupname, optname, opts);
