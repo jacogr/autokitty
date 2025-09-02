@@ -44,6 +44,8 @@
     nextCycleLink: 5
   });
 
+  const noop = () => {};
+
   const capitalizeFirst = (val) => {
     return val.charAt(0).toUpperCase() + val.slice(1);
   };
@@ -95,7 +97,11 @@
     };
   };
 
-  const noop = () => {};
+  const echo = (text) => {
+    if (text) {
+      $(game.msg(text).span).css('opacity', 0.75);
+    }
+  };
 
   const clickDom = (btn, isMulti = false) => {
     if (btn?.domNode) {
@@ -104,6 +110,16 @@
       } else {
         btn.domNode.click();
       }
+
+      return 1;
+    }
+
+    return 0;
+  };
+
+  clickDomEcho = (btn, isMulti = false) => {
+    if (clickDom(btn, isMulti)) {
+      echo(btn.opts?.name);
 
       return 1;
     }
@@ -394,7 +410,7 @@
   };
 
   const execTrade = (name) => {
-    if ((name === 'leviathans') && (gamePage.religion.getZU('blackPyramid').val > 0) && (gamePage.diplomacy.get('leviathans').unlocked === false)) {
+    if ((name === 'leviathans') && !gamePage.diplomacy.get('leviathans').unlocked && gamePage.religion.getZU('blackPyramid').val) {
       gamePage.diplomacy.unlockElders();
     }
 
@@ -541,7 +557,7 @@
       const blck = findZigBld('blackPyramid');
 
       if (isZigBuildable(blck)) {
-        return dryRun ? 1 : clickDom(blck);
+        return dryRun ? 1 : clickDomEcho(blck);
       }
 
       const best = findZigBld(uni.bestBuilding);
@@ -558,7 +574,7 @@
           ? ((mt.val <= bt.val) ? mark : best)
           : (mv ? mark : best);
 
-        return dryRun ? 1 : clickDom(next);
+        return dryRun ? 1 : clickDomEcho(next);
       }
 
       const zigTears = gamePage.resPool.get('tears').value + (gamePage.bld.getBuildingExt('ziggurat').meta.on * gamePage.resPool.get('unicorns').value / 2500);
@@ -601,7 +617,7 @@
         return 0;
       }
 
-      return dryRun ? 1 : clickDom(bld);
+      return dryRun ? 1 : clickDomEcho(bld);
     } catch (e) {
       console.error('buildTheology', e);
     }
@@ -618,7 +634,7 @@
       return 0;
     }
 
-    return  dryRun ? 1 : clickDom(btn);
+    return  dryRun ? 1 : clickDomEcho(btn);
   };
 
   let lastExploreTime = 0;
@@ -1115,8 +1131,14 @@
     jqAppend(divTxtGroup, styleDiv($(`<div id="kittycheatTxt${id}"></div>`), true));
   }
 
-  // switch off confirmation, i.e. we use shift clicks for building
+  //adjust messages, switch off confirmation
+  game.console.maxMessages = 100;
   game.opts.noConfirm = true;
+
+  // these logs are very fast with this script
+  for (const f of ['craft', 'faith', 'hunt', 'trade']) {
+    game.console.filters[f].enabled = false;
+  }
 
   // start the loops
   execOpts(INTERVAL.ALL_OPT);
