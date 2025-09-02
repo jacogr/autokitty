@@ -99,8 +99,16 @@
 
   function echo (text) {
     if (text) {
-      $(game.msg(text).span).css('opacity', 0.75);
+      $(game.msg(text).span).css('opacity', 0.275);
     }
+  }
+
+  function getBtnName (btn) {
+    return btn?.opts?.name || btn?.model?.metadata?.label;
+  }
+
+  function echoBtn (btn) {
+    echo(getBtnName(btn));
   }
 
   function clickDom (btn, isMulti = false) {
@@ -119,7 +127,7 @@
 
   function clickDomEcho (btn, isMulti = false) {
     if (clickDom(btn, isMulti)) {
-      echo(btn.opts?.name);
+      echoBtn(btn);
 
       return 1;
     }
@@ -319,17 +327,10 @@
 
         const amortization = unicornPrice / buildingProduction;
 
-        if (amortization < bestAmortization) {
-          const isValid = !buildingImpl.model.prices.find((p) =>
-            (p.name !== 'unicorns' && p.name !== 'tears') &&
-            (p.val > gamePage.resPool.get(p.name).value)
-          );
-
-          if (isValid && (0 < riftBonus || (religionRatio < religionBonus && 0 < unicornPrice))) {
-            bestAmortization = amortization;
-            bestBuilding = building;
-            bestPrices = buildingImpl.model.prices;
-          }
+        if ((amortization < bestAmortization) && (0 < riftBonus || (religionRatio < religionBonus && 0 < unicornPrice))) {
+          bestAmortization = amortization;
+          bestBuilding = building;
+          bestPrices = buildingImpl.model.prices;
         }
       }
 
@@ -548,8 +549,17 @@
 
       const uni = calcZiggurats();
 
-      // we don't auto-build pastures (or nothing)
-      if (!uni.bestBuilding || uni.bestBuilding === 'unicornPasture') {
+      if (!uni.bestBuilding) {
+        return 0;
+      } else if (uni.bestBuilding === 'unicornPasture') {
+        if (game.ui.activeTabId == gamePage.bldTab.id) {
+          const bld = gamePage.bldTab.children.find((b) => b.model.metadata.name === uni.bestBuilding);
+
+          if (isZigBuildable(bld)) {
+            return dryRun ? 1 : clickDomEcho(bld);
+          }
+        }
+
         return 0;
       }
 
@@ -634,7 +644,13 @@
       return 0;
     }
 
-    return  dryRun ? 1 : clickDomEcho(btn);
+    return  dryRun ? 1 : clickDom(btn);
+  }
+
+  function pushBtnName (done, btn) {
+    const n = getBtnName(btn);
+
+    n && done.push(n);
   }
 
   let lastExploreTime = 0;
@@ -660,13 +676,23 @@
         tab.vsPanel?.children[0]?.children ||
         // science, workshop
         tab.buttons;
+      const done = [];
 
       for (const btn of buttons) {
-        count += unlockTabBtn(btn, dryRun);
+        const res = unlockTabBtn(btn, dryRun);
 
-        if (dryRun && count) {
-          return count;
+        if (res) {
+          pushBtnName(done, btn);
+          count += res;
+
+          if (dryRun) {
+            return count;
+          }
         }
+      }
+
+      if (done.length) {
+        echo(done.join(', '));
       }
 
       // for trade, unlock new races to trade with
@@ -750,15 +776,25 @@
         tab.planetPanels ||
         // others
         [tab];
+      const done = [];
 
       for (const area of areas) {
-        for (const child of area.children) {
-          count += buildTabBtn(child, dryRun);
+        for (const btn of area.children) {
+          const res = buildTabBtn(btn, dryRun);
 
-          if (dryRun && count) {
-            return count;
+          if (res) {
+            pushBtnName(done, btn);
+            count += res;
+
+            if (dryRun) {
+              return count;
+            }
           }
         }
+      }
+
+      if (done.length) {
+        echo(done.join(', '));
       }
     } catch (e) {
       console.error('buildTab', tab?.tabName, e);
@@ -827,12 +863,17 @@
     let zigText = zig.bestBuilding;
 
     if (zig.bestBuilding && zig.bestPrices) {
+      const bld = findZigBld(zig.bestBuilding);
       const zigguratRatio = Math.max(gamePage.bld.getBuildingExt('ziggurat').meta.on, 1);
       const unicornTotal = ((gamePage.resPool.get('tears').value * 2500) / zigguratRatio) + gamePage.resPool.get('unicorns').value;
       const unicornPrice = calcZigguratsPrices(zig.bestPrices, zigguratRatio);
       const calc = toPercent(unicornTotal / unicornPrice);
 
-      zigText = findZigBld(zig.bestBuilding).opts.name + (calc ? `, ${calc.text}` : '');
+      const name = bld?.opts.name || (zig.bestBuilding === 'unicornPasture' && 'Unic. Pasture');
+
+      if (name) {
+        zigText = name + (calc ? `, ${calc.text}` : '');
+      }
     }
 
     const cryText = cry && (
