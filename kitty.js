@@ -635,7 +635,7 @@
     return 0;
   }
 
-  function unlockTabBtn (btn, dryRun, isMulti = false) {
+  function unlockTabBtn (btn, dryRun, buildMulti = false) {
     if (!btn?.model?.enabled || !btn.model.visible || !btn.model.metadata) {
       return 0;
     } else if (getInvalidPrices(btn.model.prices).length) {
@@ -644,7 +644,7 @@
       return 0;
     }
 
-    return  dryRun ? 1 : clickDom(btn, isMulti);
+    return  dryRun ? 1 : clickDom(btn, buildMulti);
   }
 
   function pushBtnName (done, btn) {
@@ -679,10 +679,10 @@
       const done = [];
 
       // multi for religion & embassy upgrades
-      const isMulti = !!((tab.rUpgradeButtons || tab.racePanels)?.length);
+      const buildMulti = !!((tab.rUpgradeButtons || tab.racePanels)?.length);
 
       for (const btn of buttons) {
-        const res = unlockTabBtn(btn, dryRun, isMulti);
+        const res = unlockTabBtn(btn, dryRun, buildMulti);
 
         if (res) {
           pushBtnName(done, btn);
