@@ -44,24 +44,24 @@
     nextCycleLink: 5
   });
 
-  const noop = () => {};
+  function noop () {}
 
-  const capitalizeFirst = (val) => {
+  function capitalizeFirst (val) {
     return val.charAt(0).toUpperCase() + val.slice(1);
-  };
+  }
 
-  const jqAppend = (parent, child) => {
+  function jqAppend (parent, child) {
      parent.append(child);
 
      return child;
-  };
+  }
 
-  const activateGroup = (groupname, active = false) => {
+  function activateGroup (groupname, active = false) {
     cheatMap[groupname].active = active;
     $(`div#${getGroupId(groupname)}`).animate({ opacity: active ? 1 : 0.33 }, 100);
-  };
+  }
 
-  const activateBtn = (opts, active = false) => {
+  function activateBtn (opts, active = false) {
     opts.active = active;
 
     return opts.btn.css({
@@ -75,13 +75,13 @@
       'margin-right': opts.end ? '5px' : (opts.excl ? '-2px' : '1px'),
       'margin-bottom': '1px'
     });
-  };
+  }
 
-  const styleDiv = (div, small = false, extra = {}) => {
+  function styleDiv (div, small = false, extra = {}) {
     return div.css({ ...extra, 'margin-bottom': small ? '5px' : '20px' });
-  };
+  }
 
-  const toPercent = (frac) => {
+  function toPercent (frac) {
     if ((frac < 0) || (frac > Number.MAX_SAFE_INTEGER)) {
       return;
     }
@@ -95,15 +95,15 @@
         : `${raw.toFixed(3)}%`,
       raw
     };
-  };
+  }
 
-  const echo = (text) => {
+  function echo (text) {
     if (text) {
       $(game.msg(text).span).css('opacity', 0.75);
     }
-  };
+  }
 
-  const clickDom = (btn, isMulti = false) => {
+  function clickDom (btn, isMulti = false) {
     if (btn?.domNode) {
       if (isMulti) {
         btn.domNode.dispatchEvent(new MouseEvent('click', { shiftKey: true }));
@@ -115,9 +115,9 @@
     }
 
     return 0;
-  };
+  }
 
-  clickDomEcho = (btn, isMulti = false) => {
+  function clickDomEcho (btn, isMulti = false) {
     if (clickDom(btn, isMulti)) {
       echo(btn.opts?.name);
 
@@ -125,9 +125,9 @@
     }
 
     return 0;
-  };
+  }
 
-  const clickSpan = (label) => {
+  function clickSpan (label) {
     const elem = $('span').filter(function() {
       return $(this).text().indexOf(label) === 0;
     });
@@ -139,15 +139,15 @@
     }
 
     return 0;
-  };
+  }
 
-  const renderBgTab = (tab) => {
+  function renderBgTab (tab) {
     if (game.ui.activeTabId !== tab.tabId) {
       tab.render();
     }
-  };
+  }
 
-  const getInvalidPrices = (prices) => {
+  function getInvalidPrices (prices) {
     return prices.filter((p) => {
       const r = gamePage.resPool.get(p.name);
 
@@ -159,9 +159,9 @@
             : 1
       );
     });
-  };
+  }
 
-  const hasResource = (vals = {}, isTrade = false) => {
+  function hasResource (vals = {}, isTrade = false) {
     let cando = true;
 
     for (const key in vals) {
@@ -177,9 +177,9 @@
     }
 
     return cando;
-  };
+  }
 
-  const fillResources = (name = null) => {
+  function fillResources (name = null) {
     if (!(cheatMap.control.resources.active || cheatMap.control.x10.active) && !name) {
       return;
     }
@@ -191,9 +191,9 @@
         r.value = max;
       }
     }
-  };
+  }
 
-  const calcZigguratsPrices = (prices, zigguratRatio) => {
+  function calcZigguratsPrices (prices, zigguratRatio) {
     let unicornPrice = 0;
 
     for (const price of prices) {
@@ -205,9 +205,9 @@
     }
 
     return unicornPrice;
-  };
+  }
 
-  const calcZiggurats = () => {
+  function calcZiggurats () {
     try {
       const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
       const pastureImpl = gamePage.bld.getBuildingExt('unicornPasture');
@@ -338,9 +338,9 @@
       console.error('Unicorns', e);
       return { err: 'Unable to calculate' };
     }
-  };
+  }
 
-  const calcBcoin = () => {
+  function calcBcoin () {
     try {
       const price = game.calendar.cryptoPrice;
 
@@ -364,9 +364,9 @@
     }
 
     return null;
-  };
+  }
 
-  const calcTranscend = () => {
+  function calcTranscend () {
     try {
       return toPercent(game.religion.faithRatio / game.religion._getTranscendNextPrice());
     } catch (e) {
@@ -374,13 +374,13 @@
     }
 
     return null;
-  };
+  }
 
-  const findTheologyBld = (id) => {
+  function findTheologyBld (id) {
     return gamePage.religionTab.ctPanel.children[0].children.find((b) => b.id === id);
-  };
+  }
 
-  const calcTheology = () => {
+  function calcTheology () {
     try {
       const best = gamePage.religionTab.ctPanel.children[0].children
         .filter((a) => {
@@ -407,17 +407,17 @@
     }
 
     return null;
-  };
+  }
 
-  const execTrade = (name) => {
+  function execTrade (name) {
     if ((name === 'leviathans') && !gamePage.diplomacy.get('leviathans').unlocked && gamePage.religion.getZU('blackPyramid').val) {
       gamePage.diplomacy.unlockElders();
     }
 
     gamePage.diplomacyTab.racePanels.find((p) => p.race.name === name)?.tradeBtn.tradeAllHref.link.click();
-  };
+  }
 
-  const execCraft = (name) => {
+  function execCraft (name) {
     const iswood = (name === 'wood');
     const iswinter = (gamePage.calendar.season === 3);
     const isautum = (gamePage.calendar.season === 2) && (gamePage.calendar.day >= 75);
@@ -425,22 +425,22 @@
     if (!iswood || (!iswinter && !isautum)) {
       gamePage.craftAll(name);
     }
-  };
+  }
 
-  const fnAdore = () => {
+  function fnAdore () {
     renderBgTab(gamePage.religionTab);
 
     game.religion.resetFaith(1.01, false);
     clickDom(gamePage.religionTab?.praiseBtn);
-  };
+  }
 
-  const fnPromote = () => {
+  function fnPromote () {
     renderBgTab(gamePage.villageTab);
 
     clickDom(gamePage.villageTab?.promoteKittensBtn);
-  };
+  }
 
-  const fnCombust = () => {
+  function fnCombust () {
     const res = combustCycles
       .map(([cycle, div]) => ({
         cycle,
@@ -455,28 +455,28 @@
 
       btn.model[res.cycle].handler.call(btn);
     }
-  };
+  }
 
-  const fnCombust40k = () => {
+  function fnCombust40k () {
     if (game.calendar.year < 40000) {
       fnCombust();
     } else {
       activateBtn(cheatMap.actions['40k'], false);
     }
-  };
+  }
 
-  const findLeviathans = () => {
+  function findLeviathans () {
     return gamePage.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans');
-  };
+  }
 
-  const fnFeed = () => {
+  function fnFeed () {
     if (gamePage.resPool.get('necrocorn').value > 1) {
       renderBgTab(gamePage.diplomacyTab)
       clickDom(findLeviathans()?.feedBtn);
     }
-  };
+  }
 
-  const fnSellBcoin = () => {
+  function fnSellBcoin () {
     const info = calcBcoin();
 
     if (info?.price >= MAXVAL.BCOIN_PRICE) {
@@ -487,9 +487,9 @@
         clickDom(findLeviathans()?.sellBcoin);
       }
     }
-  };
+  }
 
-  const execOpt = (name, opts) => {
+  function execOpt (name, opts) {
     try {
       if (opts.active && hasResource(opts.res, opts.trade)) {
         if (opts.func) {
@@ -503,9 +503,9 @@
     } catch (e) {
       console.error('execOpt', name, e);
     }
-  };
+  }
 
-  const execOptTimer = (group, name, opts) => {
+  function execOptTimer (group, name, opts) {
     try {
       if (opts.active && cheatMap[group].active) {
         const isFillable = ['hunt', 'praise'].includes(name);
@@ -525,24 +525,24 @@
     }
 
     setTimeout(() => execOptTimer(group, name, opts), opts.delay);
-  };
+  }
 
   let lastSacrificeTime = 0;
 
-  const getTearsPrice = (bld) => {
+  function getTearsPrice (bld) {
     return bld?.model.prices.find((p) => p.name === 'tears');
-  };
+  }
 
-  const findZigBld = (id) => {
+  function findZigBld (id) {
     return gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id);
-  };
+  }
 
-  const isZigBuildable = (bld) => {
+  function isZigBuildable (bld) {
     return !!(bld && bld.model.visible) &&
     hasResource(bld.model.prices.reduce((o, { name, val }) => ({ ...o, [name]: val }), {}), true);
-  };
+  }
 
-  const buildZig = (dryRun) => {
+  function buildZig (dryRun) {
     try {
       renderBgTab(gamePage.religionTab);
 
@@ -598,9 +598,9 @@
     }
 
     return 0;
-  };
+  }
 
-  const buildTheology = (dryRun) => {
+  function buildTheology (dryRun) {
     try {
       renderBgTab(gamePage.religionTab);
 
@@ -623,9 +623,9 @@
     }
 
     return 0;
-  };
+  }
 
-  const unlockTabBtn = (btn, dryRun) => {
+  function unlockTabBtn (btn, dryRun) {
     if (!btn?.model?.enabled || !btn.model.visible || !btn.model.metadata) {
       return 0;
     } else if (getInvalidPrices(btn.model.prices).length) {
@@ -635,11 +635,11 @@
     }
 
     return  dryRun ? 1 : clickDomEcho(btn);
-  };
+  }
 
   let lastExploreTime = 0;
 
-  const unlockTab = (tab, dryRun) => {
+  function unlockTab (tab, dryRun) {
     let count = 0;
 
     try {
@@ -690,9 +690,9 @@
     }
 
     return count;
-  };
+  }
 
-  const buildTabBtn = (btn, dryRun) => {
+  function buildTabBtn (btn, dryRun) {
     const model = btn?.model;
 
     // don't buy invisible or switched off
@@ -730,9 +730,9 @@
     }
 
     return dryRun ? 1 : clickDom(btn, buildMulti);
-  };
+  }
 
-  const buildTab = (tab, dryRun) => {
+  function buildTab (tab, dryRun) {
     let count = 0;
 
     try {
@@ -765,9 +765,9 @@
     }
 
     return count;
-  };
+  }
 
-  const loopTabs = (dryRun, stats, statsType, tabs, fn) => {
+  function loopTabs (dryRun, stats, statsType, tabs, fn) {
     const indv = [];
     let total = 0;
 
@@ -785,9 +785,9 @@
     }
 
     return total;
-  };
+  }
 
-  const execBuildAll = (delay, dryRun = false) => {
+  function execBuildAll (delay, dryRun = false) {
     const stats = {};
     let total = 0;
 
@@ -814,9 +814,9 @@
     }
 
     return stats;
-  };
+  }
 
-  const execTextInfo = (delay) => {
+  function execTextInfo (delay) {
     renderBgTab(gamePage.religionTab);
 
     const next = execBuildAll(0, true);
@@ -848,7 +848,7 @@
     $('div#kittycheatTxtBcoins').html(`Blackcoin: ${bcoin?.text || '-'}`);
 
     setTimeout(() => execTextInfo(delay), delay);
-  };
+  }
 
   const cheatMap = {
     'control': {
@@ -1053,7 +1053,7 @@
   };
   const cheatArr = Object.entries(cheatMap);
 
-  const execOpts = (delay) => {
+  function execOpts (delay) {
     for (const [group, maps] of cheatArr) {
       if (group !== 'control' && cheatMap[group].active) {
         for (const n in maps) {
@@ -1070,13 +1070,13 @@
     fillResources();
 
     setTimeout(() => execOpts(delay), delay);
-  };
+  }
 
-  const getGroupId = (groupname) => {
+  function getGroupId (groupname) {
     return `kittycheatAct${capitalizeFirst(groupname)}`;
-  };
+  }
 
-  const clickOptBtn = (group, name, opts) => {
+  function clickOptBtn (group, name, opts) {
     activateBtn(opts, !opts.active);
 
     if (cheatMap[group].active) {
@@ -1094,7 +1094,7 @@
         }
       }
     }
-  };
+  }
 
   const divCont = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>').css({
     'padding-bottom': '30px',
