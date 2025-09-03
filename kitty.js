@@ -9,8 +9,8 @@
     EXOTIC: 0.01,
     // spend 50% maximum on karma
     KARMA: 0.5,
-    // don't convert if we have less than 7.5% of the max
-    CRAFT: 0.075,
+    // only craft 92.5% of max - don't exhaust sources
+    CRAFT: 0.925,
     // build uncapped buildings when we use only 10% of resources
     UNCAPPED: 0.1
   };
@@ -169,22 +169,14 @@
     });
   }
 
-  function hasResource (vals = {}, isTrade = false) {
-    let cando = true;
-
-    for (const key in vals) {
-      if (cando) {
-        const res = gamePage.resPool.get(key);
-
-        cando = res.value >= vals[key];
-
-        if (cando && !isTrade && res.maxValue > 0) {
-          cando = (res.value / res.maxValue) >= FRACTION.CRAFT;
-        }
+  function hasResource (vals = {}) {
+    for (const k in vals) {
+      if (vals[k] > gamePage.resPool.get(k).value) {
+        return false;
       }
     }
 
-    return cando;
+    return true;
   }
 
   function fillResources (name = null) {
@@ -419,12 +411,14 @@
   }
 
   function execCraft (name) {
-    const max = Math.ceil((1 - FRACTION.CRAFT) * game.workshop.getCraftAllCount(name));
+    const max = game.workshop.getCraftAllCount(name);
 
-    if (max > 0 && max < Number.MAX_VALUE) {
-      game.workshop.craft(name, max);
-    } else {
-      game.workshop.craftAll(name);
+    if (max > 0) {
+      if (max < Number.MAX_VALUE) {
+        game.workshop.craft(name, Math.ceil(FRACTION.CRAFT * max));
+      } else {
+        game.workshop.craftAll(name);
+      }
     }
   }
 
