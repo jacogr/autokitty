@@ -9,8 +9,8 @@
     EXOTIC: 0.01,
     // spend 50% maximum on karma
     KARMA: 0.5,
-    // don't convert if we have less than 5% of the max
-    CRAFT: 0.05,
+    // don't convert if we have less than 7.5% of the max
+    CRAFT: 0.075,
     // build uncapped buildings when we use only 10% of resources
     UNCAPPED: 0.1
   };
@@ -419,12 +419,12 @@
   }
 
   function execCraft (name) {
-    const iswood = (name === 'wood');
-    const iswinter = (gamePage.calendar.season === 3);
-    const isautum = (gamePage.calendar.season === 2) && (gamePage.calendar.day >= 75);
+    const max = Math.ceil((1 - FRACTION.CRAFT) * game.workshop.getCraftAllCount(name));
 
-    if (!iswood || (!iswinter && !isautum)) {
-      gamePage.craftAll(name);
+    if (max > 0 && max < Number.MAX_VALUE) {
+      game.workshop.craft(name, max);
+    } else {
+      game.workshop.craftAll(name);
     }
   }
 
