@@ -1,4 +1,3 @@
-
 (() => {
   const game = window.game;
   const gamePage = window.gamePage;
@@ -159,7 +158,7 @@
     return prices.filter((p) => {
       const r = gamePage.resPool.get(p.name);
 
-      return (p.val / r.value) > (
+      return (p.val / r.value) >(
         r.type === 'exotic'
           ?  FRACTION.EXOTIC
           : r.name === 'karma' // type=rare, also affects neocorns
@@ -167,16 +166,6 @@
             : 1
       );
     });
-  }
-
-  function hasResource (vals = {}) {
-    for (const k in vals) {
-      if (vals[k] > gamePage.resPool.get(k).value) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   function fillResources (name = null) {
@@ -466,7 +455,7 @@
 
   function fnFeed () {
     if (gamePage.resPool.get('necrocorn').value > 1) {
-      renderBgTab(gamePage.diplomacyTab)
+      renderBgTab(gamePage.diplomacyTab);
       clickDom(findLeviathans()?.feedBtn);
     }
   }
@@ -486,7 +475,7 @@
 
   function execOpt (name, opts) {
     try {
-      if (opts.active && hasResource(opts.res, opts.trade)) {
+      if (opts.active) {
         if (opts.func) {
           opts.func();
         } else if (opts.trade) {
@@ -533,8 +522,7 @@
   }
 
   function isZigBuildable (bld) {
-    return !!(bld && bld.model.visible) &&
-    hasResource(bld.model.prices.reduce((o, { name, val }) => ({ ...o, [name]: val }), {}), true);
+    return !!(bld && bld.model.visible) && !getInvalidPrices(bld.model.prices).length;
   }
 
   function buildZig (dryRun) {
@@ -909,6 +897,7 @@
       'x10': { active: false, excl: ['resources'], end: true }
     },
     'crafting': {
+      // TODO: res is currently not used, remove or add
       active: false,
       //'wood': {
       //  res: { 'catnip': 250 }
