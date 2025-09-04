@@ -76,8 +76,8 @@
     });
   }
 
-  function styleDiv (div, small = false, extra = {}) {
-    return div.css({ ...extra, 'margin-bottom': small ? '5px' : '20px' });
+  function styleDiv (div, small = false) {
+    return div.css({ 'margin-bottom': small ? '5px' : '20px' });
   }
 
   function toPercent (frac) {
@@ -674,12 +674,12 @@
         const res = unlockTabBtn(btn, dryRun, buildMulti);
 
         if (res) {
+          if (dryRun) {
+            return res;
+          }
+
           pushBtnName(done, btn);
           count += res;
-
-          if (dryRun) {
-            return count;
-          }
         }
       }
 
@@ -775,12 +775,12 @@
           const res = buildTabBtn(btn, dryRun);
 
           if (res) {
+            if (dryRun) {
+              return res;
+            }
+
             pushBtnName(done, btn);
             count += res;
-
-            if (dryRun) {
-              return count;
-            }
           }
         }
       }
