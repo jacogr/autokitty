@@ -888,13 +888,13 @@
       const name = bld?.opts.name || (zig.bestBuilding === 'unicornPasture' && 'Unic. Pasture');
 
       if (name) {
-        zigText = name + (calc ? `, ${calc.text}` : '');
+        zigText = name + (calc ? ` ${calc.text}` : '');
       }
     }
 
     const cryText = cry[0]?.bestBuilding && (
       findTheologyBld(cry[0].bestBuilding).opts.name +
-      (cry[0].percent ? `, ${cry[0].percent.text}` : '')
+      (cry[0].percent ? ` ${cry[0].percent.text}` : '')
     );
 
     $('div#kittycheatTxtDryBld').html(`Buildings: ${next.build?.join(', ') || '-'}`);
