@@ -16,7 +16,7 @@
 
   const MAXVAL = {
     // sell bcoin when it hits this amount (1100 is a crash)
-    BCOIN_PRICE: 1050,
+    BCOIN_SELL: 1085,
     // build at most 25 HGs - this is optimal for paragon
     BLDG_GENOCIDE: 25
   };
@@ -97,17 +97,11 @@
   }
 
   function echo (text) {
-    if (text) {
-      $(game.msg(text).span).css('opacity', 0.275);
-    }
+    text && $(game.msg(text).span).css('opacity', 0.275);
   }
 
   function getBtnName (btn) {
     return btn?.opts?.name || btn?.model?.metadata?.label;
-  }
-
-  function echoBtn (btn) {
-    echo(getBtnName(btn));
   }
 
   function clickDom (btn, isMulti = false) {
@@ -126,7 +120,7 @@
 
   function clickDomEcho (btn, isMulti = false) {
     if (clickDom(btn, isMulti)) {
-      echoBtn(btn);
+      echo(getBtnName(btn));
 
       return 1;
     }
@@ -330,7 +324,7 @@
 
       if (price) {
         const action = (
-          price >= MAXVAL.BCOIN_PRICE
+          price >= MAXVAL.BCOIN_SELL
             ? 'sell'
             : price <= 950
               ? 'buy'
@@ -459,10 +453,8 @@
   function fnSellBcoin () {
     const info = calcBcoin();
 
-    if (info?.price >= MAXVAL.BCOIN_PRICE) {
-      const res = gamePage.resPool.get('blackcoin');
-
-      if (res.value > 0 && renderBgTab(gamePage.diplomacyTab)) {
+    if (info?.price >= MAXVAL.BCOIN_SELL) {
+      if (gamePage.resPool.get('blackcoin').value > 0 && renderBgTab(gamePage.diplomacyTab)) {
         clickDom(findLeviathans()?.sellBcoin);
       }
     }
@@ -587,19 +579,10 @@
     return 0;
   }
 
-  function buildTheologyBtn (btn, best, totres, dryRun) {
+  function buildTheologyBtn (btn, best, dryRun) {
     if (!btn || !best || !best.percent || best.percent.frac < 1) {
       return 0;
-    }
-
-    // Not 100% sure this totres is needed - just dunno when the model updates
-    for (const p of btn.model.prices) {
-      if ((totres[p.name] -= p.val) < 0) {
-        return 0;
-      }
-    }
-
-    if (getInvalidPrices(btn).length) {
+    } else if (getInvalidPrices(btn).length) {
       return 0;
     }
 
@@ -614,16 +597,11 @@
       renderBgTab(gamePage.religionTab);
 
       const avail = calcTheology();
-      const totres = { 'necrocorns': 0, 'relic': 0, 'void': 0 };
-
-      for (const n in totres) {
-        totres[n] = gamePage.resPool.get(n).value;
-      }
 
       for (const best of avail) {
         const btn = gamePage.religionTab.ctPanel.children[0].children.find((b) => b.id === best?.bestBuilding && b.model.visible && b.model.enabled);
 
-        if (buildTheologyBtn(btn, best, totres, dryRun)) {
+        if (buildTheologyBtn(btn, best, dryRun)) {
           if (dryRun) {
             return 1;
           }
@@ -673,8 +651,8 @@
   let lastExploreTime = 0;
 
   function unlockTab (tab, dryRun) {
-    let count = 0;
     const done = [];
+    let count = 0;
 
     try {
       if (!tab.visible) {
@@ -777,8 +755,8 @@
   }
 
   function buildTab (tab, dryRun) {
-    let count = 0;
     const done = [];
+    let count = 0;
 
     try {
       // for builds, we always want the tab visible & active
