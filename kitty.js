@@ -152,6 +152,8 @@
     if (game.ui.activeTabId !== tab.tabId) {
       tab.render();
     }
+
+    return tab;
   }
 
   function getInvalidPrices (btn) {
@@ -409,22 +411,16 @@
   }
 
   function fnAdore () {
-    renderBgTab(gamePage.religionTab);
-
     game.religion.resetFaith(1.01, false);
-    clickDom(gamePage.religionTab?.praiseBtn);
+    clickDom(renderBgTab(gamePage.religionTab)?.praiseBtn);
   }
 
   function fnPromote () {
-    renderBgTab(gamePage.villageTab);
-
-    clickDom(gamePage.villageTab?.promoteKittensBtn);
+    clickDom(renderBgTab(gamePage.villageTab)?.promoteKittensBtn);
   }
 
   function fnLoadout () {
-    renderBgTab(gamePage.villageTab);
-
-    clickDom(gamePage.villageTab.buttons.find((b) => b?.opts?.loadout?.pinned));
+    clickDom(renderBgTab(gamePage.villageTab)?.buttons.find((b) => b?.opts?.loadout?.pinned));
   }
 
   function fnCombust () {
@@ -436,11 +432,9 @@
       .find((r) => r.count > 0);
 
     if (res) {
-      renderBgTab(gamePage.timeTab);
+      const btn = renderBgTab(gamePage.timeTab)?.cfPanel.children[0].children[0];
 
-      const btn = gamePage.timeTab.cfPanel.children[0].children[0];
-
-      btn.model[res.cycle].handler.call(btn);
+      btn && btn.model[res.cycle].handler.call(btn);
     }
   }
 
@@ -457,8 +451,7 @@
   }
 
   function fnFeed () {
-    if (gamePage.resPool.get('necrocorn').value > 1) {
-      renderBgTab(gamePage.diplomacyTab);
+    if (gamePage.resPool.get('necrocorn').value > 1 && renderBgTab(gamePage.diplomacyTab)) {
       clickDom(findLeviathans()?.feedBtn);
     }
   }
@@ -469,8 +462,7 @@
     if (info?.price >= MAXVAL.BCOIN_PRICE) {
       const res = gamePage.resPool.get('blackcoin');
 
-      if (res.value > 0) {
-        renderBgTab(gamePage.diplomacyTab);
+      if (res.value > 0 && renderBgTab(gamePage.diplomacyTab)) {
         clickDom(findLeviathans()?.sellBcoin);
       }
     }
