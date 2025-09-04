@@ -395,7 +395,7 @@
       gamePage.diplomacy.unlockElders();
     }
 
-    gamePage.diplomacyTab.racePanels.find((p) => p.race.name === name)?.tradeBtn.tradeAllHref.link.click();
+    renderBgTab(gamePage.diplomacyTab)?.racePanels.find((p) => p.race.name === name)?.tradeBtn.tradeAllHref.link.click();
   }
 
   function execCraft (name) {
