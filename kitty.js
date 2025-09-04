@@ -751,7 +751,7 @@
             : null;
 
       if (next) {
-        return dryRun ? 1 : echo(getBnName(next.bld), clickDom(next.bld));
+        return dryRun ? 1 : echo(getBtnName(next.bld), clickDom(next.bld));
       }
 
       const zigTears = gamePage.resPool.get('tears').value + (gamePage.bld.getBuildingExt('ziggurat').meta.on * gamePage.resPool.get('unicorns').value / 2500);
