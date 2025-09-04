@@ -364,7 +364,7 @@
 
   function calcTheology () {
     try {
-      const best = gamePage.religionTab.ctPanel.children[0].children
+      return gamePage.religionTab.ctPanel.children[0].children
         .filter((a) => {
           if ((a.id === 'holyGenocide') && (a.model.on >= MAXVAL.BLDG_GENOCIDE)) {
             return false;
@@ -376,14 +376,11 @@
 
           return (invalids.length === 0) || ((invalids.length === 1) && (invalids[0].name === 'relic'));
         })
-        .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)[0];
-
-      if (best) {
-        return {
-          bestBuilding: best.id,
-          percent: toPercent(gamePage.resPool.get('relic').value / (best.model.prices[0].val * (1 / FRACTION.EXOTIC)))
-        };
-      }
+        .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
+        .map((a) => ({
+          bestBuilding: a.id,
+          percent: toPercent(gamePage.resPool.get('relic').value / (a.model.prices[0].val * (1 / FRACTION.EXOTIC)))
+        }));
     } catch (e) {
       console.error('calcTheology', e);
     }
@@ -592,29 +589,57 @@
     return 0;
   }
 
+  function buildTheologyBtn (btn, best, totres, dryRun) {
+    if (!btn || !best || !best.percent || best.percent.frac < 1) {
+      return 0;
+    }
+
+    for (const p of btn.model.prices) {
+      if ((totres[p.name] -= p.val) < 0) {
+        return 0;
+      }
+    }
+
+    return dryRun ? 1 : clickDom(btn);
+  }
+
   function buildTheology (dryRun) {
+    const done = [];
+    let count = 0;
+
     try {
       renderBgTab(gamePage.religionTab);
 
-      const best = calcTheology();
+      const avail = calcTheology();
+      const totres = { 'necrocorns': 0, 'relic': 0, 'void': 0 };
 
-      if (!best || !best.percent || best.percent.frac < 1) {
-        return 0;
+      for (const n in totres) {
+        totres[n] = gamePage.resPool.get(n).value;
       }
 
-      const cld = gamePage.religionTab.ctPanel.children[0].children;
-      const bld = cld.find((b) => b.id === best.bestBuilding && b.model.visible && b.model.enabled);
+      for (const best of avail) {
+        const btn = gamePage.religionTab.ctPanel.children[0].children.find((b) => b.id === best?.bestBuilding && b.model.visible && b.model.enabled);
 
-      if (!bld) {
-        return 0;
+        if (buildTheologyBtn(btn, best, totres, dryRun)) {
+          if (dryRun) {
+            return 1;
+          }
+
+          pushBtnName(done, btn);
+          count++;
+        } else {
+          break;
+        }
       }
-
-      return dryRun ? 1 : clickDomEcho(bld);
     } catch (e) {
       console.error('buildTheology', e);
     }
 
-    return 0;
+    if (done.length) {
+      echo(done.join(', '));
+    }
+
+    return count;
   }
 
   function unlockTabBtn (btn, dryRun, buildMulti = false) {
@@ -633,7 +658,7 @@
       return 0;
     }
 
-    return  dryRun ? 1 : clickDom(btn, buildMulti);
+    return dryRun ? 1 : clickDom(btn, buildMulti);
   }
 
   function pushBtnName (done, btn) {
@@ -646,6 +671,7 @@
 
   function unlockTab (tab, dryRun) {
     let count = 0;
+    const done = [];
 
     try {
       if (!tab.visible) {
@@ -665,26 +691,19 @@
         tab.vsPanel?.children[0]?.children ||
         // science, workshop
         tab.buttons;
-      const done = [];
 
       // multi for religion & embassy upgrades
       const buildMulti = !!((tab.rUpgradeButtons || tab.racePanels)?.length);
 
       for (const btn of buttons) {
-        const res = unlockTabBtn(btn, dryRun, buildMulti);
-
-        if (res) {
+        if (unlockTabBtn(btn, dryRun, buildMulti)) {
           if (dryRun) {
-            return res;
+            return 1;
           }
 
           pushBtnName(done, btn);
-          count += res;
+          count++;
         }
-      }
-
-      if (done.length) {
-        echo(done.join(', '));
       }
 
       // for trade, unlock new races to trade with
@@ -705,6 +724,10 @@
       }
     } catch (e) {
       console.error('unlockTab', tab?.tabName, e);
+    }
+
+    if (done.length) {
+      echo(done.join(', '));
     }
 
     return count;
@@ -752,6 +775,7 @@
 
   function buildTab (tab, dryRun) {
     let count = 0;
+    const done = [];
 
     try {
       // for builds, we always want the tab visible & active
@@ -768,28 +792,25 @@
         tab.planetPanels ||
         // others
         [tab];
-      const done = [];
 
       for (const area of areas) {
         for (const btn of area.children) {
-          const res = buildTabBtn(btn, dryRun);
-
-          if (res) {
+          if (buildTabBtn(btn, dryRun)) {
             if (dryRun) {
-              return res;
+              return 1;
             }
 
             pushBtnName(done, btn);
-            count += res;
+            count++;
           }
         }
       }
-
-      if (done.length) {
-        echo(done.join(', '));
-      }
     } catch (e) {
       console.error('buildTab', tab?.tabName, e);
+    }
+
+    if (done.length) {
+      echo(done.join(', '));
     }
 
     return count;
@@ -868,9 +889,9 @@
       }
     }
 
-    const cryText = cry && (
-      findTheologyBld(cry.bestBuilding).opts.name +
-      (cry.percent ? `, ${cry.percent.text}` : '')
+    const cryText = cry[0]?.bestBuilding && (
+      findTheologyBld(cry[0].bestBuilding).opts.name +
+      (cry[0].percent ? `, ${cry[0].percent.text}` : '')
     );
 
     $('div#kittycheatTxtDryBld').html(`Buildings: ${next.build?.join(', ') || '-'}`);
