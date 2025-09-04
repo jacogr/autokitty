@@ -6,8 +6,10 @@
   const FRACTION = {
     // spend 1% maximum on any exotic
     EXOTIC: 0.01,
-    // spend 50% maximum on karma
+    // spend max 50% maximum on karma (no in-play increase)
     KARMA: 0.5,
+    // spend max 75% on timeCrystal (it does increase in-play)
+    TC: 0.75,
     // only craft 92.5% of max - don't exhaust sources
     CRAFT: 0.925,
     // build uncapped buildings when we use only 10% of resources
@@ -165,7 +167,9 @@
           ?  FRACTION.EXOTIC
           : r.name === 'karma' // type=rare, also affects neocorns
             ? FRACTION.KARMA
-            : 1
+            : r.name === 'timeCrystal'
+              ? FRACTION.TC
+              : 1
       );
     });
   }
