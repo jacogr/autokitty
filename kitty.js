@@ -421,6 +421,12 @@
     clickDom(gamePage.villageTab?.promoteKittensBtn);
   }
 
+  function fnLoadout () {
+    renderBgTab(gamePage.villageTab);
+
+    clickDom(gamePage.villageTab.buttons.find((b) => b?.opts?.loadout?.pinned));
+  }
+
   function fnCombust () {
     const res = combustCycles
       .map(([cycle, div]) => ({
@@ -1081,6 +1087,11 @@
       },
       'promote': {
         func: fnPromote,
+        active: true,
+        delay: INTERVAL.PROMOTE
+      },
+      'loadout': {
+        func: fnLoadout,
         active: true,
         delay: INTERVAL.PROMOTE,
         end: true
