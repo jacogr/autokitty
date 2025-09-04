@@ -594,15 +594,14 @@
       return 0;
     }
 
+    // Not 100% sure this totres is needed - just dunno when the model updates
     for (const p of btn.model.prices) {
       if ((totres[p.name] -= p.val) < 0) {
         return 0;
       }
     }
 
-    const invalids = getInvalidPrices(btn.model.prices);
-
-    if (invalids.length) {
+    if (getInvalidPrices(btn.model.prices).length) {
       return 0;
     }
 
