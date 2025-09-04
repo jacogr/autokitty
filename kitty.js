@@ -106,10 +106,12 @@
     return btn?.opts?.name || btn?.model?.metadata?.label;
   }
 
-  function clickDom (btn, isMulti = false) {
+  function clickDom (btn, opts = {}) {
     if (btn?.domNode) {
-      if (isMulti) {
+      if (opts.isAll) {
         btn.domNode.dispatchEvent(new MouseEvent('click', { shiftKey: true }));
+      } else if (opts.isBatch) {
+        btn.domNode.dispatchEvent(new MouseEvent('click', { ctrlKey: true, metaKey: true }));
       } else {
         btn.domNode.click();
       }
@@ -120,8 +122,8 @@
     return 0;
   }
 
-  function clickDomEcho (btn, isMulti = false) {
-    if (clickDom(btn, isMulti)) {
+  function clickDomEcho (btn) {
+    if (clickDom(btn)) {
       echo(getBtnName(btn));
 
       return 1;
@@ -628,7 +630,7 @@
     return count;
   }
 
-  function unlockTabBtn (btn, dryRun, buildMulti = false) {
+  function unlockTabBtn (btn, dryRun, isAll = false) {
     if (!btn?.model?.enabled || !btn.model.visible || !btn.model.metadata) {
       return 0;
     } else if (btn.id === 'cryochambers' && btn.model.on >= gamePage.bld.getBuildingExt('chronosphere').meta.on) {
@@ -644,7 +646,7 @@
       return 0;
     }
 
-    return dryRun ? 1 : clickDom(btn, buildMulti);
+    return dryRun ? 1 : clickDom(btn, { isAll });
   }
 
   function pushBtnName (done, btn) {
@@ -679,10 +681,10 @@
         tab.buttons;
 
       // multi for religion & embassy upgrades
-      const buildMulti = !!((tab.rUpgradeButtons || tab.racePanels)?.length);
+      const isAll = !!((tab.rUpgradeButtons || tab.racePanels)?.length);
 
       for (const btn of buttons) {
-        if (unlockTabBtn(btn, dryRun, buildMulti)) {
+        if (unlockTabBtn(btn, dryRun, isAll)) {
           if (dryRun) {
             return 1;
           }
@@ -738,10 +740,10 @@
 
     // at least something with a max
     const firstMax = model.prices.find((p) => gamePage.resPool.get(p.name).maxValue > 0);
-    let buildMulti = model.metadata.on >= 1;
+    let isAll = model.metadata.on >= 1;
 
     // without a max, we only build a single
-    if (!firstMax && buildMulti) {
+    if (!firstMax && isAll) {
       const fistInvalid = model.prices.find((p) => {
         const r = gamePage.resPool.get(p.name);
 
@@ -752,11 +754,10 @@
         return 0;
       }
 
-      // only build a single
-      buildMulti = false;
+      isAll = false;
     }
 
-    return dryRun ? 1 : clickDom(btn, buildMulti);
+    return dryRun ? 1 : clickDom(btn, { isAll });
   }
 
   function buildTab (tab, dryRun) {
