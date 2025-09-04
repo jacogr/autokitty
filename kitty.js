@@ -1,8 +1,4 @@
-(() => {
-  const game = window.game;
-  const gamePage = window.gamePage;
-  const $ = window.$;
-
+(($, game, gamePage) => {
   const FRACTION = {
     // spend 1% maximum on any exotic
     EXOTIC: 0.01,
@@ -1178,4 +1174,4 @@
   execOpts(INTERVAL.ALL_OPT);
   execTextInfo(INTERVAL.ALL_TXT);
   execBuildAll(INTERVAL.ALL_BLD);
-})();
+})($, game, gamePage);
