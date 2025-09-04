@@ -222,7 +222,7 @@
         delay: INTERVAL.FEED
       },
       'bcoin': {
-        func: fnSellBcoin,
+        func: fnTradeBcoin,
         active: true,
         delay: INTERVAL.BCOIN,
         end: true
@@ -647,12 +647,19 @@
     }
   }
 
-  function fnSellBcoin () {
+  function fnTradeBcoin () {
     const info = calcBcoin();
 
-    if (info?.price >= MAXVAL.BCOIN_SELL) {
-      if (gamePage.resPool.get('blackcoin').value > 0 && renderBgTab(gamePage.diplomacyTab)) {
-        clickDom(findLeviathans()?.sellBcoin);
+    if (info?.price) {
+      const bcoin = gamePage.resPool.get('blackcoin').value;
+      const action = info.price >= MAXVAL.BCOIN_SELL && bcoin > 0
+        ? 'sellBcoin'
+        : info.price <= MAXVAL.BCOIN_BUY && bcoin === 0
+          ? 'buyBcoin'
+          : null;
+
+      if (action && renderBgTab(gamePage.diplomacyTab)) {
+        clickDom(findLeviathans()?.[action]);
       }
     }
   }
