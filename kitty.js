@@ -1,4 +1,4 @@
-(function ($, game, gamePage) {
+(($, game, gamePage) => {
   const FRACTION = {
     // spend 1% maximum on any exotic
     EXOTIC: 0.01,
