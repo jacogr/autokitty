@@ -158,7 +158,7 @@
     return prices.filter((p) => {
       const r = gamePage.resPool.get(p.name);
 
-      return (p.val / r.value) >(
+      return (p.val / r.value) > (
         r.type === 'exotic'
           ?  FRACTION.EXOTIC
           : r.name === 'karma' // type=rare, also affects neocorns
@@ -598,6 +598,12 @@
       if ((totres[p.name] -= p.val) < 0) {
         return 0;
       }
+    }
+
+    const invalids = getInvalidPrices(btn.model.prices);
+
+    if (invalids.length) {
+      return 0;
     }
 
     return dryRun ? 1 : clickDom(btn);
