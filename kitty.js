@@ -15,6 +15,8 @@
   };
 
   const MAXVAL = {
+    // buy bcoin below this value
+    BCOIN_BUY: 950,
     // sell bcoin when it hits this amount (1100 is a crash)
     BCOIN_SELL: 1085,
     // build at most 25 HGs - this is optimal for paragon
@@ -326,7 +328,7 @@
         const action = (
           price >= MAXVAL.BCOIN_SELL
             ? 'sell'
-            : price <= 950
+            : price <= MAXVAL.BCOIN_BUY
               ? 'buy'
               : 'hold'
         );
@@ -395,12 +397,8 @@
   function execCraft (name) {
     const max = game.workshop.getCraftAllCount(name);
 
-    if (max > 0) {
-      if (max < Number.MAX_VALUE) {
-        game.workshop.craft(name, Math.ceil(FRACTION.CRAFT * max));
-      } else {
-        game.workshop.craftAll(name);
-      }
+    if (max > 0 && max < Number.MAX_VALUE) {
+      game.workshop.craft(name, Math.ceil(FRACTION.CRAFT * max));
     }
   }
 
@@ -481,15 +479,9 @@
       if (opts.active && cheatMap[group].active) {
         const isFillable = ['hunt', 'praise'].includes(name);
 
-        if (isFillable) {
-          fillResources();
-        }
-
+        isFillable && fillResources();
         execOpt(name, opts);
-
-        if (isFillable) {
-          fillResources();
-        }
+        isFillable && fillResources();
       }
     } catch (e) {
       console.error('execOptTimer', name, e);
@@ -514,6 +506,10 @@
 
   function buildZig (dryRun) {
     try {
+      if (!gamePage.religionTab?.visible) {
+        return 0;
+      }
+
       renderBgTab(gamePage.religionTab);
 
       const uni = calcZiggurats();
@@ -594,6 +590,10 @@
     let count = 0;
 
     try {
+      if (!gamePage.religionTab?.visible) {
+        return 0;
+      }
+
       renderBgTab(gamePage.religionTab);
 
       const avail = calcTheology();
@@ -655,7 +655,7 @@
     let count = 0;
 
     try {
-      if (!tab.visible) {
+      if (!tab?.visible) {
         return 0;
       }
 
@@ -759,15 +759,11 @@
     let count = 0;
 
     try {
-      // for builds, we always want the tab visible & active
-      if (!tab.visible) {
+      if (!tab?.visible) {
         return 0;
-      } else if (dryRun) {
-        renderBgTab(tab);
       }
-      // else if (game.ui.activeTabId !== tab.tabId) {
-      //   return 0;
-      // }
+
+      renderBgTab(tab);
 
       const areas =
         // space
@@ -858,23 +854,17 @@
     let zigText = zig.bestBuilding;
 
     if (zig.bestBuilding && zig.bestPrices) {
-      const bld = findZigBld(zig.bestBuilding);
-      const zigguratRatio = Math.max(gamePage.bld.getBuildingExt('ziggurat').meta.on, 1);
+      const zigguratRatio = gamePage.bld.getBuildingExt('ziggurat').meta.on;
       const unicornTotal = ((gamePage.resPool.get('tears').value * 2500) / zigguratRatio) + gamePage.resPool.get('unicorns').value;
       const unicornPrice = calcZigguratsPrices(zig.bestPrices, zigguratRatio);
-      const calc = toPercent(unicornTotal / unicornPrice);
-
-      const name = bld?.opts.name || (zig.bestBuilding === 'unicornPasture' && 'Unic. Pasture');
+      const name = findZigBld(zig.bestBuilding)?.opts.name || (zig.bestBuilding === 'unicornPasture' && 'Unic. Pasture');
 
       if (name) {
-        zigText = name + (calc ? ` ${calc.text}` : '');
+        zigText = `${name} ${toPercent(unicornTotal / unicornPrice)?.text || ''}`;
       }
     }
 
-    const cryText = cry[0]?.bestBuilding && (
-      findTheologyBld(cry[0].bestBuilding).opts.name +
-      (cry[0].percent ? ` ${cry[0].percent.text}` : '')
-    );
+    const cryText = cry[0]?.bestBuilding && `${findTheologyBld(cry[0].bestBuilding).opts.name} ${cry[0].percent?.text || ''}`;
 
     $('div#kittycheatTxtDryBld').html(`Buildings: ${next.build?.join(', ') || '-'}`);
     $('div#kittycheatTxtDryUpg').html(`Upgrades : ${next.upgrade?.join(', ') || '-'}`);
