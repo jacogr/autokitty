@@ -492,16 +492,22 @@
 
   let lastSacrificeTime = 0;
 
-  function getTearsPrice (bld) {
-    return bld?.model.prices.find((p) => p.name === 'tears');
+  function isZigBuildable (bld) {
+    return !!bld?.model.visible && !getInvalidPrices(bld).length;
   }
 
   function findZigBld (id) {
     return gamePage.religionTab.zgUpgradeButtons.find((b) => b.id === id);
   }
 
-  function isZigBuildable (bld) {
-    return !!(bld && bld.model.visible) && !getInvalidPrices(bld).length;
+  function getZigInfo (id) {
+    const bld = findZigBld(id);
+
+    return {
+      bld,
+      isBuildable: isZigBuildable(bld),
+      tears: bld?.model.prices.find((p) => p.name === 'tears')
+    };
   }
 
   function buildZig (dryRun) {
@@ -529,33 +535,32 @@
       }
 
       // first we see if we can do a black pyramid
-      const blck = findZigBld('blackPyramid');
+      const blck = getZigInfo('blackPyramid');
 
-      if (isZigBuildable(blck)) {
-        return dryRun ? 1 : clickDomEcho(blck);
+      if (blck.isBuildable) {
+        return dryRun ? 1 : clickDomEcho(blck.bld);
       }
 
-      const best = findZigBld(uni.bestBuilding);
-      const mark = findZigBld('marker');
+      const best = getZigInfo(uni.bestBuilding);
+      const mark = getZigInfo('marker');
+      const next = best.isBuildable && mark.isBuildable
+        ? mark.tears.val <= best.tears.val
+          ? mark
+          : best
+        : mark.isBuildable
+          ? mark
+          : best.isBuildable
+            ? best
+            : null;
 
-      const bv = isZigBuildable(best);
-      const mv = isZigBuildable(mark);
-
-      const bt = getTearsPrice(best);
-      const mt = getTearsPrice(mark);
-
-      if (bv || mv) {
-        const next = (bv && mv)
-          ? ((mt.val <= bt.val) ? mark : best)
-          : (mv ? mark : best);
-
-        return dryRun ? 1 : clickDomEcho(next);
+      if (next) {
+        return dryRun ? 1 : clickDomEcho(next.bld);
       }
 
       const zigTears = gamePage.resPool.get('tears').value + (gamePage.bld.getBuildingExt('ziggurat').meta.on * gamePage.resPool.get('unicorns').value / 2500);
 
       // only sacrifice when we do have enough available (only every 10 seconds)
-      if (bt && zigTears > bt.val) {
+      if (best.tears && zigTears > best.tears.val) {
         const nowTime = Date.now();
         const nowDelta = nowTime - lastSacrificeTime;
 
