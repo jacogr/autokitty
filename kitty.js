@@ -650,16 +650,11 @@
   function fnTradeBcoin () {
     const info = calcBcoin();
 
-    if (info?.price) {
+    if (info && info.price && info.action !== 'hold') {
       const bcoin = gamePage.resPool.get('blackcoin').value;
-      const action = info.price >= MAXVAL.BCOIN_SELL && bcoin > 0
-        ? 'sellBcoin'
-        : info.price <= MAXVAL.BCOIN_BUY && bcoin === 0
-          ? 'buyBcoin'
-          : null;
 
-      if (action && renderBgTab(gamePage.diplomacyTab)) {
-        clickDom(findLeviathans()?.[action]);
+      if (((info.action === 'sell' && bcoin > 0) || (info.action === 'buy' && bcoin === 0)) && renderBgTab(gamePage.diplomacyTab)) {
+        clickDom(findLeviathans()?.[`${action}Bcoin`]);
       }
     }
   }
