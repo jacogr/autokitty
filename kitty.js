@@ -243,13 +243,11 @@
     }
   };
 
-  const cheatArr = Object.entries(cheatMap);
-
-  const combustCycles = Object.entries({
+  const combustCycles = {
     tenErasLink: 500,
     previousCycleLink: 45,
     nextCycleLink: 5
-  });
+  };
 
   let lastExploreTime = 0;
   let lastSacrificeTime = 0;
@@ -264,11 +262,6 @@
      parent.append(child);
 
      return child;
-  }
-
-  function activateGroup (groupname, active = false) {
-    cheatMap[groupname].active = active;
-    $(`div#${getGroupId(groupname)}`).css('opacity', active ? 1 : 0.33);
   }
 
   function activateBtn (opts, active = false) {
@@ -344,15 +337,21 @@
   }
 
   function renderBgTab (tab) {
-    if (game.ui.activeTabId !== tab.tabId) {
+    if (!tab?.visible) {
+      return null;
+    } else if (game.ui.activeTabId !== tab.tabId) {
       tab.render();
     }
 
     return tab;
   }
 
-  function getInvalidPrices (btn) {
+  function getInvalidPrices (btn, skip = null) {
     return btn.model.prices.filter((p) => {
+      if (p.name === skip) {
+        return false;
+      }
+
       const r = gamePage.resPool.get(p.name);
 
       return (p.val / r.value) > (
@@ -380,17 +379,17 @@
   }
 
   function calcZigguratsPrices (prices, zigguratRatio) {
-    let unicornPrice = 0;
+    let total = 0;
 
-    for (const price of prices) {
-      if (price.name === 'unicorns') {
-        unicornPrice += price.val;
-      } else if (price.name === 'tears') {
-        unicornPrice += (price.val * 2500) / zigguratRatio;
+    for (const p of prices) {
+      if (p.name === 'unicorns') {
+        total += p.val;
+      } else if (p.name === 'tears') {
+        total += (p.val * 2500) / zigguratRatio;
       }
     }
 
-    return unicornPrice;
+    return total;
   }
 
   function calcZiggurats () {
@@ -400,9 +399,9 @@
       const zigImpl = gamePage.bld.getBuildingExt('ziggurat');
       const unicornsPerTickBase = pastureImpl?.meta.effects?.unicornsPerTickBase;
 
-      if (!pastureImpl || !pastureImpl.meta.unlocked || !pastureImpl.meta.on) {
+      if (!pastureImpl?.meta.unlocked || !pastureImpl.meta.on) {
         return { err: 'No pasture built' };
-      } else if (!zigImpl || !zigImpl.meta.unlocked || !zigImpl.meta.on) {
+      } else if (!zigImpl?.meta.unlocked || !zigImpl.meta.on) {
         return { err: 'No ziggurat built' };
       } else if (!unicornsPerTickBase) {
         return { err: 'No ticks per base' };
@@ -569,9 +568,7 @@
             return false;
           }
 
-          const invalids = getInvalidPrices(a);
-
-          return (invalids.length === 0) || ((invalids.length === 1) && (invalids[0].name === 'relic'));
+          return !getInvalidPrices(a, 'relic').length;
         })
         .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
         .map((a) => ({
@@ -615,17 +612,16 @@
   }
 
   function fnCombust () {
-    const res = combustCycles
-      .map(([cycle, div]) => ({
-        cycle,
-        count: Math.floor(((game.getEffect('heatMax') - game.time.heat) / div) / 10)
-      }))
-      .find((r) => r.count > 0);
+    const avail = (game.getEffect('heatMax') - game.time.heat) / 10;
 
-    if (res) {
-      const btn = renderBgTab(gamePage.timeTab)?.cfPanel.children[0].children[0];
+    for (const c in combustCycles) {
+      if ((avail / combustCycles[c]) > 1) {
+        const btn = renderBgTab(gamePage.timeTab)?.cfPanel.children[0].children[0];
 
-      btn && btn.model[res.cycle].handler.call(btn);
+        btn && btn.model[c].handler.call(btn);
+
+        return;
+      }
     }
   }
 
@@ -650,7 +646,7 @@
   function fnTradeBcoin () {
     const info = calcBcoin();
 
-    if (info && info.price && info.action !== 'hold') {
+    if (info?.price && info.action !== 'hold') {
       const bcoin = gamePage.resPool.get('blackcoin').value;
 
       if (((info.action === 'sell' && bcoin > 0) || (info.action === 'buy' && bcoin === 0)) && renderBgTab(gamePage.diplomacyTab)) {
@@ -685,7 +681,7 @@
         isFillable && fillResources();
       }
     } catch (e) {
-      console.error('execOptTimer', name, e);
+      console.error('execOptTimer', group, name, e);
     }
 
     setTimeout(() => execOptTimer(group, name, opts), opts.delay);
@@ -711,11 +707,9 @@
 
   function buildZig (dryRun) {
     try {
-      if (!gamePage.religionTab?.visible) {
+      if (!renderBgTab(gamePage.religionTab)) {
         return 0;
       }
-
-      renderBgTab(gamePage.religionTab);
 
       const uni = calcZiggurats();
 
@@ -780,9 +774,7 @@
   }
 
   function buildTheologyBtn (btn, best, dryRun) {
-    if (!btn || !best || !best.percent || best.percent.frac < 1) {
-      return 0;
-    } else if (getInvalidPrices(btn).length) {
+    if (!btn || !best?.percent || best.percent.frac < 1 || getInvalidPrices(btn).length) {
       return 0;
     }
 
@@ -794,15 +786,11 @@
     let count = 0;
 
     try {
-      if (!gamePage.religionTab?.visible) {
+      if (!renderBgTab(gamePage.religionTab)) {
         return 0;
       }
 
-      renderBgTab(gamePage.religionTab);
-
-      const avail = calcTheology();
-
-      for (const best of avail) {
+      for (const best of calcTheology()) {
         const btn = gamePage.religionTab.ctPanel.children[0].children.find((b) => b.id === best?.bestBuilding && b.model.visible && b.model.enabled);
 
         if (buildTheologyBtn(btn, best, dryRun)) {
@@ -834,7 +822,6 @@
       return 0;
     }
 
-    // max resources
     if (!dryRun) {
       fillResources();
     }
@@ -846,10 +833,10 @@
     return dryRun ? 1 : clickDom(btn, { isAll });
   }
 
-  function pushBtnName (done, btn) {
+  function pushBtnName (arr, btn) {
     const n = getBtnName(btn);
 
-    n && done.push(n);
+    n && arr.push(n);
   }
 
   function unlockTab (tab, dryRun) {
@@ -857,11 +844,9 @@
     let count = 0;
 
     try {
-      if (!tab?.visible) {
+      if (!renderBgTab(tab)) {
         return 0;
       }
-
-      renderBgTab(tab);
 
       const buttons =
         // religion
@@ -892,7 +877,7 @@
       // for trade, unlock new races to trade with
       if (tab.exploreBtn && tab.racePanels && tab.racePanels.length !== 8) {
         const maxRaces = tab.leviathansInfo
-          ? 8 - (tab.racePanels.find((r) => r.race.name === 'leviathans') ? 0 : 1)
+          ? 8 - (findLeviathans()?.race.unlocked ? 0 : 1)
           : 7;
 
         if (tab.racePanels.length !== maxRaces) {
@@ -919,12 +904,10 @@
   function buildTabBtn (btn, dryRun) {
     const model = btn?.model;
 
-    // don't buy invisible or switched off
-    if (!model?.enabled || !model.visible || !model.metadata || (model.metadata.on !== model.metadata.val)) {
+    if (!model?.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val)) {
       return 0;
     }
 
-    // max resources
     if (!dryRun) {
       fillResources();
     }
@@ -960,11 +943,9 @@
     let count = 0;
 
     try {
-      if (!tab?.visible) {
+      if (!renderBgTab(tab)) {
         return 0;
       }
-
-      renderBgTab(tab);
 
       const areas =
         // space
@@ -1078,14 +1059,16 @@
   }
 
   function execOpts (delay) {
-    for (const [group, maps] of cheatArr) {
-      if (group !== 'control' && cheatMap[group].active) {
-        for (const n in maps) {
-          const o = maps[n];
+    for (const group in cheatMap) {
+      const maps = cheatMap[group];
+
+      if (group !== 'control' && maps.active) {
+        for (const m in maps) {
+          const o = maps[m];
 
           if (o.active && !o.delay) {
             fillResources();
-            execOpt(n, o);
+            execOpt(m, o);
           }
         }
       }
@@ -1096,8 +1079,13 @@
     setTimeout(() => execOpts(delay), delay);
   }
 
-  function getGroupId (groupname) {
-    return `kittycheatAct${capitalizeFirst(groupname)}`;
+  function getGroupId (group) {
+    return `kittycheatAct${capitalizeFirst(group)}`;
+  }
+
+  function activateGroup (groupname, active = false) {
+    cheatMap[groupname].active = active;
+    $(`div#${getGroupId(groupname)}`).css('opacity', active ? 1 : 0.33);
   }
 
   function clickOptBtn (group, name, opts) {
@@ -1108,8 +1096,8 @@
         activateGroup(opts.group, opts.active);
       } else if (opts.active) {
         if (opts.excl) {
-          for (const excl of opts.excl) {
-            activateBtn(cheatMap[group][excl], false);
+          for (const e of opts.excl) {
+            activateBtn(cheatMap[group][e], false);
           }
         }
 
@@ -1120,51 +1108,57 @@
     }
   }
 
-  const divCont = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>').css({
-    'padding-bottom': '30px',
-    'font-family': 'monospace',
-    'font-size': 'small'
-  }));
-  const divActGroup = jqAppend(divCont, styleDiv($('<div id="kittycheatAct"></div>')));
-  const divTxtGroup = jqAppend(divCont, styleDiv($('<div id="kittycheatTxt"></div>')));
+  function initCheat () {
+    const divCont = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>').css({
+      'padding-bottom': '30px',
+      'font-family': 'monospace',
+      'font-size': 'small'
+    }));
+    const divActGroup = jqAppend(divCont, styleDiv($('<div id="kittycheatAct"></div>')));
+    const divTxtGroup = jqAppend(divCont, styleDiv($('<div id="kittycheatTxt"></div>')));
 
-  // add groups for all the options
-  for (const [groupname, group] of cheatArr) {
-    const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="${getGroupId(groupname)}"></div>`)));
+    // add groups for all the options
+    for (const group in cheatMap) {
+      const maps = cheatMap[group];
+      const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="${getGroupId(group)}"></div>`)));
 
-    for (const optname in group) {
-      const opts = group[optname];
+      for (const name in maps) {
+        const opts = maps[name];
 
-      if (optname === 'active') {
-        activateGroup(groupname, opts);
-      } else {
-        opts.btn = jqAppend(divGroup, $(`<button>${optname}</button>`).click(() => {
-          clickOptBtn(groupname, optname, opts);
-        }));
+        if (name === 'active') {
+          activateGroup(group, opts);
+        } else {
+          opts.btn = jqAppend(divGroup, $(`<button>${name}</button>`).click(() => {
+            clickOptBtn(group, name, opts);
+          }));
 
-        activateBtn(opts, opts.active || false);
+          activateBtn(opts, opts.active);
 
-        if (opts.delay) {
-          execOptTimer(groupname, optname, opts);
+          if (opts.delay) {
+            execOptTimer(group, name, opts);
+          }
         }
       }
     }
+
+    for (const id of ['DryBld', 'DryUpg', 'RelZig', 'RelCry', 'RelLvl', 'Bcoins']) {
+      jqAppend(divTxtGroup, styleDiv($(`<div id="kittycheatTxt${id}"></div>`), true));
+    }
   }
 
-  for (const id of ['DryBld', 'DryUpg', 'RelZig', 'RelCry', 'RelLvl', 'Bcoins']) {
-    jqAppend(divTxtGroup, styleDiv($(`<div id="kittycheatTxt${id}"></div>`), true));
+  function initGame () {
+    //adjust messages, switch off confirmation
+    game.console.maxMessages = 100;
+    game.opts.noConfirm = true;
+
+    // these logs are very fast with this script
+    for (const f of ['craft', 'faith', 'hunt', 'trade']) {
+      game.console.filters[f].enabled = false;
+    }
   }
 
-  //adjust messages, switch off confirmation
-  game.console.maxMessages = 100;
-  game.opts.noConfirm = true;
-
-  // these logs are very fast with this script
-  for (const f of ['craft', 'faith', 'hunt', 'trade']) {
-    game.console.filters[f].enabled = false;
-  }
-
-  // start the loops
+  initGame();
+  initCheat();
   execOpts(INTERVAL.ALL_OPT);
   execTextInfo(INTERVAL.ALL_TXT);
   execBuildAll(INTERVAL.ALL_BLD);
