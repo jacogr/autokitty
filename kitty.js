@@ -654,7 +654,7 @@
       const bcoin = gamePage.resPool.get('blackcoin').value;
 
       if (((info.action === 'sell' && bcoin > 0) || (info.action === 'buy' && bcoin === 0)) && renderBgTab(gamePage.diplomacyTab)) {
-        clickDom(findLeviathans()?.[`${action}Bcoin`]);
+        clickDom(findLeviathans()?.[`${info.action}Bcoin`]);
       }
     }
   }
