@@ -35,11 +35,224 @@
     SACRIFICE: 10000
   };
 
+  const cheatMap = {
+    'control': {
+      active: true,
+      'build': { active: false },
+      'upgrade': { active: false, end: true },
+      'craft': { active: false, group: 'crafting' },
+      'trade': { active: false, group: 'trading' },
+      'exec': { active: false, group: 'actions', end: true },
+      'zig': { active: false },
+      'crypto': { active: false, end: true },
+      'resources': { active: false, excl: ['x10'] },
+      'x10': { active: false, excl: ['resources'], end: true }
+    },
+    'crafting': {
+      // TODO: res is currently not used, remove or add
+      active: false,
+      //'wood': {
+      //  res: { 'catnip': 250 }
+      //},
+      'beam': {
+        res: { 'wood': 250 },
+        active: true
+      },
+      'slab': {
+        res: { 'minerals': 250 },
+        active: true
+      },
+      'steel': {
+        res: { 'coal': 100 },
+        active: true
+      },
+      'plate': {
+        res: { 'iron': 125 },
+        active: true
+      },
+      'gear': {
+        res: { 'steel': 15 }
+      },
+      'concrate': {
+        res: { 'steel': 25 }
+      },
+      'alloy': {
+        res: { 'titanium': 10 }
+      },
+      'parchment': {
+        res: { 'furs': 175 },
+        active: true
+      },
+      'manuscript': {
+        res: { 'parchment': 25, 'culture': 400 }
+      },
+      'compedium': {
+        res: { 'manuscript': 50, 'science': 10000 }
+      },
+      'blueprint': {
+        res: { 'compedium': 25, 'science': 25000 }
+      },
+      'kerosene': {
+        res: { 'oil': 7500 },
+        active: true
+      },
+      'megalith': {
+        res: { 'beam': 2500 }
+      },
+      'scaffold': {
+        res: { 'beam': 50 }
+      },
+      'ship': {
+        res: { 'starchart': 25 }
+      },
+      'eludium': {
+        res: { 'unobtainium': 1000, 'alloy': 2500 }
+      },
+      'thorium': {
+        res: { 'uranium': 250 },
+        active: true
+      },
+      'bloodstone': {
+        res: { 'timeCrystal': 5000, 'relic': 10000 }
+      },
+      'tMythril': {
+        res: { 'bloodstone': 5 }
+      }
+    },
+    'trading': {
+      active: false,
+      'leviathans': {
+        res: { 'unobtainium': 5000 },
+        trade: true,
+        active: true
+      },
+      'dragons': {
+        res: { 'titanium': 250 },
+        trade: true,
+        active: true
+      },
+      'zebras': {
+        res: { 'slab': 50 },
+        trade: true,
+        active: true
+      },
+      'nagas': {
+        res: { 'ivory': 500 },
+        trade: true
+      },
+      'spiders': {
+        res: { 'scaffold': 50 },
+        trade: true
+      },
+      'griffins': {
+        res: { 'wood': 500 },
+        trade: true,
+        active: true
+      },
+      'lizards': {
+        res: { 'minerals': 1000 },
+        trade: true,
+        active: true
+      },
+      'sharks': {
+        res: { 'iron': 100 },
+        trade: true,
+        active: true
+      }
+    },
+    'actions': {
+      active: false,
+      'catnip': {
+        func: () => {
+          clickSpan('Gather catnip');
+        },
+        active: true,
+        delay: INTERVAL.CATNIP_GATHER
+      },
+      'refine': {
+        func: () => {
+          fillResources('catnip');
+          clickSpan('Refine catnip');
+        },
+        active: true,
+        delay: INTERVAL.CATNIP_REFINE,
+        end: true
+      },
+      'praise': {
+        func: () => {
+          fillResources('faith');
+          gamePage.religion.praise();
+        },
+        active: true,
+        delay: INTERVAL.PRAISE
+      },
+      'adore': {
+        func: fnAdore,
+        active: true,
+        delay: INTERVAL.ADORE,
+        end: true
+      },
+      'observe': {
+        func: () => {
+          $('input#observeBtn').click();
+        },
+        active: true
+      },
+      'hunt': {
+        func: () => {
+          fillResources('manpower');
+          gamePage.village.huntAll();
+        },
+        active: true
+      },
+      'promote': {
+        func: fnPromote,
+        active: true,
+        delay: INTERVAL.PROMOTE
+      },
+      'loadout': {
+        func: fnLoadout,
+        active: true,
+        delay: INTERVAL.PROMOTE,
+        end: true
+      },
+      'feed': {
+        func: fnFeed,
+        active: false,
+        delay: INTERVAL.FEED
+      },
+      'bcoin': {
+        func: fnSellBcoin,
+        active: true,
+        delay: INTERVAL.BCOIN,
+        end: true
+      },
+      'combust': {
+        func: fnCombust,
+        active: false,
+        delay: INTERVAL.COMBUST,
+        excl: ['40k']
+      },
+      '40k': {
+        func: fnCombust40k,
+        active: false,
+        delay: INTERVAL.COMBUST,
+        excl: ['combust'],
+        end: true
+      }
+    }
+  };
+
+  const cheatArr = Object.entries(cheatMap);
+
   const combustCycles = Object.entries({
     tenErasLink: 500,
     previousCycleLink: 45,
     nextCycleLink: 5
   });
+
+  let lastExploreTime = 0;
+  let lastSacrificeTime = 0;
 
   function noop () {}
 
@@ -484,8 +697,6 @@
     setTimeout(() => execOptTimer(group, name, opts), opts.delay);
   }
 
-  let lastSacrificeTime = 0;
-
   function isZigBuildable (bld) {
     return !!bld?.model.visible && !getInvalidPrices(bld).length;
   }
@@ -646,8 +857,6 @@
 
     n && done.push(n);
   }
-
-  let lastExploreTime = 0;
 
   function unlockTab (tab, dryRun) {
     const done = [];
@@ -873,215 +1082,6 @@
 
     setTimeout(() => execTextInfo(delay), delay);
   }
-
-  const cheatMap = {
-    'control': {
-      active: true,
-      'build': { active: false },
-      'upgrade': { active: false, end: true },
-      'craft': { active: false, group: 'crafting' },
-      'trade': { active: false, group: 'trading' },
-      'exec': { active: false, group: 'actions', end: true },
-      'zig': { active: false },
-      'crypto': { active: false, end: true },
-      'resources': { active: false, excl: ['x10'] },
-      'x10': { active: false, excl: ['resources'], end: true }
-    },
-    'crafting': {
-      // TODO: res is currently not used, remove or add
-      active: false,
-      //'wood': {
-      //  res: { 'catnip': 250 }
-      //},
-      'beam': {
-        res: { 'wood': 250 },
-        active: true
-      },
-      'slab': {
-        res: { 'minerals': 250 },
-        active: true
-      },
-      'steel': {
-        res: { 'coal': 100 },
-        active: true
-      },
-      'plate': {
-        res: { 'iron': 125 },
-        active: true
-      },
-      'gear': {
-        res: { 'steel': 15 }
-      },
-      'concrate': {
-        res: { 'steel': 25 }
-      },
-      'alloy': {
-        res: { 'titanium': 10 }
-      },
-      'parchment': {
-        res: { 'furs': 175 },
-        active: true
-      },
-      'manuscript': {
-        res: { 'parchment': 25, 'culture': 400 }
-      },
-      'compedium': {
-        res: { 'manuscript': 50, 'science': 10000 }
-      },
-      'blueprint': {
-        res: { 'compedium': 25, 'science': 25000 }
-      },
-      'kerosene': {
-        res: { 'oil': 7500 },
-        active: true
-      },
-      'megalith': {
-        res: { 'beam': 2500 }
-      },
-      'scaffold': {
-        res: { 'beam': 50 }
-      },
-      'ship': {
-        res: { 'starchart': 25 }
-      },
-      'eludium': {
-        res: { 'unobtainium': 1000, 'alloy': 2500 }
-      },
-      'thorium': {
-        res: { 'uranium': 250 },
-        active: true
-      },
-      'bloodstone': {
-        res: { 'timeCrystal': 5000, 'relic': 10000 }
-      },
-      'tMythril': {
-        res: { 'bloodstone': 5 }
-      }
-    },
-    'trading': {
-      active: false,
-      'leviathans': {
-        res: { 'unobtainium': 5000 },
-        trade: true,
-        active: true
-      },
-      'dragons': {
-        res: { 'titanium': 250 },
-        trade: true,
-        active: true
-      },
-      'zebras': {
-        res: { 'slab': 50 },
-        trade: true,
-        active: true
-      },
-      'nagas': {
-        res: { 'ivory': 500 },
-        trade: true
-      },
-      'spiders': {
-        res: { 'scaffold': 50 },
-        trade: true
-      },
-      'griffins': {
-        res: { 'wood': 500 },
-        trade: true,
-        active: true
-      },
-      'lizards': {
-        res: { 'minerals': 1000 },
-        trade: true,
-        active: true
-      },
-      'sharks': {
-        res: { 'iron': 100 },
-        trade: true,
-        active: true
-      }
-    },
-    'actions': {
-      active: false,
-      'catnip': {
-        func: () => {
-          clickSpan('Gather catnip');
-        },
-        active: true,
-        delay: INTERVAL.CATNIP_GATHER
-      },
-      'refine': {
-        func: () => {
-          fillResources('catnip');
-          clickSpan('Refine catnip');
-        },
-        active: true,
-        delay: INTERVAL.CATNIP_REFINE,
-        end: true
-      },
-      'praise': {
-        func: () => {
-          fillResources('faith');
-          gamePage.religion.praise();
-        },
-        active: true,
-        delay: INTERVAL.PRAISE
-      },
-      'adore': {
-        func: fnAdore,
-        active: true,
-        delay: INTERVAL.ADORE,
-        end: true
-      },
-      'observe': {
-        func: () => {
-          $('input#observeBtn').click();
-        },
-        active: true
-      },
-      'hunt': {
-        func: () => {
-          fillResources('manpower');
-          gamePage.village.huntAll();
-        },
-        active: true
-      },
-      'promote': {
-        func: fnPromote,
-        active: true,
-        delay: INTERVAL.PROMOTE
-      },
-      'loadout': {
-        func: fnLoadout,
-        active: true,
-        delay: INTERVAL.PROMOTE,
-        end: true
-      },
-      'feed': {
-        func: fnFeed,
-        active: false,
-        delay: INTERVAL.FEED
-      },
-      'bcoin': {
-        func: fnSellBcoin,
-        active: true,
-        delay: INTERVAL.BCOIN,
-        end: true
-      },
-      'combust': {
-        func: fnCombust,
-        active: false,
-        delay: INTERVAL.COMBUST,
-        excl: ['40k']
-      },
-      '40k': {
-        func: fnCombust40k,
-        active: false,
-        delay: INTERVAL.COMBUST,
-        excl: ['combust'],
-        end: true
-      }
-    }
-  };
-  const cheatArr = Object.entries(cheatMap);
 
   function execOpts (delay) {
     for (const [group, maps] of cheatArr) {
