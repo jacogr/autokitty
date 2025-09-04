@@ -154,8 +154,8 @@
     }
   }
 
-  function getInvalidPrices (prices) {
-    return prices.filter((p) => {
+  function getInvalidPrices (btn) {
+    return btn.model.prices.filter((p) => {
       const r = gamePage.resPool.get(p.name);
 
       return (p.val / r.value) > (
@@ -372,7 +372,7 @@
             return false;
           }
 
-          const invalids = getInvalidPrices(a.model.prices);
+          const invalids = getInvalidPrices(a);
 
           return (invalids.length === 0) || ((invalids.length === 1) && (invalids[0].name === 'relic'));
         })
@@ -519,7 +519,7 @@
   }
 
   function isZigBuildable (bld) {
-    return !!(bld && bld.model.visible) && !getInvalidPrices(bld.model.prices).length;
+    return !!(bld && bld.model.visible) && !getInvalidPrices(bld).length;
   }
 
   function buildZig (dryRun) {
@@ -601,7 +601,7 @@
       }
     }
 
-    if (getInvalidPrices(btn.model.prices).length) {
+    if (getInvalidPrices(btn).length) {
       return 0;
     }
 
@@ -659,7 +659,7 @@
       fillResources();
     }
 
-    if (getInvalidPrices(btn.model.prices).length) {
+    if (getInvalidPrices(btn).length) {
       return 0;
     }
 
@@ -751,7 +751,7 @@
       fillResources();
     }
 
-    if (getInvalidPrices(model.prices).length) {
+    if (getInvalidPrices(btn).length) {
       return 0;
     }
 
