@@ -305,8 +305,10 @@
     }
   }
 
-  function echo (text) {
-    text && $(game.msg(text).span).css('opacity', 0.275);
+  function echo (text, retval = 1) {
+    !!retval && !!text && $(game.msg(text).span).css('opacity', 0.275);
+
+    return retval;
   }
 
   function getBtnName (btn) {
@@ -322,16 +324,6 @@
       } else {
         btn.domNode.click();
       }
-
-      return 1;
-    }
-
-    return 0;
-  }
-
-  function clickDomEcho (btn) {
-    if (clickDom(btn)) {
-      echo(getBtnName(btn));
 
       return 1;
     }
@@ -732,7 +724,7 @@
           const bld = gamePage.bldTab.children.find((b) => b.model.metadata.name === uni.bestBuilding);
 
           if (isZigBuildable(bld)) {
-            return dryRun ? 1 : clickDomEcho(bld);
+            return dryRun ? 1 : echo(getBtnName(bld), clickDom(bld));
           }
         }
 
@@ -743,7 +735,7 @@
       const blck = getZigInfo('blackPyramid');
 
       if (blck.isBuildable) {
-        return dryRun ? 1 : clickDomEcho(blck.bld);
+        return dryRun ? 1 : echo(getBtnName(blck.bld), clickDom(blck.bld));
       }
 
       const best = getZigInfo(uni.bestBuilding);
@@ -759,7 +751,7 @@
             : null;
 
       if (next) {
-        return dryRun ? 1 : clickDomEcho(next.bld);
+        return dryRun ? 1 : echo(getBnName(next.bld), clickDom(next.bld));
       }
 
       const zigTears = gamePage.resPool.get('tears').value + (gamePage.bld.getBuildingExt('ziggurat').meta.on * gamePage.resPool.get('unicorns').value / 2500);
