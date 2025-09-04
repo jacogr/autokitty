@@ -59,7 +59,7 @@
 
   function activateGroup (groupname, active = false) {
     cheatMap[groupname].active = active;
-    $(`div#${getGroupId(groupname)}`).animate({ opacity: active ? 1 : 0.33 }, 100);
+    $(`div#${getGroupId(groupname)}`).css('opacity', active ? 1 : 0.33);
   }
 
   function activateBtn (opts, active = false) {
@@ -83,19 +83,17 @@
   }
 
   function toPercent (frac) {
-    if ((frac < 0) || (frac > Number.MAX_SAFE_INTEGER)) {
-      return;
+    if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
+      const raw = 100 * frac;
+
+      return {
+        frac,
+        text: raw >= 100
+          ? '>> 100%'
+          : `${raw.toFixed(3)}%`,
+        raw
+      };
     }
-
-    const raw = 100 * frac;
-
-    return {
-      frac,
-      text: raw >= 100
-        ? '>> 100%'
-        : `${raw.toFixed(3)}%`,
-      raw
-    };
   }
 
   function echo (text) {
@@ -133,9 +131,7 @@
   }
 
   function clickSpan (label) {
-    const elem = $('span').filter(function() {
-      return $(this).text().indexOf(label) === 0;
-    });
+    const elem = $('span').filter((_, e) => $(e).text().indexOf(label) === 0);
 
     if (elem.length) {
       elem.click();
