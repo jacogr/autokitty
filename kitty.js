@@ -764,9 +764,10 @@
         return 0;
       } else if (dryRun) {
         renderBgTab(tab);
-      } else if (game.ui.activeTabId !== tab.tabId) {
-        return 0;
       }
+      // else if (game.ui.activeTabId !== tab.tabId) {
+      //   return 0;
+      // }
 
       const areas =
         // space
@@ -840,7 +841,7 @@
     }
 
     if (delay) {
-      setTimeout(() => execBuildAll(delay), Math.ceil(delay / (total ? 3 : 1)));
+      setTimeout(() => execBuildAll(delay), delay); // Math.ceil(delay / (total ? 3 : 1)));
     }
 
     return stats;
