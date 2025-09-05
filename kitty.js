@@ -38,17 +38,17 @@
   const cheatMap = {
     'control': {
       active: true,
-      'build': { active: false },
-      'upgrade': { active: false, end: true },
-      'craft': { active: false, group: 'crafting' },
-      'trade': { active: false, group: 'trading' },
-      'exec': { active: false, group: 'actions', end: true },
-      'zig': { active: false },
-      'crypto': { active: false, end: true },
-      'pollute': { active: true },
+      'build': {},
+      'upgrade': { end: true },
+      'craft': { group: 'crafting' },
+      'trade': { group: 'trading' },
+      'exec': { group: 'actions', end: true },
+      'zig': {},
+      'crypto': { end: true },
+      'pollute': {},
       'uncap': { active: true, end: true },
-      'resources': { active: false, excl: ['x10'] },
-      'x10': { active: false, excl: ['resources'], end: true }
+      'resources': { excl: ['x10'] },
+      'x10': { excl: ['resources'], end: true }
     },
     'crafting': {
       // TODO: res is currently not used, remove or add
@@ -102,7 +102,8 @@
         res: { 'beam': 2500 }
       },
       'scaffold': {
-        res: { 'beam': 50 }
+        res: { 'beam': 50 },
+        active: true
       },
       'ship': {
         res: { 'starchart': 25 }
@@ -220,24 +221,21 @@
       },
       'feed': {
         func: fnFeed,
-        active: false,
         delay: INTERVAL.FEED
       },
       'bcoin': {
         func: fnTradeBcoin,
-        active: false,
+        active: true,
         delay: INTERVAL.BCOIN,
         end: true
       },
       'combust': {
         func: fnCombust,
-        active: false,
         delay: INTERVAL.COMBUST,
         excl: ['40k']
       },
       '40k': {
         func: fnCombust40k,
-        active: false,
         delay: INTERVAL.COMBUST,
         excl: ['combust'],
         end: true
