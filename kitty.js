@@ -12,52 +12,114 @@
  *
  * @typedef {(elem: any) => jQuery} JQuery
  *
- * @typedef {Object} KittensGameBld
+ * @typedef {'chronosphere' | 'unicornPasture' | 'ziggurat'} KittensNamesBld
  *
- * @typedef {Object} KittensGameBldTab
+ * @typedef {'numeromancy' | 'unicornmancy'} KittensNamesPerk
  *
- * @typedef {Object} KittensGameBtn
+ * @typedef {Object} KittensBld
+ * @property {number} cathPollution
+ * @property {(name: KittensNamesBld) => KittensBldg} getBuildingExt
+ *
+ * @typedef {Object} KittensBldTab
+ * @property {KittensBtn[]} children
+ *
+ * @typedef {Object} KittensBldgMetadata
+ * @property {KittensEffects} effects
+ * @property {string} label
+ * @property {string} name
+ * @property {number} on
+ * @property {boolean} unlocked
+ *
+ * @typedef {Object} KittensBldgModel
+ * @property {boolean} enabled
+ * @property {KittensBldgMetadata} metadata
+ * @property {number} on
+ * @property {KittensPrice[]} prices
+ * @property {boolean} visible
+ *
+ * @typedef {Object} KittensBldg
+ * @property {KittensEffects} effects
+ * @property {KittensBldgMetadata} meta
+ * @property {KittensBldgModel} [model]
+ * @property {number} val
+ *
+ * @typedef {Object} KittensBtnOpts
+ * @property {{ pinned: boolean }} loadout
+ * @property {string} name
+ *
+ * @typedef {Object} KittensBtn
  * @property {HTMLElement} domNode
+ * @property {string} id
+ * @property {KittensBldgModel} model
+ * @property {KittensBtnOpts} [opts]
  *
- * @typedef {Object} KittensGameCalendarCycle
+ * @typedef {Object} KittensCalendarCycle
+ * @property {{ unicorns: number }} festivalEffects
  *
- * @typedef {Object} KittensGameCalendar
+ * @typedef {Object} KittensCalendar
  * @property {number} cryptoPrice
  * @property {string} cycle
- * @property {KittensGameCalendarCycle[]} cycles
+ * @property {KittensCalendarCycle[]} cycles
  * @property {number} festivalDays
  * @property {number} year
  *
- * @typedef {Object} KittensGameConsole
+ * @typedef {Object} KittensConsole
  * @property {number} maxMessages
  * @property {{ [x: string]: { enabled: boolean } }} filters
  *
- * @typedef {Object} KittensGameDiplomacy
+ * @typedef {Object} KittensDiplomacyRace
+ * @property {string} name
+ * @property {boolean} unlocked
  *
- * @typedef {Object} KittensGameDiplomacyTab
+ * @typedef {Object} KittensDiplomacy
+ * @property {(name: 'leviathans') => KittensDiplomacyRace} get
+ * @property {() => void} unlockElders
  *
- * @typedef {Object} KittensGameOpts
+ * @typedef {Object} KittensDiplomacyRacePanel
+ * @property {KittensDiplomacyRace} race
+ * @property {KittensBtn} [feedBtn]
+ * @property {{ tradeAllHref: { link: HTMLElement } }} tradeBtn
+ *
+ * @typedef {Object} KittensDiplomacyTab
+ * @property {KittensDiplomacyRacePanel[]} racePanels
+ *
+ * @typedef {Object} KittensEffects
+ * @property {number} cathPollutionPerTickProd
+ * @property {number} riftChance
+ * @property {number} unicornsPerTickBase
+ * @property {number} unicornsRatioReligion
+ *
+ * @typedef {Object} KittensOpts
  * @property {boolean} noConfirm
  *
- * @typedef {Object} KittensGamePrestigePerk
+ * @typedef {Object} KittensPerk
  * @property {boolean} researched
  *
- * @typedef {Object} KittensGamePrestige
+ * @typedef {Object} KittensPrestige
  * @property {() => number} getParagonProductionRatio
- * @property {(name: string) => KittensGamePrestigePerk} getPerk
+ * @property {(name: KittensNamesPerk) => KittensPerk} getPerk
  *
- * @typedef {Object} KittensGameReligion
+ * @typedef {Object} KittensPrice
+ * @property {string} name
+ * @property {number} val
+ *
+ * @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensReligionZUNames
+ *
+ * @typedef {Object} KittensReligion
  * @property {() => number} _getTranscendNextPrice
  * @property {number} faithRatio
  * @property {() => number} getSolarRevolutionRatio
+ * @property {(name: KittensReligionZUNames) => KittensBldg} getZU
  * @property {() => void} praise
  * @property {(n: number, b: boolean) => void} resetFaith
  *
- * @typedef {Object} KittensGameReligionTab
- * @property {KittensGameBtn} praiseBtn
+ * @typedef {Object} KittensReligionTab
+ * @property {{ children: { children: KittensBtn[] }[] }} ctPanel
+ * @property {KittensBtn} praiseBtn
  * @property {{ model: { allLink: { handler: () => void } } }} sacrificeBtn
+ * @property {KittensBtn[]} zgUpgradeButtons
 *
- * @typedef {Object} KittensGameRes
+ * @typedef {Object} KittensRes
  * @property {number} maxValue
  * @property {string} name
  * @property {string} type
@@ -65,54 +127,59 @@
  * @property {number} value
  * @property {boolean} visible
  *
- * @typedef {Object} KittensGameResPool
- * @property {(name: string) => KittensGameRes} get
- * @property {KittensGameRes[]} resources
+ * @typedef {Object} KittensResPool
+ * @property {(name: string) => KittensRes} get
+ * @property {KittensRes[]} resources
  *
- * @typedef {Object} KittensGameTab
+ * @typedef {Object} KittensTab
  * @property {string} id
  * @property {() => void} render
  * @property {string} tabId
+ * @property {string} tabName
  * @property {boolean} visible
  *
- * @typedef {Object} KittensGameTime
+ * @typedef {Object} KittensTime
  * @property {number} heat
  *
- * @typedef {Object} KittensGameUI
+ * @typedef {Object} KittensTimeTab
+ * @property {{ children: { children: KittensBtn[] }[] }} cfPanel
+ *
+ * @typedef {Object} KittensUI
  * @property {string} activeTabId
  *
- * @typedef {Object} KittensGameVillage
+ * @typedef {Object} KittensVillage
  * @property {() => void} huntAll
  *
- * @typedef {Object} KittensGameVillageTab
- * @property {KittensGameBtn[]} buttons
- * @property {KittensGameBtn} promoteKittensBtn
+ * @typedef {Object} KittensVillageTab
+ * @property {KittensBtn[]} buttons
+ * @property {KittensBtn} promoteKittensBtn
  *
- * @typedef {Object} KittensGameWorkshop
+ * @typedef {Object} KittensWorkshop
  * @property {(name: string, count: number) => void} craft
  * @property {(name: string) => void} craftAll
  * @property {(name: string) => number} getCraftAllCount
  *
  * @typedef {Object} KittensGame
- * @property {KittensGameTab & KittensGameBld} bld
- * @property {KittensGameBldTab} bldTab
- * @property {KittensGameCalendar} calendar
- * @property {KittensGameConsole} console
- * @property {KittensGameDiplomacy} diplomacy
- * @property {KittensGameTab & KittensGameDiplomacyTab} diplomacyTab
+ * @property {KittensBld} bld
+ * @property {KittensTab & KittensBldTab} bldTab
+ * @property {KittensCalendar} calendar
+ * @property {KittensConsole} console
+ * @property {KittensDiplomacy} diplomacy
+ * @property {KittensTab & KittensDiplomacyTab} diplomacyTab
  * @property {(name: string) => number} getEffect
  * @property {() => number} getTicksPerSecondUI
  * @property {(text?: string) => { span: HTMLElement }} msg
- * @property {KittensGameOpts} opts
- * @property {KittensGamePrestige} prestige
- * @property {KittensGameReligion} religion
- * @property {KittensGameTab & KittensGameReligionTab} religionTab
- * @property {KittensGameResPool} resPool
- * @property {KittensGameTime} time
- * @property {KittensGameUI} ui
- * @property {KittensGameVillage} village
- * @property {KittensGameTab & KittensGameVillageTab} villageTab
- * @property {KittensGameWorkshop} workshop
+ * @property {KittensOpts} opts
+ * @property {KittensPrestige} prestige
+ * @property {KittensReligion} religion
+ * @property {KittensTab & KittensReligionTab} religionTab
+ * @property {KittensResPool} resPool
+ * @property {KittensTime} time
+ * @property {KittensTab & KittensTimeTab} timeTab
+ * @property {KittensUI} ui
+ * @property {KittensVillage} village
+ * @property {KittensTab & KittensVillageTab} villageTab
+ * @property {KittensWorkshop} workshop
  */
 (
 /**
@@ -422,6 +489,9 @@
     return div.css({ 'margin-bottom': small ? '5px' : '20px' });
   }
 
+  /**
+   * @param {number} frac
+   */
   function toPercent (frac) {
     if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
       const raw = 100 * frac;
@@ -447,10 +517,19 @@
     return retval;
   }
 
+  /**
+   * @param {KittensBtn | undefined} btn
+   * @returns {string | undefined}
+   */
   function getBtnName (btn) {
     return btn?.opts?.name || btn?.model?.metadata?.label;
   }
 
+  /**
+   * @param {KittensBtn | null | undefined} btn
+   * @param {{ isAll?: boolean, isBatch?: boolean }} [opts]
+   * @returns {number}
+   */
   function clickDom (btn, opts = {}) {
     if (btn?.domNode) {
       if (opts.isAll) {
@@ -484,8 +563,9 @@
   }
 
   /**
-   * @param {KittensGameTab} tab
-   * @returns {KittensGameTab | null}
+   * @template {KittensTab} T
+   * @param {T | null | undefined} [tab]
+   * @returns {T | null | undefined}
    */
   function renderBgTab (tab) {
     if (!tab?.visible) {
@@ -498,11 +578,9 @@
   }
 
   /**
-   * TODO
-   *
-   * @param {*} btn
+   * @param {KittensBtn} btn
    * @param {string | null} [skip]
-   * @returns
+   * @returns {KittensPrice[]}
    */
   function getInvalidPrices (btn, skip = null) {
     return btn.model.prices.filter((p) => {
@@ -540,6 +618,11 @@
     }
   }
 
+  /**
+   * @param {KittensPrice[]} prices
+   * @param {number} zigguratRatio
+   * @returns {number}
+   */
   function calcZigguratsPrices (prices, zigguratRatio) {
     let total = 0;
 
@@ -554,8 +637,12 @@
     return total;
   }
 
+  /**
+   * @returns {{ err?: string, bestBuilding?: string, bestPrices?: KittensPrice[] }}
+   */
   function calcZiggurats () {
     try {
+      /** @type {KittensReligionZUNames[]} */
       const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
       const pastureImpl = game.bld.getBuildingExt('unicornPasture');
       const zigImpl = game.bld.getBuildingExt('ziggurat');
@@ -619,7 +706,7 @@
       // If the unicorn pasture amortizes itself in less than infinity ticks,
       // set it as the default. This is likely to protect against cases where
       // production of unicorns is 0.
-      const pastureAmortization = pastureImpl.model?.prices[0].val / pastureProduction;
+      const pastureAmortization = (pastureImpl?.model?.prices[0]?.val || 0) / pastureProduction;
 
       let bestAmortization = Number.POSITIVE_INFINITY;
       let bestBuilding = 'unicornPasture';
@@ -716,6 +803,10 @@
     return null;
   }
 
+  /**
+   * @param {string} id
+   * @returns {KittensBtn | undefined}
+   */
   function findTheologyBld (id) {
     return game.religionTab.ctPanel.children[0].children.find((b) => b.id === id);
   }
@@ -753,7 +844,8 @@
       game.diplomacy.unlockElders();
     }
 
-    renderBgTab(game.diplomacyTab)?.racePanels.find((p) => p.race.name === name)?.tradeBtn.tradeAllHref.link.click();
+    const t = renderBgTab(game.diplomacyTab)?.racePanels.find((p) => p.race.name === name)?.tradeBtn.tradeAllHref.link.click();
+    // renderBgTab(game.diplomacyTab)?.racePanels.find((p) => p.race.name === name)?.tradeBtn.tradeAllHref.link.click();
   }
 
   function execCraft (name) {
@@ -799,6 +891,9 @@
     }
   }
 
+  /**
+   * @returns {KittensDiplomacyRacePanel | undefined}
+   */
   function findLeviathans () {
     return game.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans');
   }
@@ -857,6 +952,10 @@
     return !!bld?.model.visible && !getInvalidPrices(bld).length;
   }
 
+  /**
+   * @param {string} id
+   * @returns {KittensBtn | undefined}
+   */
   function findZigBld (id) {
     return game.religionTab.zgUpgradeButtons.find((b) => b.id === id);
   }
@@ -906,7 +1005,7 @@
 
       const best = getZigInfo(uni.bestBuilding);
       const mark = getZigInfo('marker');
-      const next = best.isBuildable && mark.isBuildable
+      const next = (best.isBuildable && mark.tears) && (mark.isBuildable && best.tears)
         ? mark.tears.val <= best.tears.val
           ? mark
           : best
@@ -964,7 +1063,9 @@
         return 0;
       }
 
-      for (const best of calcTheology()) {
+      const avail = calcTheology() || [];
+
+      for (const best of avail) {
         const btn = game.religionTab.ctPanel.children[0].children.find((b) => b.id === best?.bestBuilding && b.model.visible && b.model.enabled);
 
         if (buildTheologyBtn(btn, best, dryRun)) {
@@ -989,6 +1090,12 @@
     return count;
   }
 
+  /**
+   * @param {KittensBtn} btn
+   * @param {*} dryRun
+   * @param {*} isAll
+   * @returns
+   */
   function unlockTabBtn (btn, dryRun, isAll = false) {
     if (!btn?.model?.enabled || !btn.model.visible || !btn.model.metadata) {
       return 0;
@@ -1216,17 +1323,17 @@
     let zigText = zig.bestBuilding;
 
     if (zig.bestBuilding && zig.bestPrices) {
-      const zigguratRatio = game.bld.getBuildingExt('ziggurat').meta.on;
+      const zigguratRatio = game.bld.getBuildingExt('ziggurat')?.meta.on || 0;
       const unicornTotal = ((game.resPool.get('tears').value * 2500) / zigguratRatio) + game.resPool.get('unicorns').value;
       const unicornPrice = calcZigguratsPrices(zig.bestPrices, zigguratRatio);
-      const name = findZigBld(zig.bestBuilding)?.opts.name || (zig.bestBuilding === 'unicornPasture' && 'Unic. Pasture');
+      const name = findZigBld(zig.bestBuilding)?.opts?.name || (zig.bestBuilding === 'unicornPasture' && 'Unic. Pasture');
 
       if (name) {
         zigText = `${name} ${toPercent(unicornTotal / unicornPrice)?.text || ''}`;
       }
     }
 
-    const cryText = cry[0]?.bestBuilding && `${findTheologyBld(cry[0].bestBuilding).opts.name} ${cry[0].percent?.text || ''}`;
+    const cryText = cry?.[0]?.bestBuilding && `${findTheologyBld(cry[0].bestBuilding)?.opts?.name} ${cry[0].percent?.text || ''}`;
 
     $('div#kittycheatTxtDryBld').html(`Buildings: ${next.build?.join(', ') || '-'}`);
     $('div#kittycheatTxtDryUpg').html(`Upgrades : ${next.upgrade?.join(', ') || '-'}`);
@@ -1238,6 +1345,9 @@
     setTimeout(() => execTextInfo(delay), delay);
   }
 
+  /**
+   * @param {number} delay
+   */
   function execOpts (delay) {
     for (const group in cheatMap) {
       const maps = cheatMap[group];
@@ -1259,6 +1369,10 @@
     setTimeout(() => execOpts(delay), delay);
   }
 
+  /**
+   * @param {string} group
+   * @returns {string}
+   */
   function getGroupId (group) {
     return `kittycheatAct${capitalizeFirst(group)}`;
   }
