@@ -45,6 +45,8 @@
       'exec': { active: false, group: 'actions', end: true },
       'zig': { active: false },
       'crypto': { active: false, end: true },
+      'pollute': { active: true },
+      'uncap': { active: true, end: true },
       'resources': { active: false, excl: ['x10'] },
       'x10': { active: false, excl: ['resources'], end: true }
     },
@@ -223,7 +225,7 @@
       },
       'bcoin': {
         func: fnTradeBcoin,
-        active: true,
+        active: false,
         delay: INTERVAL.BCOIN,
         end: true
       },
@@ -906,6 +908,8 @@
 
     if (!model?.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val)) {
       return 0;
+    } else if (!cheatMap.control.pollute.active && model.metadata.effects?.cathPollutionPerTickProd) {
+      return 0;
     }
 
     if (!dryRun) {
@@ -922,6 +926,10 @@
 
     // without a max, we only build a single
     if (!firstMax && isAll) {
+      if (!cheatMap.control.uncap.active) {
+        return 0;
+      }
+
       const fistInvalid = model.prices.find((p) => {
         const r = gamePage.resPool.get(p.name);
 
