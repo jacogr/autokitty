@@ -1019,7 +1019,7 @@
    */
   function execOpt (group, name, opts) {
     try {
-      if (opts.active && cheatMap[group].active) {
+      if (opts.active && cheatMap[/** @type {'actions'} */ (group)].active) {
         !opts.noFill && fillResources();
 
         switch (group) {
@@ -1468,11 +1468,11 @@
    */
   function execOpts (delay) {
     for (const group in cheatMap) {
-      const { active, all } = cheatMap[group];
+      const { active, all } = cheatMap[/** @type {'actions'} */ (group)];
 
       if (active && isExecGroup(group)) {
         for (const name in all) {
-          const opts = all[name];
+          const opts = /** @type {CheatOpt} */ (all[name]);
 
           if (opts.active && !opts.delay) {
             execOpt(group, name, opts);
@@ -1497,7 +1497,7 @@
    * @param {boolean} [active]
    */
   function activateGroup (group, active = false) {
-    cheatMap[group].active = active;
+    cheatMap[/** @type {'actions'} */ (group)].active = active;
     $(`div#${getGroupId(group)}`).css('opacity', active ? 1 : 0.33);
   }
 
@@ -1509,13 +1509,13 @@
   function clickOptBtn (group, name, opts) {
     activateBtn(opts, !opts.active);
 
-    if (cheatMap[group].active) {
+    if (cheatMap[/** @type {'actions'} */ (group)].active) {
       if (opts.group) {
         activateGroup(opts.group, opts.active);
       } else if (opts.active) {
         if (opts.excl) {
           for (const e of opts.excl) {
-            activateBtn(cheatMap[group].all[e], false);
+            activateBtn(/** @type {CheatOpt} */ (cheatMap[/** @type {'actions'} */ (group)].all[e]), false);
           }
         }
 
@@ -1540,7 +1540,7 @@
 
     // add groups for all the options
     for (const group in cheatMap) {
-      const { active, all } = cheatMap[group];
+      const { active, all } = cheatMap[/** @type {'actions'} */ (group)];
       const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="${getGroupId(group)}"></div>`)));
 
       if (group !== 'control') {
@@ -1550,7 +1550,7 @@
       activateGroup(group, active);
 
       for (const name in all) {
-        const opts = all[name];
+        const opts = /** @type {CheatOpt} */ (all[name]);
 
         opts.btn = jqAppend(divGroup, $(`<button>${name}</button>`).click(() => {
           clickOptBtn(group, name, opts);
