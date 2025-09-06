@@ -3,15 +3,7 @@
 /**
  * jQuery definitions
  *
- * @typedef {{
- *  append: (elem: jQuery) => jQuery,
- *  click: (fn?: () => unknown) => jQuery,
- *  css: (style: { [x: string]: string | number } | string, val?: string | number) => jQuery,
- *  filter: (fn: (index: number, elem: HTMLElement) => boolean) => jQuery,
- *  html: (html: string) => jQuery,
- *  length: number,
- *  text: () => string
- * }} jQuery
+ * @typedef {{ append: (elem: jQuery) => jQuery, click: (fn?: () => unknown) => jQuery, css: (style: { [x: string]: string | number } | string, val?: string | number) => jQuery, filter: (fn: (index: number, elem: HTMLElement) => boolean) => jQuery, html: (html: string) => jQuery, length: number, text: () => string }} jQuery
  *
  * @typedef {(elem: HTMLElement | string) => jQuery} JQuery
  */
@@ -39,265 +31,91 @@
  *
  * @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab
  *
- * @typedef {{
- *  id: string,
- *  render: () => void,
- *  tabId: string,
- *  tabName: string,
- *  visible: boolean
- * }} KittensTab
+ * @typedef {{ id: string, render: () => void, tabId: string, tabName: string, visible: boolean }} KittensTab
  *
- * @typedef {{
- *  children: KittensBtn[]
- * }} KittensBtnPanel
+ * @typedef {{ children: KittensBtn[] }} KittensBtnPanel
  *
- * @typedef {{
- *  cathPollution: number,
- *  getBuildingExt: (name: KittensNamedBldg) => KittensBldg
- * }} KittensBld
+ * @typedef {{ cathPollution: number, getBuildingExt: (name: KittensNamedBldg) => KittensBldg }} KittensBld
  *
  * @typedef {KittensBtnPanel & KittensTab} KittensBldTab
  *
- * @typedef {{
- *  effects: KittensEffects,
- *  label: string,
- *  name: string,
- *  on: number,
- *  unlocked: boolean,
- *  val: number
- * }} KittensBldgMetadata
+ * @typedef {{ effects: KittensEffects, label: string, name: string, on: number, unlocked: boolean, val: number }} KittensBldgMetadata
  *
- * @typedef {{
- *  enabled: boolean,
- *  metadata: KittensBldgMetadata,
- *  on: number,
- *  prices: KittensPrice[],
- *  visible: boolean
- * }} KittensBldgModel
+ * @typedef {{ enabled: boolean, metadata: KittensBldgMetadata, on: number, prices: KittensPrice[], visible: boolean }} KittensBldgModel
  *
- * @typedef {{
- *  effects: KittensEffects,
- *  meta: KittensBldgMetadata,
- *  model?: KittensBldgModel,
- *  val: number
- * }} KittensBldg
+ * @typedef {{ effects: KittensEffects, meta: KittensBldgMetadata, model?: KittensBldgModel, val: number }} KittensBldg
  *
- * @typedef {{
- *  loadout: { pinned: boolean },
- *  name: string
- * }} KittensBtnOpts
+ * @typedef {{ loadout: { pinned: boolean }, name: string }} KittensBtnOpts
  *
- * @typedef {{
- *  domNode: HTMLElement,
- *  id: string,
- *  model: KittensBldgModel,
- *  opts?: KittensBtnOpts
- * }} KittensBtn
+ * @typedef {{ domNode: HTMLElement, id: string, model: KittensBldgModel, opts?: KittensBtnOpts }} KittensBtn
  *
- * @typedef {{
- *  festivalEffects: { unicorns: number }
- * }} KittensCalendarCycle
+ * @typedef {{ festivalEffects: { unicorns: number } }} KittensCalendarCycle
  *
- * @typedef {{
- *  cryptoPrice: number,
- *  cycle: string,
- *  cycles: KittensCalendarCycle[],
- *  festivalDays: number,
- *  year: number
- * }} KittensCalendar
+ * @typedef {{ cryptoPrice: number, cycle: string,  cycles: KittensCalendarCycle[], festivalDays: number, year: number }} KittensCalendar
  *
- * @typedef {{
- *  filters: { [x in KittensNamedConsFilt]: { enabled: boolean } },
- *  maxMessages: number
- * }} KittensConsole
+ * @typedef {{ filters: { [x in KittensNamedConsFilt]: { enabled: boolean } }, maxMessages: number }} KittensConsole
  *
- * @typedef {{
- *  name: KittensNamedRace,
- *  unlocked: boolean
- * }} KittensDiplomacyRace
+ * @typedef {{ name: KittensNamedRace, unlocked: boolean }} KittensDiplomacyRace
  *
- * @typedef {{
- *  get: (name: KittensNamedRace) => KittensDiplomacyRace,
- *  unlockElders: () => void
- * }} KittensDiplomacy
+ * @typedef {{ get: (name: KittensNamedRace) => KittensDiplomacyRace, unlockElders: () => void }} KittensDiplomacy
  *
- * @typedef {{
- *  embassyButton: KittensBtn,
- *  race: KittensDiplomacyRace,
- *  feedBtn?: KittensBtn,
- *  tradeBtn: { tradeAllHref: { link: HTMLElement } }
- * }} KittensDiplomacyRacePanel
+ * @typedef {{ embassyButton: KittensBtn, race: KittensDiplomacyRace, feedBtn?: KittensBtn, tradeBtn: { tradeAllHref: { link: HTMLElement } } }} KittensDiplomacyRacePanel
  *
- * @typedef {KittensTab & {
- *  exploreBtn: KittensBtn,
- *  racePanels: KittensDiplomacyRacePanel[],
- *  leviathansInfo: any
- * }} KittensDiplomacyTab
+ * @typedef {KittensTab & { exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }} KittensDiplomacyTab
  *
- * @typedef {{
- *  cathPollutionPerTickProd?: number,
- *  riftChance?: number,
- *  unicornsPerTickBase?: number,
- *  unicornsRatioReligion?: number
- * }} KittensEffects
+ * @typedef {{ cathPollutionPerTickProd?: number, riftChance?: number, unicornsPerTickBase?: number, unicornsRatioReligion?: number }} KittensEffects
  *
- * @typedef {{
- *  noConfirm: boolean
- * }} KittensOpts
+ * @typedef {{ noConfirm: boolean }} KittensOpts
  *
- * @typedef {{
- *  researched: boolean
- * }} KittensPerk
+ * @typedef {{ researched: boolean }} KittensPerk
  *
- * @typedef {{
- *  getParagonProductionRatio: () => number,
- *  getPerk: (name: KittensNamedPerk) => KittensPerk
- * }} KittensPrestige
+ * @typedef {{ getParagonProductionRatio: () => number, getPerk: (name: KittensNamedPerk) => KittensPerk }} KittensPrestige
  *
- * @typedef {{
- *  name: KittensNamedRes,
- *  val: number
- * }} KittensPrice
+ * @typedef {{ name: KittensNamedRes, val: number }} KittensPrice
  *
- * @typedef {{
- *  _getTranscendNextPrice: () => number,
- *  faithRatio: number,
- *  getSolarRevolutionRatio: () => number,
- *  getZU: (name: KittensNamedBldgZU) => KittensBldg,
- *  praise: () => void,
- *  resetFaith: (n: number, b: boolean) => void
- * }} KittensReligion
+ * @typedef {{ _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBldg, praise: () => void, resetFaith: (n: number, b: boolean) => void }} KittensReligion
  *
- * @typedef {KittensTab & {
- *  ctPanel: { children: KittensBtnPanel[] },
- *  praiseBtn: KittensBtn,
- *  rUpgradeButtons: KittensBtn[],
- *  sacrificeBtn: { model: { allLink: { handler: () => void } } },
- *  zgUpgradeButtons: KittensBtn[]
- * }} KittensReligionTab
+ * @typedef {KittensTab & { ctPanel: { children: KittensBtnPanel[] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: () => void } } }, zgUpgradeButtons: KittensBtn[] }} KittensReligionTab
  *
- * @typedef {{
- *  maxValue: number,
- *  name: KittensNamedRes,
- *  type: KittensNamedResType,
- *  unlocked: boolean,
- *  value: number,
- *  visible: boolean
- * }} KittensRes
+ * @typedef {{ maxValue: number, name: KittensNamedRes, type: KittensNamedResType, unlocked: boolean, value: number, visible: boolean }} KittensRes
  *
- * @typedef {{
- *  get: (name: KittensNamedRes) => KittensRes,
- *  resources: KittensRes[]
- * }} KittensResPool
+ * @typedef {{ get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }} KittensResPool
  *
- * @typedef {KittensTab & {
- *  GCPanel: KittensBtnPanel,
- *  planetPanels: KittensBtnPanel[]
- * }} KittensSpaceTab
+ * @typedef {KittensTab & { GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }} KittensSpaceTab
  *
- * @typedef {{
- *  heat: number
- * }} KittensTime
+ * @typedef {{ heat: number }} KittensTime
  *
- * @typedef {KittensTab & {
- *  cfPanel: { children: KittensBtnPanel[] },
- *  vsPanel: { children: KittensBtnPanel[] }
- * }} KittensTimeTab
+ * @typedef {KittensTab & { cfPanel: { children: KittensBtnPanel[] }, vsPanel: { children: KittensBtnPanel[] } }} KittensTimeTab
  *
- * @typedef {{
- *  activeTabId: string
- * }} KittensUI
+ * @typedef {{ activeTabId: string }} KittensUI
  *
- * @typedef {{
- *  huntAll: () => void
- * }} KittensVillage
+ * @typedef {{ huntAll: () => void }} KittensVillage
  *
- * @typedef {KittensTab & {
- *  buttons: KittensBtn[],
- *  promoteKittensBtn: KittensBtn
- * }} KittensVillageTab
+ * @typedef {KittensTab & { buttons: KittensBtn[], promoteKittensBtn: KittensBtn }} KittensVillageTab
  *
- * @typedef {{
- *  craft: (name: KittensNamedRes, count: number) => void,
- *  craftAll: (name: KittensNamedRes) => void,
- *  getCraftAllCount: (name: KittensNamedRes) => number
- * }} KittensWorkshop
+ * @typedef {{  craft: (name: KittensNamedRes, count: number) => void, craftAll: (name: KittensNamedRes) => void, getCraftAllCount: (name: KittensNamedRes) => number }} KittensWorkshop
  *
- * @typedef {KittensTab & {
- *  buttons: KittensBtn[]
- * }} KittensWorkshopTab
+ * @typedef {KittensTab & { buttons: KittensBtn[] }} KittensWorkshopTab
  *
- * @typedef {{
- *  bld: KittensBld,
- *  bldTab: KittensBldTab,
- *  calendar: KittensCalendar,
- *  console: KittensConsole,
- *  diplomacy: KittensDiplomacy,
- *  diplomacyTab: KittensDiplomacyTab,
- *  getEffect: (name: string) => number,
- *  getTicksPerSecondUI: () => number,
- *  msg: (text?: string) => { span: HTMLElement },
- *  opts: KittensOpts,
- *  prestige: KittensPrestige,
- *  religion: KittensReligion,
- *  religionTab: KittensReligionTab,
- *  resPool: KittensResPool,
- *  time: KittensTime,
- *  timeTab: KittensTimeTab,
- *  spaceTab: KittensSpaceTab,
- *  ui: KittensUI,
- *  village: KittensVillage,
- *  villageTab: KittensVillageTab,
- *  workshop: KittensWorkshop,
- *  workshopTab: KittensWorkshopTab
- * }} KittensGame
+ * @typedef {{ bld: KittensBld, bldTab: KittensBldTab, calendar: KittensCalendar, console: KittensConsole, diplomacy: KittensDiplomacy, diplomacyTab: KittensDiplomacyTab, getEffect: (name: string) => number, getTicksPerSecondUI: () => number, msg: (text?: string) => { span: HTMLElement }, opts: KittensOpts, prestige: KittensPrestige, religion: KittensReligion, religionTab: KittensReligionTab, resPool: KittensResPool, time: KittensTime, timeTab: KittensTimeTab, spaceTab: KittensSpaceTab, ui: KittensUI, village: KittensVillage, villageTab: KittensVillageTab, workshop: KittensWorkshop, workshopTab: KittensWorkshopTab }} KittensGame
  */
 
 /**
  * Kitty Cheat definitions
  *
- * @typedef {{
- *  active?: boolean,
- *  delay?: number,
- *  end?: boolean,
- *  excl?: string[],
- *  fn?: (group: string, name: string, opts: CheatOpt) => void,
- *  group?: 'actions' | 'crafting' | 'trading',
- *  noFill?: boolean
- * }} CheatOptPartial
+ * @typedef {{ active?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean }} CheatOptPartial
  *
- * @typedef {CheatOptPartial & {
- *  fn: (group: string, name: string, opts: CheatOpt) => void
- * }} CheatOptPartialAction
+ * @typedef {CheatOptPartial & { fn: (group: string, name: string, opts: CheatOpt) => void }} CheatOptPartialAction
  *
- * @typedef {CheatOptPartial & {
- *  btn: jQuery
- * }} CheatOpt
+ * @typedef {CheatOptPartial & { btn: jQuery }} CheatOpt
  *
- * @typedef {{
- *  active: boolean
- * }} CheatMapEntry
+ * @typedef {{ active: boolean  }} CheatMapEntry
  *
- * @typedef {{
- *  control: { active: true, all: { [x: string]: CheatOptPartial } },
- *  crafting: CheatMapEntry & { all: { [x in KittensNamedRes]?: CheatOptPartial } },
- *  trading: CheatMapEntry & { all: { [x in KittensNamedRace]: CheatOptPartial } },
- *  actions: CheatMapEntry & { all: { [x: string]: CheatOptPartialAction } },
- *  tabs: { active: true, all: { [x: string]: CheatOptPartial & { tab: KittensNamedTab } } }
- * }} CheatMap
+ * @typedef {{ actions: CheatMapEntry & { all: { [x: string]: CheatOptPartialAction } }, control: { active: true, all: { [x: string]: CheatOptPartial } }, crafting: CheatMapEntry & { all: { [x in KittensNamedRes]?: CheatOptPartial } }, tabs: { active: true, all: { [x: string]: CheatOptPartial & { tab: KittensNamedTab } } }, trading: CheatMapEntry & { all: { [x in KittensNamedRace]: CheatOptPartial } } }} CheatMap
  *
- * @typedef {{
- *  frac: number,
- *  raw: number
- *  text: string
- * }} CheatPercent
+ * @typedef {{ frac: number, raw: number, text: string }} CheatPercent
  *
- * @typedef {{
- *  build?: string[],
- *  crypto?: string[],
- *  upgrade?: string[],
- *  zig?: string[]
- * }} CheatStats
+ * @typedef {{  build?: string[], crypto?: string[], upgrade?: string[], zig?: string[] }} CheatStats
  */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
