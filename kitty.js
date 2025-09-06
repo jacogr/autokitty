@@ -19,6 +19,8 @@
 /**
  * Kittens Game definitions
  *
+ * @typedef {'craft' | 'faith' | 'hunt' | 'trade'} KittensNamesConsFilt
+ *
  * @typedef {'chronosphere' | 'unicornPasture' | 'ziggurat'} KittensNamesBldgBld
  *
  * @typedef {'holyGenocide'} KittensNamesBldgCrypto
@@ -34,7 +36,7 @@
  *
  * @typedef {'common' | 'exotic' | 'rare'} KittensNamesResType
  *
- * @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'workshopTab'} KittensNamesTab
+ * @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'scientTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamesTab
  *
  * @typedef {{
  *  id: string,
@@ -56,11 +58,11 @@
  * @typedef {KittensBtnPanel & KittensTab} KittensBldTab
  *
  * @typedef {{
- *  effects: KittensEffects
- *  label: string
- *  name: string
- *  on: number
- *  unlocked: boolean
+ *  effects: KittensEffects,
+ *  label: string,
+ *  name: string,
+ *  on: number,
+ *  unlocked: boolean,
  *  val: number
  * }} KittensBldgMetadata
  *
@@ -105,7 +107,7 @@
  *
  * @typedef {{
  *  maxMessages: number,
- *  filters: { [x: string]: { enabled: boolean } }
+ *  filters: { [x in KittensNamesConsFilt]: { enabled: boolean } }
  * }} KittensConsole
  *
  * @typedef {{
@@ -760,6 +762,8 @@
    * @returns {{ err?: string, bestBuilding?: KittensNamesBldgZU | 'unicornPasture', bestPrices?: KittensPrice[] }}
    */
   function calcZiggurats () {
+    // Adapted from Kitten Scientists
+    // https://github.com/kitten-science/kitten-scientists/blob/804104d4ddc8b64e74f1ad5b448e0ca334fa6479/source/ReligionManager.ts#L246-L395
     try {
       /** @type {KittensNamesBldgZU[]} */
       const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
@@ -822,18 +826,21 @@
 
       const pastureProduction = unicornsPerTickBase * game.getTicksPerSecondUI() * globalRatio * religionRatio * paragonRatio * faithBonus * cycleBonus;
 
+      /** @type {KittensNamesBldgZU | 'unicornPasture'} */
+      let bestBuilding = 'unicornPasture';
+      let bestAmortization = Number.POSITIVE_INFINITY;
+      let bestPrices = [];
+
       // If the unicorn pasture amortizes itself in less than infinity ticks,
       // set it as the default. This is likely to protect against cases where
       // production of unicorns is 0.
-      const pastureAmortization = (pastureImpl?.model?.prices[0]?.val || 0) / pastureProduction;
+      if (pastureImpl.model?.prices) {
+        const pastureAmortization = pastureImpl.model.prices[0].val / pastureProduction;
 
-      /** @type { KittensNamesBldgZU | 'unicornPasture'} */
-      let bestBuilding = 'unicornPasture';
-      let bestPrices = pastureImpl.model?.prices || [];
-      let bestAmortization = Number.POSITIVE_INFINITY;
-
-      if (pastureAmortization < bestAmortization) {
-        bestAmortization = pastureAmortization;
+        if (pastureAmortization < bestAmortization) {
+          bestAmortization = pastureAmortization;
+          bestPrices = pastureImpl.model.prices;
+        }
       }
 
       for (let i = 0; i < validBuildings.length; i++) {
