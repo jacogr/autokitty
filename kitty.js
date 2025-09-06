@@ -1048,7 +1048,9 @@
    */
   function execOpt (group, name, opts) {
     try {
-      if (opts.active) {
+      if (opts.active && cheatMap[group].active) {
+        fillResources();
+
         if (opts.fn) {
           opts.fn();
         } else if (group === 'trading') {
@@ -1070,17 +1072,7 @@
    * @param {CheatOpt} opts
    */
   function execOptTimer (group, name, opts) {
-    try {
-      if (opts.active && cheatMap[group].active) {
-        const isFillable = ['hunt', 'praise'].includes(name);
-
-        isFillable && fillResources();
-        execOpt(group, name, opts);
-        isFillable && fillResources();
-      }
-    } catch (e) {
-      console.error('execOptTimer', group, name, e);
-    }
+    execOpt(group, name, opts);
 
     setTimeout(() => execOptTimer(group, name, opts), opts.delay);
   }
@@ -1548,17 +1540,14 @@
    */
   function execOpts (delay) {
     for (const group in cheatMap) {
-      if (isExecGroup(group)) {
-        const { active, all } = cheatMap[group];
+      const { active, all } = cheatMap[group];
 
-        if (active) {
-          for (const name in all) {
-            const opts = all[name];
+      if (active && isExecGroup(group)) {
+        for (const name in all) {
+          const opts = all[name];
 
-            if (opts.active && !opts.delay) {
-              fillResources();
-              execOpt(group, name, opts);
-            }
+          if (opts.active && !opts.delay) {
+            execOpt(group, name, opts);
           }
         }
       }
