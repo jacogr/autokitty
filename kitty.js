@@ -713,11 +713,12 @@
   }
 
   /**
+   * Adapted from Kitten Scientists
+   * https://github.com/kitten-science/kitten-scientists/blob/804104d4ddc8b64e74f1ad5b448e0ca334fa6479/source/ReligionManager.ts#L246-L395
+   *
    * @returns {{ err?: string, bestBuilding?: KittensNamedBldgZU | 'unicornPasture', bestPrices?: KittensPrice[] }}
    */
   function calcZiggurats () {
-    // Adapted from Kitten Scientists
-    // https://github.com/kitten-science/kitten-scientists/blob/804104d4ddc8b64e74f1ad5b448e0ca334fa6479/source/ReligionManager.ts#L246-L395
     /** @type {KittensNamedBldgZU[]} */
     const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
     const pastureImpl = game.bld.getBuildingExt('unicornPasture');
@@ -844,15 +845,10 @@
   }
 
   /**
-   * @returns {{ action: 'buy' | 'hold' | 'sell', price: number, text: string } | null}
+   * @returns {{ action: 'buy' | 'hold' | 'sell', price: number, text: string }}
    */
   function calcBcoin () {
     const price = game.calendar.cryptoPrice;
-
-    if (!price) {
-      return null;
-    }
-
     const action = (
       price >= MAXVAL.BCOIN_SELL
         ? 'sell'
@@ -876,14 +872,14 @@
   }
 
   /**
-   * @returns {{ bestBuilding: KittensNamedBldgCrypto, percent?: CheatPercent }[] | null}
+   * @returns {{ bestBuilding: KittensNamedBldgCrypto, percent?: CheatPercent }[]}
    */
   function calcTheology () {
     return game.religionTab.ctPanel.children[0].children
       .filter((a) => {
-        if ((a.id === 'holyGenocide') && (a.model.on >= MAXVAL.BLDG_GENOCIDE)) {
+        if (!a.model?.prices.length || a.model.prices[0].name !== 'relic') {
           return false;
-        } else if (a.model.prices[0].name !== 'relic') {
+        } else if ((a.id === 'holyGenocide') && (a.model.on >= MAXVAL.BLDG_GENOCIDE)) {
           return false;
         }
 
@@ -996,7 +992,7 @@
   function fnTradeBcoin () {
     const info = calcBcoin();
 
-    if (info?.price && info.action !== 'hold') {
+    if (info.price && info.action !== 'hold') {
       const bcoin = game.resPool.get('blackcoin').value;
 
       if (((info.action === 'sell' && bcoin > 0) || (info.action === 'buy' && bcoin === 0)) && renderBgTab(game.diplomacyTab)) {
@@ -1189,14 +1185,13 @@
    * @returns {number}
    */
   function buildTheology (dryRun) {
-    const done = [];
-    let count = 0;
-
     if (!renderBgTab(game.religionTab)) {
       return 0;
     }
 
-    const avail = calcTheology() || [];
+    const avail = calcTheology();
+    const done = [];
+    let count = 0;
 
     for (const best of avail) {
       const btn = game.religionTab.ctPanel.children[0].children.find((b) => b.id === best?.bestBuilding && b.model.visible && b.model.enabled);
@@ -1254,9 +1249,6 @@
    * @returns {number}
    */
   function unlockTab (tab, dryRun) {
-    const done = [];
-    let count = 0;
-
     if (!renderBgTab(tab)) {
       return 0;
     }
@@ -1267,6 +1259,8 @@
       /** @type {KittensDiplomacyTab} */ (tab).racePanels?.map((r) => r.embassyButton) ||
       /** @type {KittensTimeTab} */ (tab).vsPanel?.children[0]?.children ||
       /** @type {KittensWorkshopTab} */ (tab).buttons;
+    const done = [];
+    let count = 0;
 
     // multi for religion & embassy upgrades
     const isAll = !!((/** @type {KittensReligionTab} */ (tab).rUpgradeButtons || /** @type {KittensDiplomacyTab} */ (tab).racePanels)?.length);
@@ -1352,9 +1346,6 @@
    * @returns {number}
    */
   function buildTab (tab, dryRun) {
-    const done = [];
-    let count = 0;
-
     if (!renderBgTab(tab)) {
       return 0;
     }
@@ -1362,6 +1353,8 @@
     const areas =
       /** @type {KittensSpaceTab} */ (tab).planetPanels ||
       [/** @type {KittensBldTab} */ (tab)];
+    const done = [];
+    let count = 0;
 
     for (const area of areas) {
       for (const btn of area.children) {
@@ -1468,7 +1461,7 @@
 
     const next = execBuildAll(0, true);
     const zig = calcZiggurats();
-    const cry = calcTheology();
+    const cry = calcTheology()[0];
     const trd = calcTranscend();
     const bcoin = calcBcoin();
 
@@ -1488,7 +1481,7 @@
       }
     }
 
-    const cryText = cry?.[0]?.bestBuilding && `${findTheologyBld(cry[0].bestBuilding)?.opts?.name} ${cry[0].percent?.text || ''}`;
+    const cryText = cry?.bestBuilding && `${findTheologyBld(cry.bestBuilding)?.opts?.name} ${cry.percent?.text || ''}`;
 
     $('div#kittycheatTxtDryBld').html(`Buildings: ${next.build?.join(', ') || '-'}`);
     $('div#kittycheatTxtDryUpg').html(`Upgrades : ${next.upgrade?.join(', ') || '-'}`);
