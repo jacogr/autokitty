@@ -1,6 +1,8 @@
 // @ts-check
 
 /**
+ * jQuery definitions
+ *
  * @typedef {{
  *  append: (elem: jQuery) => jQuery,
  *  click: (fn?: () => any) => jQuery,
@@ -12,6 +14,10 @@
  * }} jQuery
  *
  * @typedef {(elem: any) => jQuery} JQuery
+ */
+
+/**
+ * Kittens Game definitions
  *
  * @typedef {'chronosphere' | 'unicornPasture' | 'ziggurat'} KittensNamesBldgBld
  *
@@ -242,16 +248,20 @@
  *  workshop: KittensWorkshop,
  *  workshopTab: KittensWorkshopTab
  * }} KittensGame
+ */
+
+/**
+ * Kitty Cheat definitions
  *
  * @typedef {{
- * active?: boolean,
- * delay?: number,
- * end?: boolean,
- * excl?: string[],
- * func?: () => void,
- * group?: 'actions' | 'crafting' | 'trading',
- * res?: { [x in KittensNamesRes]?: number },
- * trade?: boolean
+ *  active?: boolean,
+ *  delay?: number,
+ *  end?: boolean,
+ *  excl?: string[],
+ *  func?: () => void,
+ *  group?: 'actions' | 'crafting' | 'trading',
+ *  res?: { [x in KittensNamesRes]?: number },
+ *  trade?: boolean
  * }} CheatOptPartial
  *
  * @typedef {{
