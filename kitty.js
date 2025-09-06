@@ -5,15 +5,15 @@
  *
  * @typedef {{
  *  append: (elem: jQuery) => jQuery,
- *  click: (fn?: () => any) => jQuery,
- *  css: (style: any, param?: any) => jQuery,
- *  filter: (fn: (index: number, e: HTMLElement) => boolean) => jQuery,
+ *  click: (fn?: () => unknown) => jQuery,
+ *  css: (style: { [x: string]: string | number } | string, val?: string | number) => jQuery,
+ *  filter: (fn: (index: number, elem: HTMLElement) => boolean) => jQuery,
  *  html: (html: string) => jQuery,
  *  length: number,
  *  text: () => string
  * }} jQuery
  *
- * @typedef {(elem: any) => jQuery} JQuery
+ * @typedef {(elem: HTMLElement | string) => jQuery} JQuery
  */
 
 /**
@@ -107,8 +107,8 @@
  * }} KittensCalendar
  *
  * @typedef {{
- *  maxMessages: number,
- *  filters: { [x in KittensNamesConsFilt]: { enabled: boolean } }
+ *  filters: { [x in KittensNamesConsFilt]: { enabled: boolean } },
+ *  maxMessages: number
  * }} KittensConsole
  *
  * @typedef {{
@@ -1437,9 +1437,7 @@
       }
 
       const areas =
-        // space
         /** @type {KittensSpaceTab} */ (tab).planetPanels ||
-        // others
         [/** @type {KittensBldTab} */ (tab)];
 
       for (const area of areas) {
@@ -1541,15 +1539,18 @@
     const trd = calcTranscend();
     const bcoin = calcBcoin();
 
-    let zigText = /** @type {string} */ (zig.bestBuilding);
+    let zigText = /** @type {string | undefined} */ (zig.bestBuilding);
 
     if (zig.bestBuilding && zig.bestPrices) {
-      const zigguratRatio = game.bld.getBuildingExt('ziggurat')?.meta.on || 0;
-      const unicornTotal = ((game.resPool.get('tears').value * 2500) / zigguratRatio) + game.resPool.get('unicorns').value;
-      const unicornPrice = calcZigguratsPrices(zig.bestPrices, zigguratRatio);
-      const name = findZigBld(zig.bestBuilding)?.opts?.name || (zig.bestBuilding === 'unicornPasture' && 'Unic. Pasture');
+      const name = zig.bestBuilding === 'unicornPasture'
+        ? 'Unic. Pasture'
+        : findZigBld(zig.bestBuilding)?.opts?.name;
 
       if (name) {
+        const zigguratRatio = game.bld.getBuildingExt('ziggurat').meta.on;
+        const unicornTotal = ((game.resPool.get('tears').value * 2500) / zigguratRatio) + game.resPool.get('unicorns').value;
+        const unicornPrice = calcZigguratsPrices(zig.bestPrices, zigguratRatio);
+
         zigText = `${name} ${toPercent(unicornTotal / unicornPrice)?.text || ''}`;
       }
     }
@@ -1571,7 +1572,7 @@
    */
   function execOpts (delay) {
     for (const group in cheatMap) {
-      const { active, all} = cheatMap[group];
+      const { active, all } = cheatMap[group];
 
       if (active && group !== 'control') {
         for (const m in all) {
