@@ -128,11 +128,11 @@
  *  tradeBtn: { tradeAllHref: { link: HTMLElement } }
  * }} KittensDiplomacyRacePanel
  *
- * @typedef {{
+ * @typedef {KittensTab & {
  *  exploreBtn: KittensBtn,
  *  racePanels: KittensDiplomacyRacePanel[],
  *  leviathansInfo: any
- * } & KittensTab} KittensDiplomacyTab
+ * }} KittensDiplomacyTab
  *
  * @typedef {{
  *  cathPollutionPerTickProd: number,
@@ -168,13 +168,13 @@
  *  resetFaith: (n: number, b: boolean) => void
  * }} KittensReligion
  *
- * @typedef {{
+ * @typedef {KittensTab & {
  *  ctPanel: { children: KittensBtnPanel[] },
  *  praiseBtn: KittensBtn,
  *  rUpgradeButtons: KittensBtn[],
  *  sacrificeBtn: { model: { allLink: { handler: () => void } } },
  *  zgUpgradeButtons: KittensBtn[]
- * } & KittensTab} KittensReligionTab
+ * }} KittensReligionTab
  *
  * @typedef {{
  *  maxValue: number,
@@ -190,19 +190,19 @@
  *  resources: KittensRes[]
  * }} KittensResPool
  *
- * @typedef {{
+ * @typedef {KittensTab & {
  *  GCPanel: KittensBtnPanel,
  *  planetPanels: KittensBtnPanel[]
- * } & KittensTab} KittensSpaceTab
+ * }} KittensSpaceTab
  *
  * @typedef {{
  * heat: number
  * }} KittensTime
  *
- * @typedef {{
+ * @typedef {KittensTab & {
  *  cfPanel: { children: KittensBtnPanel[] },
  *  vsPanel: { children: KittensBtnPanel[] }
- * } & KittensTab} KittensTimeTab
+ * }} KittensTimeTab
  *
  * @typedef {{
  *  activeTabId: string
@@ -212,10 +212,10 @@
  *  huntAll: () => void
  * }} KittensVillage
  *
- * @typedef {{
+ * @typedef {KittensTab & {
  *  buttons: KittensBtn[],
  *  promoteKittensBtn: KittensBtn
- * } & KittensTab} KittensVillageTab
+ * }} KittensVillageTab
  *
  * @typedef {{
  *  craft: (name: KittensNamedRes, count: number) => void,
@@ -223,9 +223,9 @@
  *  getCraftAllCount: (name: KittensNamedRes) => number
  * }} KittensWorkshop
  *
- * @typedef {{
+ * @typedef {KittensTab & {
  *  buttons: KittensBtn[]
- * } & KittensTab} KittensWorkshopTab
+ * }} KittensWorkshopTab
  *
  * @typedef {{
  *  bld: KittensBld,
@@ -261,23 +261,21 @@
  *  delay?: number,
  *  end?: boolean,
  *  excl?: string[],
- *  func?: () => void,
+ *  fn?: () => void,
  *  group?: 'actions' | 'crafting' | 'trading',
- *  res?: { [x in KittensNamedRes]?: number },
- *  tab?: KittensNamedTab,
- *  trade?: boolean
+ *  res?: { [x in KittensNamedRes]?: number }
  * }} CheatOptPartial
  *
- * @typedef {{
+ * @typedef {CheatOptPartial & {
  *  btn: jQuery
- * } & CheatOptPartial} CheatOpt
+ * }} CheatOpt
  *
  * @typedef {{
  *  control: { active: true, all: { [x: string]: CheatOptPartial } },
  *  crafting: { active: boolean, all: { [x in KittensNamedRes]?: CheatOptPartial } },
  *  trading: { active: boolean, all: { [x in KittensNamedRace]: CheatOptPartial } },
- *  actions: { active: boolean, all: { [x: string]: CheatOptPartial } },
- *  tabs: { active: true, all: { [x: string]: CheatOptPartial } }
+ *  actions: { active: boolean, all: { [x: string]: CheatOptPartial & { fn: () => void } } },
+ *  tabs: { active: true, all: { [x: string]: CheatOptPartial & { tab: KittensNamedTab } } }
  * }} CheatMap
  *
  * @typedef {{
@@ -428,40 +426,32 @@
       all: {
         'leviathans': {
           res: { 'unobtainium': 5000 },
-          trade: true,
           active: true
         },
         'dragons': {
           res: { 'titanium': 250 },
-          trade: true,
           active: true
         },
         'zebras': {
           res: { 'slab': 50 },
-          trade: true,
           active: true
         },
         'nagas': {
-          res: { 'ivory': 500 },
-          trade: true
+          res: { 'ivory': 500 }
         },
         'spiders': {
-          res: { 'scaffold': 50 },
-          trade: true
+          res: { 'scaffold': 50 }
         },
         'griffins': {
           res: { 'wood': 500 },
-          trade: true,
           active: true
         },
         'lizards': {
           res: { 'minerals': 1000 },
-          trade: true,
           active: true
         },
         'sharks': {
           res: { 'iron': 100 },
-          trade: true,
           active: true
         }
       }
@@ -470,14 +460,14 @@
       active: false,
       all: {
         'catnip': {
-          func: () => {
+          fn: () => {
             clickSpan('Gather catnip');
           },
           active: true,
           delay: INTERVAL.CATNIP_GATHER
         },
         'refine': {
-          func: () => {
+          fn: () => {
             fillResources('catnip');
             clickSpan('Refine catnip');
           },
@@ -486,7 +476,7 @@
           end: true
         },
         'praise': {
-          func: () => {
+          fn: () => {
             fillResources('faith');
             game.religion.praise();
           },
@@ -494,52 +484,52 @@
           delay: INTERVAL.PRAISE
         },
         'adore': {
-          func: fnAdore,
+          fn: fnAdore,
           active: true,
           delay: INTERVAL.ADORE,
           end: true
         },
         'observe': {
-          func: () => {
+          fn: () => {
             $('input#observeBtn').click();
           },
           active: true
         },
         'hunt': {
-          func: () => {
+          fn: () => {
             fillResources('manpower');
             game.village.huntAll();
           },
           active: true
         },
         'promote': {
-          func: fnPromote,
+          fn: fnPromote,
           active: true,
           delay: INTERVAL.PROMOTE
         },
         'loadout': {
-          func: fnLoadout,
+          fn: fnLoadout,
           active: true,
           delay: INTERVAL.PROMOTE,
           end: true
         },
         'feed': {
-          func: fnFeed,
+          fn: fnFeed,
           delay: INTERVAL.FEED
         },
         'bcoin': {
-          func: fnTradeBcoin,
+          fn: fnTradeBcoin,
           active: true,
           delay: INTERVAL.BCOIN,
           end: true
         },
         'combust': {
-          func: fnCombust,
+          fn: fnCombust,
           delay: INTERVAL.COMBUST,
           excl: ['40k']
         },
         '40k': {
-          func: fnCombust40k,
+          fn: fnCombust40k,
           delay: INTERVAL.COMBUST,
           excl: ['combust'],
           end: true
@@ -1095,15 +1085,16 @@
   }
 
   /**
+   * @param {string} group
    * @param {string} name
    * @param {CheatOpt} opts
    */
-  function execOpt (name, opts) {
+  function execOpt (group, name, opts) {
     try {
       if (opts.active) {
-        if (opts.func) {
-          opts.func();
-        } else if (opts.trade) {
+        if (opts.fn) {
+          opts.fn();
+        } else if (group === 'trading') {
           execTrade(/** @type {KittensNamedRace} */ (name));
         } else {
           execCraft(/** @type {KittensNamedRes} */ (name));
@@ -1125,7 +1116,7 @@
         const isFillable = ['hunt', 'praise'].includes(name);
 
         isFillable && fillResources();
-        execOpt(name, opts);
+        execOpt(group, name, opts);
         isFillable && fillResources();
       }
     } catch (e) {
@@ -1598,15 +1589,17 @@
    */
   function execOpts (delay) {
     for (const group in cheatMap) {
-      const { active, all } = cheatMap[group];
+      if (isExecGroup(group)) {
+        const { active, all } = cheatMap[group];
 
-      if (active && isExecGroup(group)) {
-        for (const m in all) {
-          const o = all[m];
+        if (active) {
+          for (const name in all) {
+            const opts = all[name];
 
-          if (o.active && !o.delay) {
-            fillResources();
-            execOpt(m, o);
+            if (opts.active && !opts.delay) {
+              fillResources();
+              execOpt(group, name, opts);
+            }
           }
         }
       }
@@ -1653,7 +1646,7 @@
         }
 
         if (isExecGroup(group)) {
-          execOpt(name, opts);
+          execOpt(group, name, opts);
         }
       }
     }
