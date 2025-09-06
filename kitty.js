@@ -1492,7 +1492,7 @@
     }
 
     for (const tab of tabs) {
-      if (allowedTabs.includes(tab)) {
+      if (dryRun || allowedTabs.includes(tab)) {
         const count = fn(game[tab], dryRun);
 
         if (count) {
