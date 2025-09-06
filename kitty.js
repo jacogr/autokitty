@@ -1411,27 +1411,23 @@
       return 0;
     }
 
-    // at least something with a max
     const firstMax = model.prices.find((p) => game.resPool.get(p.name).maxValue > 0);
-    let isAll = model.metadata.on >= 1;
+    const isAll = firstMax ? model.metadata.on >= 1 : false;
 
-    // without a max, we only build a single
-    if (!firstMax && isAll) {
+    if (!firstMax) {
       if (!cheatMap.control.all.uncap.active) {
         return 0;
       }
 
-      const fistInvalid = model.prices.find((p) => {
+      const firstInvalid = model.prices.find((p) => {
         const r = game.resPool.get(p.name);
 
         return !r.maxValue && ((p.val / r.value) > FRACTION.UNCAPPED);
       });
 
-      if (fistInvalid) {
+      if (firstInvalid) {
         return 0;
       }
-
-      isAll = false;
     }
 
     return dryRun ? 1 : clickDom(btn, { isAll });
