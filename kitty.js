@@ -540,11 +540,11 @@
 
   /**
    * @param {jQuery} div
-   * @param {boolean} [small]
+   * @param {boolean} [isSmall]
    * @returns {jQuery}
    */
-  function styleDiv (div, small = false) {
-    return div.css({ 'margin-bottom': small ? '5px' : '20px' });
+  function styleDiv (div, isSmall = false) {
+    return div.css({ 'margin-bottom': isSmall ? '5px' : '20px' });
   }
 
   /**
@@ -1580,6 +1580,10 @@
     for (const group in cheatMap) {
       const { active, all } = cheatMap[group];
       const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="${getGroupId(group)}"></div>`)));
+
+      if (group !== 'control') {
+        jqAppend(divGroup, styleDiv($(`<div>${group}</div>`), true));
+      }
 
       activateGroup(group, active);
 
