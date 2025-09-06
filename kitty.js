@@ -19,25 +19,25 @@
 /**
  * Kittens Game definitions
  *
- * @typedef {'craft' | 'faith' | 'hunt' | 'trade'} KittensNamesConsFilt
+ * @typedef {'craft' | 'faith' | 'hunt' | 'trade'} KittensNamedConsFilt
  *
- * @typedef {'chronosphere' | 'unicornPasture' | 'ziggurat'} KittensNamesBldgBld
+ * @typedef {'chronosphere' | 'unicornPasture' | 'ziggurat'} KittensNamedBldgBld
  *
- * @typedef {'holyGenocide'} KittensNamesBldgCrypto
+ * @typedef {'holyGenocide'} KittensNamedBldgCrypto
  *
- * @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamesBldgZU
+ * @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamedBldgZU
  *
- * @typedef {KittensNamesBldgBld | KittensNamesBldgCrypto | KittensNamesBldgZU} KittensNamesBldg
+ * @typedef {KittensNamedBldgBld | KittensNamedBldgCrypto | KittensNamedBldgZU} KittensNamedBldg
  *
- * @typedef {'numeromancy' | 'unicornmancy'} KittensNamesPerk
+ * @typedef {'numeromancy' | 'unicornmancy'} KittensNamedPerk
  *
- * @typedef {'leviathans' | 'dragons' | 'zebras' | 'nagas' | 'spiders' | 'griffins' | 'lizards' | 'sharks'} KittensNamesRace
+ * @typedef {'leviathans' | 'dragons' | 'zebras' | 'nagas' | 'spiders' | 'griffins' | 'lizards' | 'sharks'} KittensNamedRace
  *
- * @typedef {'alloy' | 'beam' | 'blackcoin' | 'bloodstone' | 'blueprint' | 'coal' | 'compedium' | 'concrate' | 'culture' | 'eludium' | 'furs' | 'gear' | 'iron' | 'ivory' | 'karma' | 'kerosene' | 'manuscript' | 'megalith' | 'minerals' | 'necrocorn' | 'oil' | 'parchment' | 'plate' | 'relic' |'scaffold' |  'science' | 'ship' | 'slab' | 'starchart' | 'steel' | 'sorrow' | 'tMythril' | 'tears' | 'thorium' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'wood'} KittensNamesRes
+ * @typedef {'alloy' | 'beam' | 'blackcoin' | 'bloodstone' | 'blueprint' | 'coal' | 'compedium' | 'concrate' | 'culture' | 'eludium' | 'furs' | 'gear' | 'iron' | 'ivory' | 'karma' | 'kerosene' | 'manuscript' | 'megalith' | 'minerals' | 'necrocorn' | 'oil' | 'parchment' | 'plate' | 'relic' |'scaffold' |  'science' | 'ship' | 'slab' | 'starchart' | 'steel' | 'sorrow' | 'tMythril' | 'tears' | 'thorium' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'wood'} KittensNamedRes
  *
- * @typedef {'common' | 'exotic' | 'rare'} KittensNamesResType
+ * @typedef {'common' | 'exotic' | 'rare'} KittensNamedResType
  *
- * @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamesTab
+ * @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab
  *
  * @typedef {{
  *  id: string,
@@ -53,7 +53,7 @@
  *
  * @typedef {{
  *  cathPollution: number,
- *  getBuildingExt: (name: KittensNamesBldg) => KittensBldg
+ *  getBuildingExt: (name: KittensNamedBldg) => KittensBldg
  * }} KittensBld
  *
  * @typedef {KittensBtnPanel & KittensTab} KittensBldTab
@@ -107,17 +107,17 @@
  * }} KittensCalendar
  *
  * @typedef {{
- *  filters: { [x in KittensNamesConsFilt]: { enabled: boolean } },
+ *  filters: { [x in KittensNamedConsFilt]: { enabled: boolean } },
  *  maxMessages: number
  * }} KittensConsole
  *
  * @typedef {{
- *  name: KittensNamesRace,
+ *  name: KittensNamedRace,
  *  unlocked: boolean
  * }} KittensDiplomacyRace
  *
  * @typedef {{
- *  get: (name: KittensNamesRace) => KittensDiplomacyRace,
+ *  get: (name: KittensNamedRace) => KittensDiplomacyRace,
  *  unlockElders: () => void
  * }} KittensDiplomacy
  *
@@ -151,11 +151,11 @@
  *
  * @typedef {{
  *  getParagonProductionRatio: () => number,
- *  getPerk: (name: KittensNamesPerk) => KittensPerk
+ *  getPerk: (name: KittensNamedPerk) => KittensPerk
  * }} KittensPrestige
  *
  * @typedef {{
- *  name: KittensNamesRes,
+ *  name: KittensNamedRes,
  *  val: number
  * }} KittensPrice
  *
@@ -163,7 +163,7 @@
  *  _getTranscendNextPrice: () => number,
  *  faithRatio: number,
  *  getSolarRevolutionRatio: () => number,
- *  getZU: (name: KittensNamesBldgZU) => KittensBldg,
+ *  getZU: (name: KittensNamedBldgZU) => KittensBldg,
  *  praise: () => void,
  *  resetFaith: (n: number, b: boolean) => void
  * }} KittensReligion
@@ -178,15 +178,15 @@
  *
  * @typedef {{
  *  maxValue: number,
- *  name: KittensNamesRes,
- *  type: KittensNamesResType,
+ *  name: KittensNamedRes,
+ *  type: KittensNamedResType,
  *  unlocked: boolean,
  *  value: number,
  *  visible: boolean
  * }} KittensRes
  *
  * @typedef {{
- *  get: (name: KittensNamesRes) => KittensRes,
+ *  get: (name: KittensNamedRes) => KittensRes,
  *  resources: KittensRes[]
  * }} KittensResPool
  *
@@ -218,9 +218,9 @@
  * } & KittensTab} KittensVillageTab
  *
  * @typedef {{
- *  craft: (name: KittensNamesRes, count: number) => void,
- *  craftAll: (name: KittensNamesRes) => void,
- *  getCraftAllCount: (name: KittensNamesRes) => number
+ *  craft: (name: KittensNamedRes, count: number) => void,
+ *  craftAll: (name: KittensNamedRes) => void,
+ *  getCraftAllCount: (name: KittensNamedRes) => number
  * }} KittensWorkshop
  *
  * @typedef {{
@@ -263,7 +263,8 @@
  *  excl?: string[],
  *  func?: () => void,
  *  group?: 'actions' | 'crafting' | 'trading',
- *  res?: { [x in KittensNamesRes]?: number },
+ *  res?: { [x in KittensNamedRes]?: number },
+ *  tab?: KittensNamedTab,
  *  trade?: boolean
  * }} CheatOptPartial
  *
@@ -272,10 +273,11 @@
  * } & CheatOptPartial} CheatOpt
  *
  * @typedef {{
- *  control: { active: boolean, all: { [x: string]: CheatOptPartial } },
- *  crafting: { active: boolean, all: { [x in KittensNamesRes]?: CheatOptPartial } },
- *  trading: { active: boolean, all: { [x in KittensNamesRace]: CheatOptPartial } },
- *  actions: { active: boolean, all: { [x: string]: CheatOptPartial } }
+ *  control: { active: true, all: { [x: string]: CheatOptPartial } },
+ *  crafting: { active: boolean, all: { [x in KittensNamedRes]?: CheatOptPartial } },
+ *  trading: { active: boolean, all: { [x in KittensNamedRace]: CheatOptPartial } },
+ *  actions: { active: boolean, all: { [x: string]: CheatOptPartial } },
+ *  tabs: { active: true, all: { [x: string]: CheatOptPartial } }
  * }} CheatMap
  *
  * @typedef {{
@@ -543,6 +545,19 @@
           end: true
         }
       }
+    },
+    tabs: {
+      active: true,
+      all: {
+        bonfire: { active: true, tab: 'bldTab' },
+        village: { active: true, tab: 'villageTab' },
+        science: { active: true, tab: 'libraryTab' },
+        workshop: { active: true, tab: 'workshopTab' },
+        trade: { active: true, tab: 'diplomacyTab' },
+        religion: { active: true, tab: 'religionTab' },
+        space: { active: true, tab: 'spaceTab' },
+        time: { active: true, tab: 'timeTab' }
+      }
     }
   };
 
@@ -760,13 +775,13 @@
   }
 
   /**
-   * @returns {{ err?: string, bestBuilding?: KittensNamesBldgZU | 'unicornPasture', bestPrices?: KittensPrice[] }}
+   * @returns {{ err?: string, bestBuilding?: KittensNamedBldgZU | 'unicornPasture', bestPrices?: KittensPrice[] }}
    */
   function calcZiggurats () {
     // Adapted from Kitten Scientists
     // https://github.com/kitten-science/kitten-scientists/blob/804104d4ddc8b64e74f1ad5b448e0ca334fa6479/source/ReligionManager.ts#L246-L395
     try {
-      /** @type {KittensNamesBldgZU[]} */
+      /** @type {KittensNamedBldgZU[]} */
       const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
       const pastureImpl = game.bld.getBuildingExt('unicornPasture');
       const zigImpl = game.bld.getBuildingExt('ziggurat');
@@ -827,7 +842,7 @@
 
       const pastureProduction = unicornsPerTickBase * game.getTicksPerSecondUI() * globalRatio * religionRatio * paragonRatio * faithBonus * cycleBonus;
 
-      /** @type {KittensNamesBldgZU | 'unicornPasture'} */
+      /** @type {KittensNamedBldgZU | 'unicornPasture'} */
       let bestBuilding = 'unicornPasture';
       let bestAmortization = Number.POSITIVE_INFINITY;
       let bestPrices = [];
@@ -946,7 +961,7 @@
   }
 
   /**
-   * @returns {{ bestBuilding: KittensNamesBldgCrypto, percent?: CheatPercent }[] | null}
+   * @returns {{ bestBuilding: KittensNamedBldgCrypto, percent?: CheatPercent }[] | null}
    */
   function calcTheology () {
     try {
@@ -962,7 +977,7 @@
         })
         .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
         .map((a) => ({
-          bestBuilding: /** @type KittensNamesBldgCrypto */ (a.id),
+          bestBuilding: /** @type KittensNamedBldgCrypto */ (a.id),
           percent: toPercent(game.resPool.get('relic').value / (a.model.prices[0].val * (1 / FRACTION.EXOTIC)))
         }));
     } catch (e) {
@@ -973,7 +988,7 @@
   }
 
   /**
-   * @param {KittensNamesRace} name
+   * @param {KittensNamedRace} name
    * @returns {void}
    */
   function execTrade (name) {
@@ -987,7 +1002,7 @@
   }
 
   /**
-   * @param {KittensNamesRes} name
+   * @param {KittensNamedRes} name
    * @returns {void}
    */
   function execCraft (name) {
@@ -1089,9 +1104,9 @@
         if (opts.func) {
           opts.func();
         } else if (opts.trade) {
-          execTrade(/** @type {KittensNamesRace} */ (name));
+          execTrade(/** @type {KittensNamedRace} */ (name));
         } else {
-          execCraft(/** @type {KittensNamesRes} */ (name));
+          execCraft(/** @type {KittensNamedRes} */ (name));
         }
       }
     } catch (e) {
@@ -1224,7 +1239,7 @@
 
   /**
    * @param {KittensBtn | null | undefined} btn
-   * @param {{ bestBuilding: KittensNamesBldgCrypto, percent?: CheatPercent }} best
+   * @param {{ bestBuilding: KittensNamedBldgCrypto, percent?: CheatPercent }} best
    * @param {boolean} dryRun
    * @returns {number}
    */
@@ -1467,20 +1482,27 @@
    * @param {boolean} dryRun
    * @param {CheatStats} stats
    * @param {keyof CheatStats} statsType
-   * @param {KittensNamesTab[]} tabs
+   * @param {KittensNamedTab[]} tabs
    * @param {(tab: KittensTab, dryRun: boolean) => number} fn
    * @returns {number}
    */
   function loopTabs (dryRun, stats, statsType, tabs, fn) {
+    const allowedTabs = [];
     const indv = [];
     let total = 0;
 
-    for (const tab of tabs) {
-      const count = fn(game[tab], dryRun);
+    for (const t in cheatMap.tabs.all) {
+      cheatMap.tabs.all[t].active && allowedTabs.push(cheatMap.tabs.all[t].tab);
+    }
 
-      if (count) {
-        indv.push(game[tab].tabId);
-        total += count;
+    for (const tab of tabs) {
+      if (allowedTabs.includes(tab)) {
+        const count = fn(game[tab], dryRun);
+
+        if (count) {
+          indv.push(game[tab].tabId);
+          total += count;
+        }
       }
     }
 
@@ -1568,13 +1590,21 @@
   }
 
   /**
+   * @param {string} group
+   * @returns {boolean}
+   */
+  function isExecGroup (group) {
+    return group !== 'control' && group !== 'tabs';
+  }
+
+  /**
    * @param {number} delay
    */
   function execOpts (delay) {
     for (const group in cheatMap) {
       const { active, all } = cheatMap[group];
 
-      if (active && group !== 'control') {
+      if (active && isExecGroup(group)) {
         for (const m in all) {
           const o = all[m];
 
@@ -1626,7 +1656,7 @@
           }
         }
 
-        if (group !== 'control') {
+        if (isExecGroup(group)) {
           execOpt(name, opts);
         }
       }
