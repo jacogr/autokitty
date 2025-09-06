@@ -1,206 +1,282 @@
 // @ts-check
 
 /**
- * @typedef {Object} jQuery
- * @property {(elem: jQuery) => jQuery} append
- * @property {(fn?: () => any) => jQuery} click
- * @property {(style: any, param?: any) => jQuery} css
- * @property {(fn: (index: number, e: HTMLElement) => boolean) => jQuery} filter
- * @property {(html: string) => jQuery} html
- * @property {number} length
- * @property {() => string} text
+ * @typedef {{
+ *  append: (elem: jQuery) => jQuery,
+ *  click: (fn?: () => any) => jQuery,
+ *  css: (style: any, param?: any) => jQuery,
+ *  filter: (fn: (index: number, e: HTMLElement) => boolean) => jQuery,
+ *  html: (html: string) => jQuery,
+ *  length: number,
+ *  text: () => string
+ * }} jQuery
  *
  * @typedef {(elem: any) => jQuery} JQuery
  *
  * @typedef {'chronosphere' | 'unicornPasture' | 'ziggurat'} KittensNamesBldgBld
+ *
  * @typedef {'holyGenocide'} KittensNamesBldgCrypto
+ *
  * @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamesBldgZU
+ *
  * @typedef {KittensNamesBldgBld | KittensNamesBldgCrypto | KittensNamesBldgZU} KittensNamesBldg
  * @typedef {'numeromancy' | 'unicornmancy'} KittensNamesPerk
+ *
  * @typedef {'leviathans' | 'dragons' | 'zebras' | 'nagas' | 'spiders' | 'griffins' | 'lizards' | 'sharks'} KittensNamesRace
- * @typedef {'alloy' | 'beam' | 'blackcoin' | 'concrate' | 'culture' | 'karma' | 'minerals' | 'necrocorn' | 'relic' | 'slab' | 'unicorns' | 'tears' | 'sorrow' | 'wood'} KittensNamesRes
+ *
+ * @typedef {'alloy' | 'beam' | 'blackcoin' | 'bloodstone' | 'blueprint' | 'coal' | 'compedium' | 'concrate' | 'culture' | 'eludium' | 'furs' | 'gear' | 'iron' | 'ivory' | 'karma' | 'kerosene' | 'manuscript' | 'megalith' | 'minerals' | 'necrocorn' | 'oil' | 'parchment' | 'plate' | 'relic' |'scaffold' |  'science' | 'ship' | 'slab' | 'starchart' | 'steel' | 'sorrow' | 'tMythril' | 'tears' | 'thorium' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'wood'} KittensNamesRes
+ *
  * @typedef {'common' | 'exotic' | 'rare'} KittensNamesResType
+ *
  * @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'workshopTab'} KittensNamesTab
  *
- * @typedef {Object} KittensTab
- * @property {string} id
- * @property {() => void} render
- * @property {string} tabId
- * @property {string} tabName
- * @property {boolean} visible
+ * @typedef {{
+ *  id: string,
+ *  render: () => void,
+ *  tabId: string,
+ *  tabName: string,
+ *  visible: boolean
+ * }} KittensTab
  *
- * @typedef {Object} KittensBld
- * @property {number} cathPollution
- * @property {(name: KittensNamesBldg) => KittensBldg} getBuildingExt
+ * @typedef {{
+ *  children: KittensBtn[]
+ * }} KittensBtnPanel
  *
- * @typedef {{ children: KittensBtn[] } & KittensTab} KittensBldTab
+ * @typedef {{
+ *  cathPollution: number,
+ *  getBuildingExt: (name: KittensNamesBldg) => KittensBldg
+ * }} KittensBld
  *
- * @typedef {Object} KittensBldgMetadata
- * @property {KittensEffects} effects
- * @property {string} label
- * @property {string} name
- * @property {number} on
- * @property {boolean} unlocked
- * @property {number} val
+ * @typedef {KittensBtnPanel & KittensTab} KittensBldTab
  *
- * @typedef {Object} KittensBldgModel
- * @property {boolean} enabled
- * @property {KittensBldgMetadata} metadata
- * @property {number} on
- * @property {KittensPrice[]} prices
- * @property {boolean} visible
+ * @typedef {{
+ *  effects: KittensEffects
+ *  label: string
+ *  name: string
+ *  on: number
+ *  unlocked: boolean
+ *  val: number
+ * }} KittensBldgMetadata
  *
- * @typedef {Object} KittensBldg
- * @property {KittensEffects} effects
- * @property {KittensBldgMetadata} meta
- * @property {KittensBldgModel} [model]
- * @property {number} val
+ * @typedef {{
+ *  enabled: boolean,
+ *  metadata: KittensBldgMetadata,
+ *  on: number,
+ *  prices: KittensPrice[],
+ *  visible: boolean
+ * }} KittensBldgModel
  *
- * @typedef {Object} KittensBtnOpts
- * @property {{ pinned: boolean }} loadout
- * @property {string} name
+ * @typedef {{
+ *  effects: KittensEffects,
+ *  meta: KittensBldgMetadata,
+ *  model?: KittensBldgModel,
+ *  val: number
+ * }} KittensBldg
  *
- * @typedef {Object} KittensBtn
- * @property {HTMLElement} domNode
- * @property {string} id
- * @property {KittensBldgModel} model
- * @property {KittensBtnOpts} [opts]
+ * @typedef {{
+ *  loadout: { pinned: boolean },
+ *  name: string
+ * }} KittensBtnOpts
  *
- * @typedef {{ children: KittensBtn[] }} KittensBtnPanel
+ * @typedef {{
+ *  domNode: HTMLElement,
+ *  id: string,
+ *  model: KittensBldgModel,
+ *  opts?: KittensBtnOpts
+ * }} KittensBtn
  *
- * @typedef {Object} KittensCalendarCycle
- * @property {{ unicorns: number }} festivalEffects
+ * @typedef {{
+ *  festivalEffects: { unicorns: number }
+ * }} KittensCalendarCycle
  *
- * @typedef {Object} KittensCalendar
- * @property {number} cryptoPrice
- * @property {string} cycle
- * @property {KittensCalendarCycle[]} cycles
- * @property {number} festivalDays
- * @property {number} year
+ * @typedef {{
+ *  cryptoPrice: number,
+ *  cycle: string,
+ *  cycles: KittensCalendarCycle[],
+ *  festivalDays: number,
+ *  year: number
+ * }} KittensCalendar
  *
- * @typedef {Object} KittensConsole
- * @property {number} maxMessages
- * @property {{ [x: string]: { enabled: boolean } }} filters
+ * @typedef {{
+ *  maxMessages: number,
+ *  filters: { [x: string]: { enabled: boolean } }
+ * }} KittensConsole
  *
- * @typedef {Object} KittensDiplomacyRace
- * @property {KittensNamesRace} name
- * @property {boolean} unlocked
+ * @typedef {{
+ *  name: KittensNamesRace,
+ *  unlocked: boolean
+ * }} KittensDiplomacyRace
  *
- * @typedef {Object} KittensDiplomacy
- * @property {(name: KittensNamesRace) => KittensDiplomacyRace} get
- * @property {() => void} unlockElders
+ * @typedef {{
+ *  get: (name: KittensNamesRace) => KittensDiplomacyRace,
+ *  unlockElders: () => void
+ * }} KittensDiplomacy
  *
- * @typedef {Object} KittensDiplomacyRacePanel
- * @property {KittensBtn} embassyButton
- * @property {KittensDiplomacyRace} race
- * @property {KittensBtn} [feedBtn]
- * @property {{ tradeAllHref: { link: HTMLElement } }} tradeBtn
+ * @typedef {{
+ *  embassyButton: KittensBtn,
+ *  race: KittensDiplomacyRace,
+ *  feedBtn?: KittensBtn,
+ *  tradeBtn: { tradeAllHref: { link: HTMLElement } }
+ * }} KittensDiplomacyRacePanel
  *
- * @typedef {{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: any } & KittensTab} KittensDiplomacyTab
+ * @typedef {{
+ *  exploreBtn: KittensBtn,
+ *  racePanels: KittensDiplomacyRacePanel[],
+ *  leviathansInfo: any
+ * } & KittensTab} KittensDiplomacyTab
  *
- * @typedef {Object} KittensEffects
- * @property {number} cathPollutionPerTickProd
- * @property {number} riftChance
- * @property {number} unicornsPerTickBase
- * @property {number} unicornsRatioReligion
+ * @typedef {{
+ *  cathPollutionPerTickProd: number,
+ *  riftChance: number,
+ *  unicornsPerTickBase: number,
+ *  unicornsRatioReligion: number
+ * }} KittensEffects
  *
- * @typedef {Object} KittensOpts
- * @property {boolean} noConfirm
+ * @typedef {{
+ *  noConfirm: boolean
+ * }} KittensOpts
  *
- * @typedef {{ researched: boolean }} KittensPerk
+ * @typedef {{
+ *  researched: boolean
+ * }} KittensPerk
  *
- * @typedef {Object} KittensPrestige
- * @property {() => number} getParagonProductionRatio
- * @property {(name: KittensNamesPerk) => KittensPerk} getPerk
+ * @typedef {{
+ *  getParagonProductionRatio: () => number,
+ *  getPerk: (name: KittensNamesPerk) => KittensPerk
+ * }} KittensPrestige
  *
- * @typedef {{ name: KittensNamesRes, val: number }} KittensPrice
+ * @typedef {{
+ *  name: KittensNamesRes,
+ *  val: number
+ * }} KittensPrice
  *
- * @typedef {Object} KittensReligion
- * @property {() => number} _getTranscendNextPrice
- * @property {number} faithRatio
- * @property {() => number} getSolarRevolutionRatio
- * @property {(name: KittensNamesBldgZU) => KittensBldg} getZU
- * @property {() => void} praise
- * @property {(n: number, b: boolean) => void} resetFaith
+ * @typedef {{
+ *  _getTranscendNextPrice: () => number,
+ *  faithRatio: number,
+ *  getSolarRevolutionRatio: () => number,
+ *  getZU: (name: KittensNamesBldgZU) => KittensBldg,
+ *  praise: () => void,
+ *  resetFaith: (n: number, b: boolean) => void
+ * }} KittensReligion
  *
- * @typedef {{ ctPanel: { children: KittensBtnPanel[] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: () => void } } }, zgUpgradeButtons: KittensBtn[] } & KittensTab} KittensReligionTab
+ * @typedef {{
+ *  ctPanel: { children: KittensBtnPanel[] },
+ *  praiseBtn: KittensBtn,
+ *  rUpgradeButtons: KittensBtn[],
+ *  sacrificeBtn: { model: { allLink: { handler: () => void } } },
+ *  zgUpgradeButtons: KittensBtn[]
+ * } & KittensTab} KittensReligionTab
  *
- * @typedef {Object} KittensRes
- * @property {number} maxValue
- * @property {KittensNamesRes} name
- * @property {KittensNamesResType} type
- * @property {boolean} unlocked
- * @property {number} value
- * @property {boolean} visible
+ * @typedef {{
+ *  maxValue: number,
+ *  name: KittensNamesRes,
+ *  type: KittensNamesResType,
+ *  unlocked: boolean,
+ *  value: number,
+ *  visible: boolean
+ * }} KittensRes
  *
- * @typedef {{ get: (name: KittensNamesRes) => KittensRes, resources: KittensRes[] }} KittensResPool
+ * @typedef {{
+ *  get: (name: KittensNamesRes) => KittensRes,
+ *  resources: KittensRes[]
+ * }} KittensResPool
  *
- * @typedef {{ GCPanel: KittensBtnPanel } & KittensTab} KittensSpaceTab
+ * @typedef {{
+ *  GCPanel: KittensBtnPanel,
+ *  planetPanels: KittensBtnPanel[]
+ * } & KittensTab} KittensSpaceTab
  *
- * @typedef {Object} KittensTime
- * @property {number} heat
+ * @typedef {{
+ * heat: number
+ * }} KittensTime
  *
- * @typedef {{ cfPanel: { children: KittensBtnPanel[] }, vsPanel: { children: KittensBtnPanel[] } } & KittensTab} KittensTimeTab
+ * @typedef {{
+ *  cfPanel: { children: KittensBtnPanel[] },
+ *  vsPanel: { children: KittensBtnPanel[] }
+ * } & KittensTab} KittensTimeTab
  *
- * @typedef {{ activeTabId: string }} KittensUI
+ * @typedef {{
+ *  activeTabId: string
+ * }} KittensUI
  *
- * @typedef {Object} KittensVillage
- * @property {() => void} huntAll
+ * @typedef {{
+ *  huntAll: () => void
+ * }} KittensVillage
  *
- * @typedef {{ buttons: KittensBtn[], promoteKittensBtn: KittensBtn } & KittensTab} KittensVillageTab
+ * @typedef {{
+ *  buttons: KittensBtn[],
+ *  promoteKittensBtn: KittensBtn
+ * } & KittensTab} KittensVillageTab
  *
- * @typedef {Object} KittensWorkshop
- * @property {(name: KittensNamesRes, count: number) => void} craft
- * @property {(name: KittensNamesRes) => void} craftAll
- * @property {(name: KittensNamesRes) => number} getCraftAllCount
+ * @typedef {{
+ *  craft: (name: KittensNamesRes, count: number) => void,
+ *  craftAll: (name: KittensNamesRes) => void,
+ *  getCraftAllCount: (name: KittensNamesRes) => number
+ * }} KittensWorkshop
  *
- * @typedef {{ buttons: KittensBtn[] } & KittensTab} KittensWorkshopTab
+ * @typedef {{
+ *  buttons: KittensBtn[]
+ * } & KittensTab} KittensWorkshopTab
  *
- * @typedef {Object} KittensGame
- * @property {KittensBld} bld
- * @property {KittensBldTab} bldTab
- * @property {KittensCalendar} calendar
- * @property {KittensConsole} console
- * @property {KittensDiplomacy} diplomacy
- * @property {KittensDiplomacyTab} diplomacyTab
- * @property {(name: string) => number} getEffect
- * @property {() => number} getTicksPerSecondUI
- * @property {(text?: string) => { span: HTMLElement }} msg
- * @property {KittensOpts} opts
- * @property {KittensPrestige} prestige
- * @property {KittensReligion} religion
- * @property {KittensReligionTab} religionTab
- * @property {KittensResPool} resPool
- * @property {KittensTime} time
- * @property {KittensTimeTab} timeTab
- * @property {KittensSpaceTab} spaceTab
- * @property {KittensUI} ui
- * @property {KittensVillage} village
- * @property {KittensVillageTab} villageTab
- * @property {KittensWorkshop} workshop
- * @property {KittensWorkshopTab} workshopTab
+ * @typedef {{
+ *  bld: KittensBld,
+ *  bldTab: KittensBldTab,
+ *  calendar: KittensCalendar,
+ *  console: KittensConsole,
+ *  diplomacy: KittensDiplomacy,
+ *  diplomacyTab: KittensDiplomacyTab,
+ *  getEffect: (name: string) => number,
+ *  getTicksPerSecondUI: () => number,
+ *  msg: (text?: string) => { span: HTMLElement },
+ *  opts: KittensOpts,
+ *  prestige: KittensPrestige,
+ *  religion: KittensReligion,
+ *  religionTab: KittensReligionTab,
+ *  resPool: KittensResPool,
+ *  time: KittensTime,
+ *  timeTab: KittensTimeTab,
+ *  spaceTab: KittensSpaceTab,
+ *  ui: KittensUI,
+ *  village: KittensVillage,
+ *  villageTab: KittensVillageTab,
+ *  workshop: KittensWorkshop,
+ *  workshopTab: KittensWorkshopTab
+ * }} KittensGame
  *
- * @typedef {Object} CheatOptPartial
- * @property {boolean} [active]
- * @property {number} [delay]
- * @property {boolean} [end]
- * @property {string[]} [excl]
- * @property {() => void} [func]
- * @property {'actions' | 'crafting' | 'trading'} [group]
- * @property {{ [x: KittensNamesRes]: number }} [res]
- * @property {boolean} [trade]
+ * @typedef {{
+ * active?: boolean,
+ * delay?: number,
+ * end?: boolean,
+ * excl?: string[],
+ * func?: () => void,
+ * group?: 'actions' | 'crafting' | 'trading',
+ * res?: { [x in KittensNamesRes]?: number },
+ * trade?: boolean
+ * }} CheatOptPartial
  *
- * @typedef {{ btn: jQuery } & CheatOptPartial} CheatOpt
+ * @typedef {{
+ *  btn: jQuery
+ * } & CheatOptPartial} CheatOpt
  *
- * @typedef {Object} CheatMap
- * @property {{ active: boolean, all: { [x: string]: CheatOptPartial } }} control
- * @property {{ active: boolean, all: { [x: KittensNamesRes]: CheatOptPartial } }} crafting
- * @property {{ active: boolean, all: { [x: KittensNamesRace]: CheatOptPartial } }} trading
- * @property {{ active: boolean, all: { [x: string]: CheatOptPartial } }} actions
+ * @typedef {{
+ *  control: { active: boolean, all: { [x: string]: CheatOptPartial } },
+ *  crafting: { active: boolean, all: { [x in KittensNamesRes]?: CheatOptPartial } },
+ *  trading: { active: boolean, all: { [x in KittensNamesRace]: CheatOptPartial } },
+ *  actions: { active: boolean, all: { [x: string]: CheatOptPartial } }
+ * }} CheatMap
  *
- * @typedef {{ frac: number, raw: number, text: string }} CheatPercent
+ * @typedef {{
+ *  frac: number,
+ *  raw: number
+ *  text: string
+ * }} CheatPercent
  *
- * @typedef {{ build?: string[], crypto?: string[], upgrade?: string[], zig?: string[] }} CheatStats
+ * @typedef {{
+ *  build?: string[],
+ *  crypto?: string[],
+ *  upgrade?: string[],
+ *  zig?: string[]
+ * }} CheatStats
  */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
@@ -887,8 +963,9 @@
       game.diplomacy.unlockElders();
     }
 
-    const t = renderBgTab(game.diplomacyTab)?.racePanels.find((p) => p.race.name === name)?.tradeBtn.tradeAllHref.link.click();
-    // renderBgTab(game.diplomacyTab)?.racePanels.find((p) => p.race.name === name)?.tradeBtn.tradeAllHref.link.click();
+    renderBgTab(game.diplomacyTab)
+      ?.racePanels.find((p) => p.race.name === name)
+      ?.tradeBtn.tradeAllHref.link.click();
   }
 
   /**
@@ -986,7 +1063,7 @@
 
   /**
    * @param {string} name
-   * @param {CheatOptPartial} opts
+   * @param {CheatOpt} opts
    */
   function execOpt (name, opts) {
     try {
@@ -1007,7 +1084,7 @@
   /**
    * @param {string} group
    * @param {string} name
-   * @param {CheatOptPartial} opts
+   * @param {CheatOpt} opts
    */
   function execOptTimer (group, name, opts) {
     try {
@@ -1131,7 +1208,7 @@
    * @param {KittensBtn | null | undefined} btn
    * @param {{ bestBuilding: KittensNamesBldgCrypto, percent?: CheatPercent }} best
    * @param {boolean} dryRun
-   * @returns
+   * @returns {number}
    */
   function buildTheologyBtn (btn, best, dryRun) {
     if (!btn || !best?.percent || best.percent.frac < 1 || getInvalidPrices(btn).length) {
@@ -1216,8 +1293,6 @@
   }
 
   /**
-   * TODO
-   *
    * @param {KittensTab} tab
    * @param {boolean} dryRun
    * @returns {number}
@@ -1330,9 +1405,7 @@
   }
 
   /**
-   * TODO
-   *
-   * @param {*} tab
+   * @param {KittensTab} tab
    * @param {boolean} dryRun
    * @returns {number}
    */
@@ -1347,9 +1420,9 @@
 
       const areas =
         // space
-        tab.planetPanels ||
+        /** @type {KittensSpaceTab} */ (tab).planetPanels ||
         // others
-        [tab];
+        [/** @type {KittensBldTab} */ (tab)];
 
       for (const area of areas) {
         for (const btn of area.children) {
@@ -1380,7 +1453,7 @@
    * @param {keyof CheatStats} statsType
    * @param {KittensNamesTab[]} tabs
    * @param {(tab: KittensTab, dryRun: boolean) => number} fn
-   * @returns
+   * @returns {number}
    */
   function loopTabs (dryRun, stats, statsType, tabs, fn) {
     const indv = [];
