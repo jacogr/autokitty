@@ -262,8 +262,7 @@
  *  end?: boolean,
  *  excl?: string[],
  *  fn?: () => void,
- *  group?: 'actions' | 'crafting' | 'trading',
- *  res?: { [x in KittensNamedRes]?: number }
+ *  group?: 'actions' | 'crafting' | 'trading'
  * }} CheatOptPartial
  *
  * @typedef {CheatOptPartial & {
@@ -271,10 +270,14 @@
  * }} CheatOpt
  *
  * @typedef {{
+ *  active: boolean
+ * }} CheatMapEntry
+ *
+ * @typedef {{
  *  control: { active: true, all: { [x: string]: CheatOptPartial } },
- *  crafting: { active: boolean, all: { [x in KittensNamedRes]?: CheatOptPartial } },
- *  trading: { active: boolean, all: { [x in KittensNamedRace]: CheatOptPartial } },
- *  actions: { active: boolean, all: { [x: string]: CheatOptPartial & { fn: () => void } } },
+ *  crafting: CheatMapEntry & { all: { [x in KittensNamedRes]?: CheatOptPartial } },
+ *  trading: CheatMapEntry & { all: { [x in KittensNamedRace]: CheatOptPartial } },
+ *  actions: CheatMapEntry & { all: { [x: string]: CheatOptPartial & { fn: () => void } } },
  *  tabs: { active: true, all: { [x: string]: CheatOptPartial & { tab: KittensNamedTab } } }
  * }} CheatMap
  *
@@ -348,182 +351,98 @@
       }
     },
     crafting: {
-      // TODO: res is currently not used, remove or add
       active: false,
       all: {
-        //'wood': {
-        //  res: { 'catnip': 250 }
-        //},
-        'beam': {
-          res: { 'wood': 250 },
-          active: true
-        },
-        'slab': {
-          res: { 'minerals': 250 },
-          active: true
-        },
-        'steel': {
-          res: { 'coal': 100 },
-          active: true
-        },
-        'plate': {
-          res: { 'iron': 125 },
-          active: true
-        },
-        'gear': {
-          res: { 'steel': 15 }
-        },
-        'concrate': {
-          res: { 'steel': 25 }
-        },
-        'alloy': {
-          res: { 'titanium': 10 }
-        },
-        'parchment': {
-          res: { 'furs': 175 },
-          active: true
-        },
-        'manuscript': {
-          res: { 'parchment': 25, 'culture': 400 }
-        },
-        'compedium': {
-          res: { 'manuscript': 50, 'science': 10000 }
-        },
-        'blueprint': {
-          res: { 'compedium': 25, 'science': 25000 }
-        },
-        'kerosene': {
-          res: { 'oil': 7500 },
-          active: true
-        },
-        'megalith': {
-          res: { 'beam': 2500 }
-        },
-        'scaffold': {
-          res: { 'beam': 50 },
-          active: true
-        },
-        'ship': {
-          res: { 'starchart': 25 }
-        },
-        'eludium': {
-          res: { 'unobtainium': 1000, 'alloy': 2500 }
-        },
-        'thorium': {
-          res: { 'uranium': 250 },
-          active: true
-        },
-        'bloodstone': {
-          res: { 'timeCrystal': 5000, 'relic': 10000 }
-        },
-        'tMythril': {
-          res: { 'bloodstone': 5 }
-        }
+        //wood: {},
+        beam: { active: true },
+        slab: { active: true },
+        steel: { active: true },
+        plate: { active: true },
+        gear: {},
+        concrate: {},
+        alloy: {},
+        parchment: { active: true },
+        manuscript: {},
+        compedium: {},
+        blueprint: {},
+        kerosene: { active: true },
+        megalith: {},
+        scaffold: { active: true },
+        ship: {},
+        eludium: {},
+        thorium: { active: true },
+        bloodstone: {},
+        tMythril: {}
       }
     },
     'trading': {
       active: false,
       all: {
-        'leviathans': {
-          res: { 'unobtainium': 5000 },
-          active: true
-        },
-        'dragons': {
-          res: { 'titanium': 250 },
-          active: true
-        },
-        'zebras': {
-          res: { 'slab': 50 },
-          active: true
-        },
-        'nagas': {
-          res: { 'ivory': 500 }
-        },
-        'spiders': {
-          res: { 'scaffold': 50 }
-        },
-        'griffins': {
-          res: { 'wood': 500 },
-          active: true
-        },
-        'lizards': {
-          res: { 'minerals': 1000 },
-          active: true
-        },
-        'sharks': {
-          res: { 'iron': 100 },
-          active: true
-        }
+        leviathans: { active: true },
+        dragons: { active: true },
+        zebras: { active: true },
+        nagas: {},
+        spiders: {},
+        griffins: { active: true },
+        lizards: { active: true },
+        sharks: { active: true }
       }
     },
     'actions': {
       active: false,
       all: {
-        'catnip': {
-          fn: () => {
-            clickSpan('Gather catnip');
-          },
+        catnip: {
+          fn: fnGather,
           active: true,
           delay: INTERVAL.CATNIP_GATHER
         },
-        'refine': {
-          fn: () => {
-            fillResources('catnip');
-            clickSpan('Refine catnip');
-          },
+        refine: {
+          fn: fnRefine,
           active: true,
           delay: INTERVAL.CATNIP_REFINE,
           end: true
         },
-        'praise': {
-          fn: () => {
-            fillResources('faith');
-            game.religion.praise();
-          },
+        praise: {
+          fn: fnPraise,
           active: true,
           delay: INTERVAL.PRAISE
         },
-        'adore': {
+        adore: {
           fn: fnAdore,
           active: true,
           delay: INTERVAL.ADORE,
           end: true
         },
-        'observe': {
-          fn: () => {
-            $('input#observeBtn').click();
-          },
+        observe: {
+          fn: fnObserve,
           active: true
         },
-        'hunt': {
-          fn: () => {
-            fillResources('manpower');
-            game.village.huntAll();
-          },
+        hunt: {
+          fn: fnHunt,
           active: true
         },
-        'promote': {
+        promote: {
           fn: fnPromote,
           active: true,
           delay: INTERVAL.PROMOTE
         },
-        'loadout': {
+        loadout: {
           fn: fnLoadout,
           active: true,
           delay: INTERVAL.PROMOTE,
           end: true
         },
-        'feed': {
+        feed: {
           fn: fnFeed,
           delay: INTERVAL.FEED
         },
-        'bcoin': {
+        bcoin: {
           fn: fnTradeBcoin,
           active: true,
           delay: INTERVAL.BCOIN,
           end: true
         },
-        'combust': {
+        combust: {
           fn: fnCombust,
           delay: INTERVAL.COMBUST,
           excl: ['40k']
@@ -746,6 +665,21 @@
   }
 
   /**
+   * @param {string} id
+   * @returns {KittensBtn | undefined}
+   */
+  function findTheologyBld (id) {
+    return game.religionTab.ctPanel.children[0].children.find((b) => b.id === id);
+  }
+
+  /**
+   * @returns {KittensDiplomacyRacePanel | undefined}
+   */
+  function findLeviathans () {
+    return game.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans');
+  }
+
+  /**
    * @param {KittensPrice[]} prices
    * @param {number} zigguratRatio
    * @returns {number}
@@ -943,14 +877,6 @@
   }
 
   /**
-   * @param {string} id
-   * @returns {KittensBtn | undefined}
-   */
-  function findTheologyBld (id) {
-    return game.religionTab.ctPanel.children[0].children.find((b) => b.id === id);
-  }
-
-  /**
    * @returns {{ bestBuilding: KittensNamedBldgCrypto, percent?: CheatPercent }[] | null}
    */
   function calcTheology () {
@@ -978,32 +904,6 @@
   }
 
   /**
-   * @param {KittensNamedRace} name
-   * @returns {void}
-   */
-  function execTrade (name) {
-    if ((name === 'leviathans') && !game.diplomacy.get('leviathans').unlocked && game.religion.getZU('blackPyramid').val) {
-      game.diplomacy.unlockElders();
-    }
-
-    renderBgTab(game.diplomacyTab)
-      ?.racePanels.find((p) => p.race.name === name)
-      ?.tradeBtn.tradeAllHref.link.click();
-  }
-
-  /**
-   * @param {KittensNamedRes} name
-   * @returns {void}
-   */
-  function execCraft (name) {
-    const max = game.workshop.getCraftAllCount(name);
-
-    if (max > 0 && max < Number.MAX_VALUE) {
-      game.workshop.craft(name, Math.ceil(FRACTION.CRAFT * max));
-    }
-  }
-
-  /**
    * @returns {void}
    */
   function fnAdore () {
@@ -1023,6 +923,44 @@
    */
   function fnLoadout () {
     clickDom(renderBgTab(game.villageTab)?.buttons.find((b) => b?.opts?.loadout?.pinned));
+  }
+
+  /**
+   * @returns {void}
+   */
+  function fnGather () {
+    clickSpan('Gather catnip');
+  }
+
+  /**
+   * @returns {void}
+   */
+  function fnRefine () {
+    fillResources('catnip');
+    clickSpan('Refine catnip');
+  }
+
+  /**
+   * @returns {void}
+   */
+  function fnPraise () {
+    fillResources('faith');
+    game.religion.praise();
+  }
+
+  /**
+   * @returns {void}
+   */
+  function fnObserve () {
+    $('input#observeBtn').click();
+  }
+
+  /**
+   * @returns {void}
+   */
+  function fnHunt () {
+    fillResources('manpower');
+    game.village.huntAll();
   }
 
   /**
@@ -1054,13 +992,6 @@
   }
 
   /**
-   * @returns {KittensDiplomacyRacePanel | undefined}
-   */
-  function findLeviathans () {
-    return game.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans');
-  }
-
-  /**
    * @returns {void}
    */
   function fnFeed () {
@@ -1085,6 +1016,32 @@
   }
 
   /**
+   * @param {KittensNamedRace} name
+   * @returns {void}
+   */
+  function execTrade (name) {
+    if ((name === 'leviathans') && !game.diplomacy.get('leviathans').unlocked && game.religion.getZU('blackPyramid').val) {
+      game.diplomacy.unlockElders();
+    }
+
+    renderBgTab(game.diplomacyTab)
+      ?.racePanels.find((p) => p.race.name === name)
+      ?.tradeBtn.tradeAllHref.link.click();
+  }
+
+  /**
+   * @param {KittensNamedRes} name
+   * @returns {void}
+   */
+  function execCraft (name) {
+    const max = game.workshop.getCraftAllCount(name);
+
+    if (max > 0 && max < Number.MAX_VALUE) {
+      game.workshop.craft(name, Math.ceil(FRACTION.CRAFT * max));
+    }
+  }
+
+  /**
    * @param {string} group
    * @param {string} name
    * @param {CheatOpt} opts
@@ -1096,8 +1053,10 @@
           opts.fn();
         } else if (group === 'trading') {
           execTrade(/** @type {KittensNamedRace} */ (name));
-        } else {
+        } else if (group === 'crafting') {
           execCraft(/** @type {KittensNamedRes} */ (name));
+        } else {
+          throw new Error('Unknown execution for option');
         }
       }
     } catch (e) {
