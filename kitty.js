@@ -267,6 +267,10 @@
  * }} CheatOptPartial
  *
  * @typedef {CheatOptPartial & {
+ *  fn: () => void
+ * }} CheatOptPartialAction
+ *
+ * @typedef {CheatOptPartial & {
  *  btn: jQuery
  * }} CheatOpt
  *
@@ -278,7 +282,7 @@
  *  control: { active: true, all: { [x: string]: CheatOptPartial } },
  *  crafting: CheatMapEntry & { all: { [x in KittensNamedRes]?: CheatOptPartial } },
  *  trading: CheatMapEntry & { all: { [x in KittensNamedRace]: CheatOptPartial } },
- *  actions: CheatMapEntry & { all: { [x: string]: CheatOptPartial & { fn: () => void } } },
+ *  actions: CheatMapEntry & { all: { [x: string]: CheatOptPartialAction } },
  *  tabs: { active: true, all: { [x: string]: CheatOptPartial & { tab: KittensNamedTab } } }
  * }} CheatMap
  *
@@ -414,8 +418,7 @@
           fn: fnAdore,
           active: true,
           delay: INTERVAL.ADORE,
-          end: true,
-          noFill: true
+          end: true
         },
         observe: {
           fn: fnObserve,
@@ -665,10 +668,10 @@
     }
 
     for (const r of game.resPool.resources) {
-      if (r.name !== 'kittens' && r.name !== 'zebras') {
+      if (r.maxValue && r.unlocked && r.visible && r.name !== 'kittens' && r.name !== 'zebras') {
         const max = r.maxValue * (cheatMap.control.all.x10.active ? 10 : 1);
 
-        if (max && r.unlocked && r.visible && r.value < max ) {
+        if (max && r.value < max ) {
           r.value = max;
         }
       }
@@ -1057,19 +1060,26 @@
   function execOpt (group, name, opts) {
     try {
       if (opts.active && cheatMap[group].active) {
-        if (!opts.noFill) {
-          fillResources();
+        !opts.noFill && fillResources();
+
+        switch (group) {
+          case 'actions':
+            /** @type {CheatOptPartialAction} */ (opts).fn();
+            break;
+
+          case 'crafting':
+            execCraft(/** @type {KittensNamedRes} */ (name));
+            break;
+
+          case 'trading':
+            execTrade(/** @type {KittensNamedRace} */ (name));
+            break;
+
+          default:
+            throw new Error(`Unknown execution group ${group}`);
         }
 
-        if (opts.fn) {
-          opts.fn();
-        } else if (group === 'trading') {
-          execTrade(/** @type {KittensNamedRace} */ (name));
-        } else if (group === 'crafting') {
-          execCraft(/** @type {KittensNamedRes} */ (name));
-        } else {
-          throw new Error('Unknown execution for option');
-        }
+        !opts.noFill && fillResources();
       }
     } catch (e) {
       console.error('execOpt', name, e);
@@ -1560,8 +1570,6 @@
         }
       }
     }
-
-    fillResources();
 
     setTimeout(() => execOpts(delay), delay);
   }
