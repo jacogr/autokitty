@@ -1582,7 +1582,7 @@
       const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="${getGroupId(group)}"></div>`)));
 
       if (group !== 'control') {
-        jqAppend(divGroup, styleDiv($(`<div>${group}</div>`), true));
+        jqAppend(divGroup, styleDiv($(`<div>${capitalizeFirst(group)}</div>`), true));
       }
 
       activateGroup(group, active);
