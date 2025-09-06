@@ -12,16 +12,28 @@
  *
  * @typedef {(elem: any) => jQuery} JQuery
  *
- * @typedef {'chronosphere' | 'unicornPasture' | 'ziggurat'} KittensNamesBld
- *
+ * @typedef {'chronosphere' | 'unicornPasture' | 'ziggurat'} KittensNamesBldgBld
+ * @typedef {'holyGenocide'} KittensNamesBldgCrypto
+ * @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamesBldgZU
+ * @typedef {KittensNamesBldgBld | KittensNamesBldgCrypto | KittensNamesBldgZU} KittensNamesBldg
  * @typedef {'numeromancy' | 'unicornmancy'} KittensNamesPerk
+ * @typedef {'leviathans' | 'dragons' | 'zebras' | 'nagas' | 'spiders' | 'griffins' | 'lizards' | 'sharks'} KittensNamesRace
+ * @typedef {'alloy' | 'beam' | 'blackcoin' | 'concrate' | 'culture' | 'karma' | 'minerals' | 'necrocorn' | 'relic' | 'slab' | 'unicorns' | 'tears' | 'sorrow' | 'wood'} KittensNamesRes
+ * @typedef {'common' | 'exotic' | 'rare'} KittensNamesResType
+ * @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'workshopTab'} KittensNamesTab
+ *
+ * @typedef {Object} KittensTab
+ * @property {string} id
+ * @property {() => void} render
+ * @property {string} tabId
+ * @property {string} tabName
+ * @property {boolean} visible
  *
  * @typedef {Object} KittensBld
  * @property {number} cathPollution
- * @property {(name: KittensNamesBld) => KittensBldg} getBuildingExt
+ * @property {(name: KittensNamesBldg) => KittensBldg} getBuildingExt
  *
- * @typedef {Object} KittensBldTab
- * @property {KittensBtn[]} children
+ * @typedef {{ children: KittensBtn[] } & KittensTab} KittensBldTab
  *
  * @typedef {Object} KittensBldgMetadata
  * @property {KittensEffects} effects
@@ -29,6 +41,7 @@
  * @property {string} name
  * @property {number} on
  * @property {boolean} unlocked
+ * @property {number} val
  *
  * @typedef {Object} KittensBldgModel
  * @property {boolean} enabled
@@ -53,6 +66,8 @@
  * @property {KittensBldgModel} model
  * @property {KittensBtnOpts} [opts]
  *
+ * @typedef {{ children: KittensBtn[] }} KittensBtnPanel
+ *
  * @typedef {Object} KittensCalendarCycle
  * @property {{ unicorns: number }} festivalEffects
  *
@@ -68,20 +83,20 @@
  * @property {{ [x: string]: { enabled: boolean } }} filters
  *
  * @typedef {Object} KittensDiplomacyRace
- * @property {string} name
+ * @property {KittensNamesRace} name
  * @property {boolean} unlocked
  *
  * @typedef {Object} KittensDiplomacy
- * @property {(name: 'leviathans') => KittensDiplomacyRace} get
+ * @property {(name: KittensNamesRace) => KittensDiplomacyRace} get
  * @property {() => void} unlockElders
  *
  * @typedef {Object} KittensDiplomacyRacePanel
+ * @property {KittensBtn} embassyButton
  * @property {KittensDiplomacyRace} race
  * @property {KittensBtn} [feedBtn]
  * @property {{ tradeAllHref: { link: HTMLElement } }} tradeBtn
  *
- * @typedef {Object} KittensDiplomacyTab
- * @property {KittensDiplomacyRacePanel[]} racePanels
+ * @typedef {{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: any } & KittensTab} KittensDiplomacyTab
  *
  * @typedef {Object} KittensEffects
  * @property {number} cathPollutionPerTickProd
@@ -92,101 +107,103 @@
  * @typedef {Object} KittensOpts
  * @property {boolean} noConfirm
  *
- * @typedef {Object} KittensPerk
- * @property {boolean} researched
+ * @typedef {{ researched: boolean }} KittensPerk
  *
  * @typedef {Object} KittensPrestige
  * @property {() => number} getParagonProductionRatio
  * @property {(name: KittensNamesPerk) => KittensPerk} getPerk
  *
- * @typedef {Object} KittensPrice
- * @property {string} name
- * @property {number} val
- *
- * @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensReligionZUNames
+ * @typedef {{ name: KittensNamesRes, val: number }} KittensPrice
  *
  * @typedef {Object} KittensReligion
  * @property {() => number} _getTranscendNextPrice
  * @property {number} faithRatio
  * @property {() => number} getSolarRevolutionRatio
- * @property {(name: KittensReligionZUNames) => KittensBldg} getZU
+ * @property {(name: KittensNamesBldgZU) => KittensBldg} getZU
  * @property {() => void} praise
  * @property {(n: number, b: boolean) => void} resetFaith
  *
- * @typedef {Object} KittensReligionTab
- * @property {{ children: { children: KittensBtn[] }[] }} ctPanel
- * @property {KittensBtn} praiseBtn
- * @property {{ model: { allLink: { handler: () => void } } }} sacrificeBtn
- * @property {KittensBtn[]} zgUpgradeButtons
-*
+ * @typedef {{ ctPanel: { children: KittensBtnPanel[] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: () => void } } }, zgUpgradeButtons: KittensBtn[] } & KittensTab} KittensReligionTab
+ *
  * @typedef {Object} KittensRes
  * @property {number} maxValue
- * @property {string} name
- * @property {string} type
+ * @property {KittensNamesRes} name
+ * @property {KittensNamesResType} type
  * @property {boolean} unlocked
  * @property {number} value
  * @property {boolean} visible
  *
- * @typedef {Object} KittensResPool
- * @property {(name: string) => KittensRes} get
- * @property {KittensRes[]} resources
+ * @typedef {{ get: (name: KittensNamesRes) => KittensRes, resources: KittensRes[] }} KittensResPool
  *
- * @typedef {Object} KittensTab
- * @property {string} id
- * @property {() => void} render
- * @property {string} tabId
- * @property {string} tabName
- * @property {boolean} visible
+ * @typedef {{ GCPanel: KittensBtnPanel } & KittensTab} KittensSpaceTab
  *
  * @typedef {Object} KittensTime
  * @property {number} heat
  *
- * @typedef {Object} KittensTimeTab
- * @property {{ children: { children: KittensBtn[] }[] }} cfPanel
+ * @typedef {{ cfPanel: { children: KittensBtnPanel[] }, vsPanel: { children: KittensBtnPanel[] } } & KittensTab} KittensTimeTab
  *
- * @typedef {Object} KittensUI
- * @property {string} activeTabId
+ * @typedef {{ activeTabId: string }} KittensUI
  *
  * @typedef {Object} KittensVillage
  * @property {() => void} huntAll
  *
- * @typedef {Object} KittensVillageTab
- * @property {KittensBtn[]} buttons
- * @property {KittensBtn} promoteKittensBtn
+ * @typedef {{ buttons: KittensBtn[], promoteKittensBtn: KittensBtn } & KittensTab} KittensVillageTab
  *
  * @typedef {Object} KittensWorkshop
- * @property {(name: string, count: number) => void} craft
- * @property {(name: string) => void} craftAll
- * @property {(name: string) => number} getCraftAllCount
+ * @property {(name: KittensNamesRes, count: number) => void} craft
+ * @property {(name: KittensNamesRes) => void} craftAll
+ * @property {(name: KittensNamesRes) => number} getCraftAllCount
+ *
+ * @typedef {{ buttons: KittensBtn[] } & KittensTab} KittensWorkshopTab
  *
  * @typedef {Object} KittensGame
  * @property {KittensBld} bld
- * @property {KittensTab & KittensBldTab} bldTab
+ * @property {KittensBldTab} bldTab
  * @property {KittensCalendar} calendar
  * @property {KittensConsole} console
  * @property {KittensDiplomacy} diplomacy
- * @property {KittensTab & KittensDiplomacyTab} diplomacyTab
+ * @property {KittensDiplomacyTab} diplomacyTab
  * @property {(name: string) => number} getEffect
  * @property {() => number} getTicksPerSecondUI
  * @property {(text?: string) => { span: HTMLElement }} msg
  * @property {KittensOpts} opts
  * @property {KittensPrestige} prestige
  * @property {KittensReligion} religion
- * @property {KittensTab & KittensReligionTab} religionTab
+ * @property {KittensReligionTab} religionTab
  * @property {KittensResPool} resPool
  * @property {KittensTime} time
- * @property {KittensTab & KittensTimeTab} timeTab
+ * @property {KittensTimeTab} timeTab
+ * @property {KittensSpaceTab} spaceTab
  * @property {KittensUI} ui
  * @property {KittensVillage} village
- * @property {KittensTab & KittensVillageTab} villageTab
+ * @property {KittensVillageTab} villageTab
  * @property {KittensWorkshop} workshop
+ * @property {KittensWorkshopTab} workshopTab
+ *
+ * @typedef {Object} CheatOptPartial
+ * @property {boolean} [active]
+ * @property {number} [delay]
+ * @property {boolean} [end]
+ * @property {string[]} [excl]
+ * @property {() => void} [func]
+ * @property {'actions' | 'crafting' | 'trading'} [group]
+ * @property {{ [x: KittensNamesRes]: number }} [res]
+ * @property {boolean} [trade]
+ *
+ * @typedef {{ btn: jQuery } & CheatOptPartial} CheatOpt
+ *
+ * @typedef {Object} CheatMap
+ * @property {{ active: boolean, all: { [x: string]: CheatOptPartial } }} control
+ * @property {{ active: boolean, all: { [x: KittensNamesRes]: CheatOptPartial } }} crafting
+ * @property {{ active: boolean, all: { [x: KittensNamesRace]: CheatOptPartial } }} trading
+ * @property {{ active: boolean, all: { [x: string]: CheatOptPartial } }} actions
+ *
+ * @typedef {{ frac: number, raw: number, text: string }} CheatPercent
+ *
+ * @typedef {{ build?: string[], crypto?: string[], upgrade?: string[], zig?: string[] }} CheatStats
  */
-(
-/**
- * @param {JQuery} $
- * @param {KittensGame} game
- */
-($, game) => {
+
+((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
   const FRACTION = {
     // spend 1% maximum on any exotic
     EXOTIC: 0.01,
@@ -223,210 +240,219 @@
     SACRIFICE: 10000
   };
 
+  /** @type {CheatMap} */
   const cheatMap = {
-    'control': {
+    control: {
       active: true,
-      'build': {},
-      'upgrade': { end: true },
-      'craft': { group: 'crafting' },
-      'trade': { group: 'trading' },
-      'exec': { group: 'actions', end: true },
-      'zig': {},
-      'crypto': { end: true },
-      'pollute': {},
-      'uncap': { active: true, end: true },
-      'resources': { excl: ['x10'] },
-      'x10': { excl: ['resources'], end: true }
+      all: {
+        build: {},
+        upgrade: { end: true },
+        craft: { group: 'crafting' },
+        trade: { group: 'trading' },
+        exec: { group: 'actions', end: true },
+        zig: {},
+        crypto: { end: true },
+        pollute: {},
+        uncap: { active: true, end: true },
+        resources: { excl: ['x10'] },
+        x10: { excl: ['resources'], end: true }
+      }
     },
-    'crafting': {
+    crafting: {
       // TODO: res is currently not used, remove or add
       active: false,
-      //'wood': {
-      //  res: { 'catnip': 250 }
-      //},
-      'beam': {
-        res: { 'wood': 250 },
-        active: true
-      },
-      'slab': {
-        res: { 'minerals': 250 },
-        active: true
-      },
-      'steel': {
-        res: { 'coal': 100 },
-        active: true
-      },
-      'plate': {
-        res: { 'iron': 125 },
-        active: true
-      },
-      'gear': {
-        res: { 'steel': 15 }
-      },
-      'concrate': {
-        res: { 'steel': 25 }
-      },
-      'alloy': {
-        res: { 'titanium': 10 }
-      },
-      'parchment': {
-        res: { 'furs': 175 },
-        active: true
-      },
-      'manuscript': {
-        res: { 'parchment': 25, 'culture': 400 }
-      },
-      'compedium': {
-        res: { 'manuscript': 50, 'science': 10000 }
-      },
-      'blueprint': {
-        res: { 'compedium': 25, 'science': 25000 }
-      },
-      'kerosene': {
-        res: { 'oil': 7500 },
-        active: true
-      },
-      'megalith': {
-        res: { 'beam': 2500 }
-      },
-      'scaffold': {
-        res: { 'beam': 50 },
-        active: true
-      },
-      'ship': {
-        res: { 'starchart': 25 }
-      },
-      'eludium': {
-        res: { 'unobtainium': 1000, 'alloy': 2500 }
-      },
-      'thorium': {
-        res: { 'uranium': 250 },
-        active: true
-      },
-      'bloodstone': {
-        res: { 'timeCrystal': 5000, 'relic': 10000 }
-      },
-      'tMythril': {
-        res: { 'bloodstone': 5 }
+      all: {
+        //'wood': {
+        //  res: { 'catnip': 250 }
+        //},
+        'beam': {
+          res: { 'wood': 250 },
+          active: true
+        },
+        'slab': {
+          res: { 'minerals': 250 },
+          active: true
+        },
+        'steel': {
+          res: { 'coal': 100 },
+          active: true
+        },
+        'plate': {
+          res: { 'iron': 125 },
+          active: true
+        },
+        'gear': {
+          res: { 'steel': 15 }
+        },
+        'concrate': {
+          res: { 'steel': 25 }
+        },
+        'alloy': {
+          res: { 'titanium': 10 }
+        },
+        'parchment': {
+          res: { 'furs': 175 },
+          active: true
+        },
+        'manuscript': {
+          res: { 'parchment': 25, 'culture': 400 }
+        },
+        'compedium': {
+          res: { 'manuscript': 50, 'science': 10000 }
+        },
+        'blueprint': {
+          res: { 'compedium': 25, 'science': 25000 }
+        },
+        'kerosene': {
+          res: { 'oil': 7500 },
+          active: true
+        },
+        'megalith': {
+          res: { 'beam': 2500 }
+        },
+        'scaffold': {
+          res: { 'beam': 50 },
+          active: true
+        },
+        'ship': {
+          res: { 'starchart': 25 }
+        },
+        'eludium': {
+          res: { 'unobtainium': 1000, 'alloy': 2500 }
+        },
+        'thorium': {
+          res: { 'uranium': 250 },
+          active: true
+        },
+        'bloodstone': {
+          res: { 'timeCrystal': 5000, 'relic': 10000 }
+        },
+        'tMythril': {
+          res: { 'bloodstone': 5 }
+        }
       }
     },
     'trading': {
       active: false,
-      'leviathans': {
-        res: { 'unobtainium': 5000 },
-        trade: true,
-        active: true
-      },
-      'dragons': {
-        res: { 'titanium': 250 },
-        trade: true,
-        active: true
-      },
-      'zebras': {
-        res: { 'slab': 50 },
-        trade: true,
-        active: true
-      },
-      'nagas': {
-        res: { 'ivory': 500 },
-        trade: true
-      },
-      'spiders': {
-        res: { 'scaffold': 50 },
-        trade: true
-      },
-      'griffins': {
-        res: { 'wood': 500 },
-        trade: true,
-        active: true
-      },
-      'lizards': {
-        res: { 'minerals': 1000 },
-        trade: true,
-        active: true
-      },
-      'sharks': {
-        res: { 'iron': 100 },
-        trade: true,
-        active: true
+      all: {
+        'leviathans': {
+          res: { 'unobtainium': 5000 },
+          trade: true,
+          active: true
+        },
+        'dragons': {
+          res: { 'titanium': 250 },
+          trade: true,
+          active: true
+        },
+        'zebras': {
+          res: { 'slab': 50 },
+          trade: true,
+          active: true
+        },
+        'nagas': {
+          res: { 'ivory': 500 },
+          trade: true
+        },
+        'spiders': {
+          res: { 'scaffold': 50 },
+          trade: true
+        },
+        'griffins': {
+          res: { 'wood': 500 },
+          trade: true,
+          active: true
+        },
+        'lizards': {
+          res: { 'minerals': 1000 },
+          trade: true,
+          active: true
+        },
+        'sharks': {
+          res: { 'iron': 100 },
+          trade: true,
+          active: true
+        }
       }
     },
     'actions': {
       active: false,
-      'catnip': {
-        func: () => {
-          clickSpan('Gather catnip');
+      all: {
+        'catnip': {
+          func: () => {
+            clickSpan('Gather catnip');
+          },
+          active: true,
+          delay: INTERVAL.CATNIP_GATHER
         },
-        active: true,
-        delay: INTERVAL.CATNIP_GATHER
-      },
-      'refine': {
-        func: () => {
-          fillResources('catnip');
-          clickSpan('Refine catnip');
+        'refine': {
+          func: () => {
+            fillResources('catnip');
+            clickSpan('Refine catnip');
+          },
+          active: true,
+          delay: INTERVAL.CATNIP_REFINE,
+          end: true
         },
-        active: true,
-        delay: INTERVAL.CATNIP_REFINE,
-        end: true
-      },
-      'praise': {
-        func: () => {
-          fillResources('faith');
-          game.religion.praise();
+        'praise': {
+          func: () => {
+            fillResources('faith');
+            game.religion.praise();
+          },
+          active: true,
+          delay: INTERVAL.PRAISE
         },
-        active: true,
-        delay: INTERVAL.PRAISE
-      },
-      'adore': {
-        func: fnAdore,
-        active: true,
-        delay: INTERVAL.ADORE,
-        end: true
-      },
-      'observe': {
-        func: () => {
-          $('input#observeBtn').click();
+        'adore': {
+          func: fnAdore,
+          active: true,
+          delay: INTERVAL.ADORE,
+          end: true
         },
-        active: true
-      },
-      'hunt': {
-        func: () => {
-          fillResources('manpower');
-          game.village.huntAll();
+        'observe': {
+          func: () => {
+            $('input#observeBtn').click();
+          },
+          active: true
         },
-        active: true
-      },
-      'promote': {
-        func: fnPromote,
-        active: true,
-        delay: INTERVAL.PROMOTE
-      },
-      'loadout': {
-        func: fnLoadout,
-        active: true,
-        delay: INTERVAL.PROMOTE,
-        end: true
-      },
-      'feed': {
-        func: fnFeed,
-        delay: INTERVAL.FEED
-      },
-      'bcoin': {
-        func: fnTradeBcoin,
-        active: true,
-        delay: INTERVAL.BCOIN,
-        end: true
-      },
-      'combust': {
-        func: fnCombust,
-        delay: INTERVAL.COMBUST,
-        excl: ['40k']
-      },
-      '40k': {
-        func: fnCombust40k,
-        delay: INTERVAL.COMBUST,
-        excl: ['combust'],
-        end: true
+        'hunt': {
+          func: () => {
+            fillResources('manpower');
+            game.village.huntAll();
+          },
+          active: true
+        },
+        'promote': {
+          func: fnPromote,
+          active: true,
+          delay: INTERVAL.PROMOTE
+        },
+        'loadout': {
+          func: fnLoadout,
+          active: true,
+          delay: INTERVAL.PROMOTE,
+          end: true
+        },
+        'feed': {
+          func: fnFeed,
+          delay: INTERVAL.FEED
+        },
+        'bcoin': {
+          func: fnTradeBcoin,
+          active: true,
+          delay: INTERVAL.BCOIN,
+          end: true
+        },
+        'combust': {
+          func: fnCombust,
+          delay: INTERVAL.COMBUST,
+          excl: ['40k']
+        },
+        '40k': {
+          func: fnCombust40k,
+          delay: INTERVAL.COMBUST,
+          excl: ['combust'],
+          end: true
+        }
       }
     }
   };
@@ -464,6 +490,12 @@
      return child;
   }
 
+  /**
+   *
+   * @param {CheatOpt} opts
+   * @param {boolean} [active]
+   * @returns {jQuery}
+   */
   function activateBtn (opts, active = false) {
     opts.active = active;
 
@@ -491,6 +523,7 @@
 
   /**
    * @param {number} frac
+   * @returns {CheatPercent | undefined}
    */
   function toPercent (frac) {
     if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
@@ -518,7 +551,7 @@
   }
 
   /**
-   * @param {KittensBtn | undefined} btn
+   * @param {KittensBtn | null | undefined} btn
    * @returns {string | undefined}
    */
   function getBtnName (btn) {
@@ -605,12 +638,12 @@
    * @returns {void}
    */
   function fillResources (name = null) {
-    if (!(cheatMap.control.resources.active || cheatMap.control.x10.active) && !name) {
+    if (!(cheatMap.control.all.resources.active || cheatMap.control.all.x10.active) && !name) {
       return;
     }
 
     for (const r of game.resPool.resources) {
-      const max = r.maxValue * (cheatMap.control.x10.active ? 10 : 1);
+      const max = r.maxValue * (cheatMap.control.all.x10.active ? 10 : 1);
 
       if (max && r.unlocked && r.visible && r.value < max && !['kittens', 'zebras'].includes(r.name) && (!name || r.name === name)) {
         r.value = max;
@@ -638,11 +671,11 @@
   }
 
   /**
-   * @returns {{ err?: string, bestBuilding?: string, bestPrices?: KittensPrice[] }}
+   * @returns {{ err?: string, bestBuilding?: KittensNamesBldgZU | 'unicornPasture', bestPrices?: KittensPrice[] }}
    */
   function calcZiggurats () {
     try {
-      /** @type {KittensReligionZUNames[]} */
+      /** @type {KittensNamesBldgZU[]} */
       const validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
       const pastureImpl = game.bld.getBuildingExt('unicornPasture');
       const zigImpl = game.bld.getBuildingExt('ziggurat');
@@ -708,9 +741,10 @@
       // production of unicorns is 0.
       const pastureAmortization = (pastureImpl?.model?.prices[0]?.val || 0) / pastureProduction;
 
-      let bestAmortization = Number.POSITIVE_INFINITY;
+      /** @type { KittensNamesBldgZU | 'unicornPasture'} */
       let bestBuilding = 'unicornPasture';
       let bestPrices = pastureImpl.model?.prices || [];
+      let bestAmortization = Number.POSITIVE_INFINITY;
 
       if (pastureAmortization < bestAmortization) {
         bestAmortization = pastureAmortization;
@@ -767,6 +801,9 @@
     }
   }
 
+  /**
+   * @returns {{ action: 'buy' | 'hold' | 'sell', price: number, text: string } | null}
+   */
   function calcBcoin () {
     try {
       const price = game.calendar.cryptoPrice;
@@ -793,6 +830,9 @@
     return null;
   }
 
+  /**
+   * @returns {CheatPercent | null | undefined}
+   */
   function calcTranscend () {
     try {
       return toPercent(game.religion.faithRatio / game.religion._getTranscendNextPrice());
@@ -811,6 +851,9 @@
     return game.religionTab.ctPanel.children[0].children.find((b) => b.id === id);
   }
 
+  /**
+   * @returns {{ bestBuilding: KittensNamesBldgCrypto, percent?: CheatPercent }[] | null}
+   */
   function calcTheology () {
     try {
       return game.religionTab.ctPanel.children[0].children
@@ -825,7 +868,7 @@
         })
         .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
         .map((a) => ({
-          bestBuilding: a.id,
+          bestBuilding: /** @type KittensNamesBldgCrypto */ (a.id),
           percent: toPercent(game.resPool.get('relic').value / (a.model.prices[0].val * (1 / FRACTION.EXOTIC)))
         }));
     } catch (e) {
@@ -836,7 +879,7 @@
   }
 
   /**
-   * @param {string} name
+   * @param {KittensNamesRace} name
    * @returns {void}
    */
   function execTrade (name) {
@@ -848,6 +891,10 @@
     // renderBgTab(game.diplomacyTab)?.racePanels.find((p) => p.race.name === name)?.tradeBtn.tradeAllHref.link.click();
   }
 
+  /**
+   * @param {KittensNamesRes} name
+   * @returns {void}
+   */
   function execCraft (name) {
     const max = game.workshop.getCraftAllCount(name);
 
@@ -856,19 +903,31 @@
     }
   }
 
+  /**
+   * @returns {void}
+   */
   function fnAdore () {
     game.religion.resetFaith(1.01, false);
     clickDom(renderBgTab(game.religionTab)?.praiseBtn);
   }
 
+  /**
+   * @returns {void}
+   */
   function fnPromote () {
     clickDom(renderBgTab(game.villageTab)?.promoteKittensBtn);
   }
 
+  /**
+   * @returns {void}
+   */
   function fnLoadout () {
     clickDom(renderBgTab(game.villageTab)?.buttons.find((b) => b?.opts?.loadout?.pinned));
   }
 
+  /**
+   * @returns {void}
+   */
   function fnCombust () {
     const avail = (game.getEffect('heatMax') - game.time.heat) / 10;
 
@@ -883,11 +942,14 @@
     }
   }
 
+  /**
+   * @returns {void}
+   */
   function fnCombust40k () {
     if (game.calendar.year < 40000) {
       fnCombust();
     } else {
-      activateBtn(cheatMap.actions['40k'], false);
+      activateBtn(/** @type {CheatOpt} */ (cheatMap.actions.all['40k']), false);
     }
   }
 
@@ -898,12 +960,18 @@
     return game.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans');
   }
 
+  /**
+   * @returns {void}
+   */
   function fnFeed () {
     if (game.resPool.get('necrocorn').value > 1 && renderBgTab(game.diplomacyTab)) {
       clickDom(findLeviathans()?.feedBtn);
     }
   }
 
+  /**
+   * @returns {void}
+   */
   function fnTradeBcoin () {
     const info = calcBcoin();
 
@@ -916,15 +984,19 @@
     }
   }
 
+  /**
+   * @param {string} name
+   * @param {CheatOptPartial} opts
+   */
   function execOpt (name, opts) {
     try {
       if (opts.active) {
         if (opts.func) {
           opts.func();
         } else if (opts.trade) {
-          execTrade(name);
+          execTrade(/** @type {KittensNamesRace} */ (name));
         } else {
-          execCraft(name);
+          execCraft(/** @type {KittensNamesRes} */ (name));
         }
       }
     } catch (e) {
@@ -932,6 +1004,11 @@
     }
   }
 
+  /**
+   * @param {string} group
+   * @param {string} name
+   * @param {CheatOptPartial} opts
+   */
   function execOptTimer (group, name, opts) {
     try {
       if (opts.active && cheatMap[group].active) {
@@ -948,6 +1025,10 @@
     setTimeout(() => execOptTimer(group, name, opts), opts.delay);
   }
 
+  /**
+   * @param {KittensBtn} [bld]
+   * @returns {boolean}
+   */
   function isZigBuildable (bld) {
     return !!bld?.model.visible && !getInvalidPrices(bld).length;
   }
@@ -960,6 +1041,10 @@
     return game.religionTab.zgUpgradeButtons.find((b) => b.id === id);
   }
 
+  /**
+   * @param {string} id
+   * @returns {{ bld?: KittensBtn, isBuildable: boolean, tears?: KittensPrice }}
+   */
   function getZigInfo (id) {
     const bld = findZigBld(id);
 
@@ -1042,6 +1127,12 @@
     return 0;
   }
 
+  /**
+   * @param {KittensBtn | null | undefined} btn
+   * @param {{ bestBuilding: KittensNamesBldgCrypto, percent?: CheatPercent }} best
+   * @param {boolean} dryRun
+   * @returns
+   */
   function buildTheologyBtn (btn, best, dryRun) {
     if (!btn || !best?.percent || best.percent.frac < 1 || getInvalidPrices(btn).length) {
       return 0;
@@ -1092,9 +1183,9 @@
 
   /**
    * @param {KittensBtn} btn
-   * @param {*} dryRun
-   * @param {*} isAll
-   * @returns
+   * @param {boolean} dryRun
+   * @param {boolean} [isAll]
+   * @returns {number}
    */
   function unlockTabBtn (btn, dryRun, isAll = false) {
     if (!btn?.model?.enabled || !btn.model.visible || !btn.model.metadata) {
@@ -1114,12 +1205,23 @@
     return dryRun ? 1 : clickDom(btn, { isAll });
   }
 
+  /**
+   * @param {string[]} arr
+   * @param {KittensBtn | null | undefined} btn
+   */
   function pushBtnName (arr, btn) {
     const n = getBtnName(btn);
 
     n && arr.push(n);
   }
 
+  /**
+   * TODO
+   *
+   * @param {KittensTab} tab
+   * @param {boolean} dryRun
+   * @returns {number}
+   */
   function unlockTab (tab, dryRun) {
     const done = [];
     let count = 0;
@@ -1130,19 +1232,14 @@
       }
 
       const buttons =
-        // religion
-        tab.rUpgradeButtons ||
-        // space
-        tab.GCPanel?.children ||
-        // trade
-        tab.racePanels?.map((r) => r.embassyButton) ||
-        // time
-        tab.vsPanel?.children[0]?.children ||
-        // science, workshop
-        tab.buttons;
+        /** @type {KittensReligionTab} */ (tab).rUpgradeButtons ||
+        /** @type {KittensSpaceTab} */ (tab).GCPanel?.children ||
+        /** @type {KittensDiplomacyTab} */ (tab).racePanels?.map((r) => r.embassyButton) ||
+        /** @type {KittensTimeTab} */ (tab).vsPanel?.children[0]?.children ||
+        /** @type {KittensWorkshopTab} */ (tab).buttons;
 
       // multi for religion & embassy upgrades
-      const isAll = !!((tab.rUpgradeButtons || tab.racePanels)?.length);
+      const isAll = !!((/** @type {KittensReligionTab} */ (tab).rUpgradeButtons || /** @type {KittensDiplomacyTab} */ (tab).racePanels)?.length);
 
       for (const btn of buttons) {
         if (unlockTabBtn(btn, dryRun, isAll)) {
@@ -1155,19 +1252,21 @@
         }
       }
 
+      const d = /** @type {KittensDiplomacyTab} */ (tab);
+
       // for trade, unlock new races to trade with
-      if (tab.exploreBtn && tab.racePanels && tab.racePanels.length !== 8) {
-        const maxRaces = tab.leviathansInfo
+      if (d.exploreBtn && d.racePanels.length !== 8) {
+        const maxRaces = d.leviathansInfo
           ? 8 - (findLeviathans()?.race.unlocked ? 0 : 1)
           : 7;
 
-        if (tab.racePanels.length !== maxRaces) {
+        if (d.racePanels.length !== maxRaces) {
           const nowTime = Date.now();
           const nowDelta = nowTime - lastExploreTime;
 
           if (nowDelta > INTERVAL.EXPLORE) {
             lastExploreTime = nowTime;
-            count += dryRun ? 1 : clickDom(tab.exploreBtn);
+            count += dryRun ? 1 : clickDom(d.exploreBtn);
           }
         }
       }
@@ -1182,12 +1281,17 @@
     return count;
   }
 
+  /**
+   * @param {KittensBtn} btn
+   * @param {boolean} dryRun
+   * @returns {number}
+   */
   function buildTabBtn (btn, dryRun) {
     const model = btn?.model;
 
     if (!model?.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val)) {
       return 0;
-    } else if (!cheatMap.control.pollute.active && model.metadata.effects?.cathPollutionPerTickProd) {
+    } else if (!cheatMap.control.all.pollute.active && model.metadata.effects?.cathPollutionPerTickProd) {
       return 0;
     }
 
@@ -1205,7 +1309,7 @@
 
     // without a max, we only build a single
     if (!firstMax && isAll) {
-      if (!cheatMap.control.uncap.active) {
+      if (!cheatMap.control.all.uncap.active) {
         return 0;
       }
 
@@ -1225,6 +1329,13 @@
     return dryRun ? 1 : clickDom(btn, { isAll });
   }
 
+  /**
+   * TODO
+   *
+   * @param {*} tab
+   * @param {boolean} dryRun
+   * @returns {number}
+   */
   function buildTab (tab, dryRun) {
     const done = [];
     let count = 0;
@@ -1263,6 +1374,14 @@
     return count;
   }
 
+  /**
+   * @param {boolean} dryRun
+   * @param {CheatStats} stats
+   * @param {keyof CheatStats} statsType
+   * @param {KittensNamesTab[]} tabs
+   * @param {(tab: KittensTab, dryRun: boolean) => number} fn
+   * @returns
+   */
   function loopTabs (dryRun, stats, statsType, tabs, fn) {
     const indv = [];
     let total = 0;
@@ -1283,24 +1402,31 @@
     return total;
   }
 
+  /**
+   *
+   * @param {number} delay
+   * @param {boolean} [dryRun]
+   * @returns {CheatStats}
+   */
   function execBuildAll (delay, dryRun = false) {
+    /** @type {CheatStats} */
     const stats = {};
     let total = 0;
 
-    if (cheatMap.control.upgrade.active || dryRun) {
+    if (cheatMap.control.all.upgrade.active || dryRun) {
       total += loopTabs(dryRun, stats, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
     }
 
-    if (cheatMap.control.build.active || dryRun) {
+    if (cheatMap.control.all.build.active || dryRun) {
       total += loopTabs(dryRun, stats, 'build', ['bldTab', 'spaceTab'], buildTab);
     }
 
     if (!dryRun) {
-      if (cheatMap.control.zig.active) {
+      if (cheatMap.control.all.zig.active) {
         total += loopTabs(dryRun, stats, 'zig', ['religionTab'], (_, dryRun) => buildZig(dryRun));
       }
 
-      if (cheatMap.control.crypto.active) {
+      if (cheatMap.control.all.crypto.active) {
         total += loopTabs(dryRun, stats, 'crypto', ['religionTab'], (_, dryRun) => buildTheology(dryRun));
       }
     }
@@ -1312,6 +1438,9 @@
     return stats;
   }
 
+  /**
+   * @param {number} delay
+   */
   function execTextInfo (delay) {
     renderBgTab(game.religionTab);
 
@@ -1320,7 +1449,8 @@
     const cry = calcTheology();
     const trd = calcTranscend();
     const bcoin = calcBcoin();
-    let zigText = zig.bestBuilding;
+
+    let zigText = /** @type {string} */ (zig.bestBuilding);
 
     if (zig.bestBuilding && zig.bestPrices) {
       const zigguratRatio = game.bld.getBuildingExt('ziggurat')?.meta.on || 0;
@@ -1350,11 +1480,11 @@
    */
   function execOpts (delay) {
     for (const group in cheatMap) {
-      const maps = cheatMap[group];
+      const { active, all} = cheatMap[group];
 
-      if (group !== 'control' && maps.active) {
-        for (const m in maps) {
-          const o = maps[m];
+      if (active && group !== 'control') {
+        for (const m in all) {
+          const o = all[m];
 
           if (o.active && !o.delay) {
             fillResources();
@@ -1377,11 +1507,20 @@
     return `kittycheatAct${capitalizeFirst(group)}`;
   }
 
-  function activateGroup (groupname, active = false) {
-    cheatMap[groupname].active = active;
-    $(`div#${getGroupId(groupname)}`).css('opacity', active ? 1 : 0.33);
+  /**
+   * @param {string} group
+   * @param {boolean} [active]
+   */
+  function activateGroup (group, active = false) {
+    cheatMap[group].active = active;
+    $(`div#${getGroupId(group)}`).css('opacity', active ? 1 : 0.33);
   }
 
+  /**
+   * @param {string} group
+   * @param {string} name
+   * @param {CheatOpt} opts
+   */
   function clickOptBtn (group, name, opts) {
     activateBtn(opts, !opts.active);
 
@@ -1391,7 +1530,7 @@
       } else if (opts.active) {
         if (opts.excl) {
           for (const e of opts.excl) {
-            activateBtn(cheatMap[group][e], false);
+            activateBtn(cheatMap[group].all[e], false);
           }
         }
 
@@ -1402,6 +1541,9 @@
     }
   }
 
+  /**
+   * @returns {void}
+   */
   function initCheat () {
     const divCont = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>').css({
       'padding-bottom': '30px',
@@ -1413,24 +1555,22 @@
 
     // add groups for all the options
     for (const group in cheatMap) {
-      const maps = cheatMap[group];
+      const { active, all } = cheatMap[group];
       const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="${getGroupId(group)}"></div>`)));
 
-      for (const name in maps) {
-        const opts = maps[name];
+      activateGroup(group, active);
 
-        if (name === 'active') {
-          activateGroup(group, opts);
-        } else {
-          opts.btn = jqAppend(divGroup, $(`<button>${name}</button>`).click(() => {
-            clickOptBtn(group, name, opts);
-          }));
+      for (const name in all) {
+        const opts = all[name];
 
-          activateBtn(opts, opts.active);
+        opts.btn = jqAppend(divGroup, $(`<button>${name}</button>`).click(() => {
+          clickOptBtn(group, name, opts);
+        }));
 
-          if (opts.delay) {
-            execOptTimer(group, name, opts);
-          }
+        activateBtn(opts, opts.active);
+
+        if (opts.delay) {
+          execOptTimer(group, name, opts);
         }
       }
     }
@@ -1440,6 +1580,9 @@
     }
   }
 
+  /**
+   * @returns {void}
+   */
   function initGame () {
     //adjust messages, switch off confirmation
     game.console.maxMessages = 100;
