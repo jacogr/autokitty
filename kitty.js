@@ -28,6 +28,7 @@
  * @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamesBldgZU
  *
  * @typedef {KittensNamesBldgBld | KittensNamesBldgCrypto | KittensNamesBldgZU} KittensNamesBldg
+ *
  * @typedef {'numeromancy' | 'unicornmancy'} KittensNamesPerk
  *
  * @typedef {'leviathans' | 'dragons' | 'zebras' | 'nagas' | 'spiders' | 'griffins' | 'lizards' | 'sharks'} KittensNamesRace
@@ -36,7 +37,7 @@
  *
  * @typedef {'common' | 'exotic' | 'rare'} KittensNamesResType
  *
- * @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'scientTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamesTab
+ * @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamesTab
  *
  * @typedef {{
  *  id: string,
