@@ -33,7 +33,7 @@
  *
  * @typedef {'leviathans' | 'dragons' | 'zebras' | 'nagas' | 'spiders' | 'griffins' | 'lizards' | 'sharks'} KittensNamedRace
  *
- * @typedef {'alloy' | 'beam' | 'blackcoin' | 'bloodstone' | 'blueprint' | 'coal' | 'compedium' | 'concrate' | 'culture' | 'eludium' | 'furs' | 'gear' | 'iron' | 'ivory' | 'karma' | 'kerosene' | 'manuscript' | 'megalith' | 'minerals' | 'necrocorn' | 'oil' | 'parchment' | 'plate' | 'relic' |'scaffold' |  'science' | 'ship' | 'slab' | 'starchart' | 'steel' | 'sorrow' | 'tMythril' | 'tears' | 'thorium' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'wood'} KittensNamedRes
+ * @typedef {'alloy' | 'beam' | 'blackcoin' | 'bloodstone' | 'blueprint' | 'coal' | 'compedium' | 'concrate' | 'culture' | 'eludium' | 'furs' | 'gear' | 'iron' | 'ivory' | 'karma' | 'kerosene' | 'kittens' | 'manuscript' | 'megalith' | 'minerals' | 'necrocorn' | 'oil' | 'parchment' | 'plate' | 'relic' |'scaffold' |  'science' | 'ship' | 'slab' | 'starchart' | 'steel' | 'sorrow' | 'tMythril' | 'tears' | 'thorium' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'wood' | 'zebras'} KittensNamedRes
  *
  * @typedef {'common' | 'exotic' | 'rare'} KittensNamedResType
  *
@@ -262,7 +262,8 @@
  *  end?: boolean,
  *  excl?: string[],
  *  fn?: () => void,
- *  group?: 'actions' | 'crafting' | 'trading'
+ *  group?: 'actions' | 'crafting' | 'trading',
+ *  noFill?: boolean
  * }} CheatOptPartial
  *
  * @typedef {CheatOptPartial & {
@@ -394,13 +395,15 @@
         catnip: {
           fn: fnGather,
           active: true,
-          delay: INTERVAL.CATNIP_GATHER
+          delay: INTERVAL.CATNIP_GATHER,
+          noFill: true
         },
         refine: {
           fn: fnRefine,
           active: true,
           delay: INTERVAL.CATNIP_REFINE,
-          end: true
+          end: true,
+          noFill: true
         },
         praise: {
           fn: fnPraise,
@@ -411,11 +414,13 @@
           fn: fnAdore,
           active: true,
           delay: INTERVAL.ADORE,
-          end: true
+          end: true,
+          noFill: true
         },
         observe: {
           fn: fnObserve,
-          active: true
+          active: true,
+          noFill: true
         },
         hunt: {
           fn: fnHunt,
@@ -424,17 +429,20 @@
         promote: {
           fn: fnPromote,
           active: true,
-          delay: INTERVAL.PROMOTE
+          delay: INTERVAL.PROMOTE,
+          noFill: true
         },
         loadout: {
           fn: fnLoadout,
           active: true,
           delay: INTERVAL.PROMOTE,
-          end: true
+          end: true,
+          noFill: true
         },
         feed: {
           fn: fnFeed,
-          delay: INTERVAL.FEED
+          delay: INTERVAL.FEED,
+          noFill: true
         },
         bcoin: {
           fn: fnTradeBcoin,
@@ -445,13 +453,15 @@
         combust: {
           fn: fnCombust,
           delay: INTERVAL.COMBUST,
-          excl: ['40k']
+          excl: ['40k'],
+          noFill: true
         },
         '40k': {
           fn: fnCombust40k,
           delay: INTERVAL.COMBUST,
           excl: ['combust'],
-          end: true
+          end: true,
+          noFill: true
         }
       }
     },
@@ -647,19 +657,20 @@
   }
 
   /**
-   * @param {string | null} [name]
    * @returns {void}
    */
-  function fillResources (name = null) {
-    if (!(cheatMap.control.all.resources.active || cheatMap.control.all.x10.active) && !name) {
+  function fillResources () {
+    if (!cheatMap.control.all.resources.active && !cheatMap.control.all.x10.active) {
       return;
     }
 
     for (const r of game.resPool.resources) {
-      const max = r.maxValue * (cheatMap.control.all.x10.active ? 10 : 1);
+      if (r.name !== 'kittens' && r.name !== 'zebras') {
+        const max = r.maxValue * (cheatMap.control.all.x10.active ? 10 : 1);
 
-      if (max && r.unlocked && r.visible && r.value < max && !['kittens', 'zebras'].includes(r.name) && (!name || r.name === name)) {
-        r.value = max;
+        if (max && r.unlocked && r.visible && r.value < max ) {
+          r.value = max;
+        }
       }
     }
   }
@@ -936,7 +947,6 @@
    * @returns {void}
    */
   function fnRefine () {
-    fillResources('catnip');
     clickSpan('Refine catnip');
   }
 
@@ -944,7 +954,6 @@
    * @returns {void}
    */
   function fnPraise () {
-    fillResources('faith');
     game.religion.praise();
   }
 
@@ -959,7 +968,6 @@
    * @returns {void}
    */
   function fnHunt () {
-    fillResources('manpower');
     game.village.huntAll();
   }
 
@@ -1049,7 +1057,9 @@
   function execOpt (group, name, opts) {
     try {
       if (opts.active && cheatMap[group].active) {
-        fillResources();
+        if (!opts.noFill) {
+          fillResources();
+        }
 
         if (opts.fn) {
           opts.fn();
@@ -1122,12 +1132,10 @@
       if (!uni.bestBuilding) {
         return 0;
       } else if (uni.bestBuilding === 'unicornPasture') {
-        if (game.ui.activeTabId == game.bldTab.id) {
-          const bld = game.bldTab.children.find((b) => b.model.metadata.name === uni.bestBuilding);
+        const bld = renderBgTab(game.bldTab)?.children.find((b) => b.model.metadata.name === uni.bestBuilding);
 
-          if (isZigBuildable(bld)) {
-            return dryRun ? 1 : echo(getBtnName(bld), clickDom(bld));
-          }
+        if (isZigBuildable(bld)) {
+          return dryRun ? 1 : echo(getBtnName(bld), clickDom(bld));
         }
 
         return 0;
