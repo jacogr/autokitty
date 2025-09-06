@@ -23,7 +23,7 @@
  *
  * @typedef {'chronosphere' | 'unicornPasture' | 'ziggurat'} KittensNamedBldgBld
  *
- * @typedef {'holyGenocide'} KittensNamedBldgCrypto
+ * @typedef {'blackCore' | 'blackLibrary' | 'blackNexus' | 'blackObelisk' | 'blackRadiance' | 'blazar' | 'darkNova' | 'holyGenocide' | 'mausoleum' | 'singularity'} KittensNamedBldgCrypto
  *
  * @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamedBldgZU
  *
@@ -135,10 +135,10 @@
  * }} KittensDiplomacyTab
  *
  * @typedef {{
- *  cathPollutionPerTickProd: number,
- *  riftChance: number,
- *  unicornsPerTickBase: number,
- *  unicornsRatioReligion: number
+ *  cathPollutionPerTickProd?: number,
+ *  riftChance?: number,
+ *  unicornsPerTickBase?: number,
+ *  unicornsRatioReligion?: number
  * }} KittensEffects
  *
  * @typedef {{
@@ -196,7 +196,7 @@
  * }} KittensSpaceTab
  *
  * @typedef {{
- * heat: number
+ *  heat: number
  * }} KittensTime
  *
  * @typedef {KittensTab & {
@@ -261,13 +261,13 @@
  *  delay?: number,
  *  end?: boolean,
  *  excl?: string[],
- *  fn?: () => void,
+ *  fn?: (group: string, name: string, opts: CheatOpt) => void,
  *  group?: 'actions' | 'crafting' | 'trading',
  *  noFill?: boolean
  * }} CheatOptPartial
  *
  * @typedef {CheatOptPartial & {
- *  fn: () => void
+ *  fn: (group: string, name: string, opts: CheatOpt) => void
  * }} CheatOptPartialAction
  *
  * @typedef {CheatOptPartial & {
@@ -679,14 +679,6 @@
   }
 
   /**
-   * @param {string} id
-   * @returns {KittensBtn | undefined}
-   */
-  function findTheologyBld (id) {
-    return game.religionTab.ctPanel.children[0].children.find((b) => b.id === id);
-  }
-
-  /**
    * @returns {KittensDiplomacyRacePanel | undefined}
    */
   function findLeviathans () {
@@ -716,7 +708,7 @@
    * Adapted from Kitten Scientists
    * https://github.com/kitten-science/kitten-scientists/blob/804104d4ddc8b64e74f1ad5b448e0ca334fa6479/source/ReligionManager.ts#L246-L395
    *
-   * @returns {{ err?: string, bestBuilding?: KittensNamedBldgZU | 'unicornPasture', bestPrices?: KittensPrice[] }}
+   * @returns {{ err?: string, bestBuilding?: KittensNamedBldgZU | 'unicornPasture', bestPrices?: KittensPrice[], btn?: KittensBtn | null, ratio: number }}
    */
   function calcZiggurats () {
     /** @type {KittensNamedBldgZU[]} */
@@ -726,11 +718,11 @@
     const unicornsPerTickBase = pastureImpl?.meta.effects?.unicornsPerTickBase;
 
     if (!pastureImpl?.meta.unlocked || !pastureImpl.meta.on) {
-      return { err: 'No pasture built' };
+      return { err: 'No pasture built', ratio: 0 };
     } else if (!zigImpl?.meta.unlocked || !zigImpl.meta.on) {
-      return { err: 'No ziggurat built' };
+      return { err: 'No ziggurat built', ratio: 0 };
     } else if (!unicornsPerTickBase) {
-      return { err: 'No ticks per base' };
+      return { err: 'No ticks per base', ratio: 0 };
     }
 
     // How many unicorns are produced per second.
@@ -766,11 +758,7 @@
     const baseUnicornsPerRift = 500 * (1 + game.getEffect('unicornsRatioReligion') * 0.1);
 
     // How likely are unicorn rifts to happen? The unicornmancy metaphysics upgrade increases this chance.
-    let riftChanceRatio = 1;
-
-    if (game.prestige.getPerk('unicornmancy').researched) {
-      riftChanceRatio *= 1.1;
-    }
+    const riftChanceRatio = game.prestige.getPerk('unicornmancy').researched ? 1.1 : 1;
 
     // ?
     const unicornRiftChange = ((game.getEffect('riftChance') * riftChanceRatio) / (10000 * 2)) * baseUnicornsPerRift;
@@ -784,6 +772,7 @@
     let bestBuilding = 'unicornPasture';
     let bestAmortization = Number.POSITIVE_INFINITY;
     let bestPrices = [];
+    let bestBtn = null;
 
     // If the unicorn pasture amortizes itself in less than infinity ticks,
     // set it as the default. This is likely to protect against cases where
@@ -810,27 +799,13 @@
 
       // Determine the effect the building will have on unicorn production and unicorn rifts.
       const buildingInfo = game.religion.getZU(building);
-      let religionBonus = religionRatio;
-      let riftChance = game.getEffect('riftChance');
-
-      for (const effect in buildingInfo.effects) {
-        if (effect === 'unicornsRatioReligion') {
-          religionBonus += buildingInfo.effects.unicornsRatioReligion;
-        } else if (effect === 'riftChance') {
-          riftChance += buildingInfo.effects.riftChance;
-        }
-      }
+      const religionBonus = religionRatio + (buildingInfo.effects.unicornsRatioReligion || 0);
+      const riftChance = game.getEffect('riftChance') + (buildingInfo.effects.riftChance || 0);
 
       // The rest should be straight forward.
       const unicornsPerRift = 500 * ((religionBonus - 1) * 0.1 + 1);
-      let riftBonus = ((riftChance * riftChanceRatio) / (10000 * 2)) * unicornsPerRift;
-
-      riftBonus -= unicornRiftChange;
-
-      let buildingProduction = unicornsPerSecondBase * globalRatio * religionBonus * paragonRatio * faithBonus * cycleBonus;
-
-      buildingProduction -= unicornsPerSecond;
-      buildingProduction += riftBonus;
+      const riftBonus = (((riftChance * riftChanceRatio) / (10000 * 2)) * unicornsPerRift) - unicornRiftChange;
+      const buildingProduction = (unicornsPerSecondBase * globalRatio * religionBonus * paragonRatio * faithBonus * cycleBonus) - unicornsPerSecond + riftBonus;
 
       const amortization = unicornPrice / buildingProduction;
 
@@ -838,10 +813,11 @@
         bestAmortization = amortization;
         bestBuilding = building;
         bestPrices = buildingImpl.model.prices;
+        bestBtn = buildingImpl;
       }
     }
 
-    return { bestBuilding, bestPrices };
+    return { bestBuilding, bestPrices, btn: bestBtn, ratio: zigguratRatio };
   }
 
   /**
@@ -872,7 +848,7 @@
   }
 
   /**
-   * @returns {{ bestBuilding: KittensNamedBldgCrypto, percent?: CheatPercent }[]}
+   * @returns {{ btn: KittensBtn, percent?: CheatPercent, text: string | null }[]}
    */
   function calcTheology () {
     return game.religionTab.ctPanel.children[0].children
@@ -886,10 +862,15 @@
         return !getInvalidPrices(a, 'relic').length;
       })
       .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
-      .map((a) => ({
-        bestBuilding: /** @type KittensNamedBldgCrypto */ (a.id),
-        percent: toPercent(game.resPool.get('relic').value / (a.model.prices[0].val * (1 / FRACTION.EXOTIC)))
-      }));
+      .map((btn) => {
+        const percent = toPercent(game.resPool.get('relic').value / (btn.model.prices[0].val * (1 / FRACTION.EXOTIC)));
+
+        return {
+          btn,
+          percent,
+          text: `${getBtnName(btn)} ${percent?.text || ''}`
+        };
+      });
   }
 
   /**
@@ -967,13 +948,16 @@
   }
 
   /**
+   * @param {string} _group
+   * @param {string} _name
+   * @param {CheatOpt} opts
    * @returns {void}
    */
-  function fnCombust40k () {
+  function fnCombust40k (_group, _name, opts) {
     if (game.calendar.year < 40000) {
       fnCombust();
     } else {
-      activateBtn(/** @type {CheatOpt} */ (cheatMap.actions.all['40k']), false);
+      activateBtn(opts, false);
     }
   }
 
@@ -1031,6 +1015,7 @@
    * @param {string} group
    * @param {string} name
    * @param {CheatOpt} opts
+   * @returns {void}
    */
   function execOpt (group, name, opts) {
     try {
@@ -1039,7 +1024,7 @@
 
         switch (group) {
           case 'actions':
-            /** @type {CheatOptPartialAction} */ (opts).fn();
+            /** @type {CheatOptPartialAction} */ (opts).fn(group, name, opts);
             break;
 
           case 'crafting':
@@ -1065,6 +1050,7 @@
    * @param {string} group
    * @param {string} name
    * @param {CheatOpt} opts
+   * @returns {void}
    */
   function execOptTimer (group, name, opts) {
     execOpt(group, name, opts);
@@ -1082,18 +1068,11 @@
 
   /**
    * @param {string} id
-   * @returns {KittensBtn | undefined}
-   */
-  function findZigBld (id) {
-    return game.religionTab.zgUpgradeButtons.find((b) => b.id === id);
-  }
-
-  /**
-   * @param {string} id
+   * @param {KittensBtn | null} [btn]
    * @returns {{ bld?: KittensBtn, isBuildable: boolean, tears?: KittensPrice }}
    */
-  function getZigInfo (id) {
-    const bld = findZigBld(id);
+  function getZigInfo (id, btn = null) {
+    const bld = btn || game.religionTab.zgUpgradeButtons.find((b) => b.id === id);
 
     return {
       bld,
@@ -1111,44 +1090,38 @@
       return 0;
     }
 
-    const uni = calcZiggurats();
+    const zig = calcZiggurats();
 
-    if (!uni.bestBuilding) {
+    if (!zig.bestBuilding) {
       return 0;
-    } else if (uni.bestBuilding === 'unicornPasture') {
-      const bld = renderBgTab(game.bldTab)?.children.find((b) => b.model.metadata.name === uni.bestBuilding);
+    } else if (zig.bestBuilding === 'unicornPasture') {
+      const bld = renderBgTab(game.bldTab)?.children.find((b) => b.model.metadata.name === zig.bestBuilding);
 
-      if (isZigBuildable(bld)) {
-        return dryRun ? 1 : echo(getBtnName(bld), clickDom(bld));
-      }
-
-      return 0;
+      return isZigBuildable(bld)
+        ? dryRun ? 1 : echo(getBtnName(bld), clickDom(bld))
+        : 0;
     }
 
-    // first we see if we can do a black pyramid
     const blck = getZigInfo('blackPyramid');
-
-    if (blck.isBuildable) {
-      return dryRun ? 1 : echo(getBtnName(blck.bld), clickDom(blck.bld));
-    }
-
-    const best = getZigInfo(uni.bestBuilding);
     const mark = getZigInfo('marker');
-    const next = (best.isBuildable && mark.tears) && (mark.isBuildable && best.tears)
-      ? mark.tears.val <= best.tears.val
-        ? mark
-        : best
-      : mark.isBuildable
-        ? mark
-        : best.isBuildable
-          ? best
-          : null;
+    const best = getZigInfo(zig.bestBuilding);
+    const next = blck.isBuildable
+      ? blck
+      : (best.isBuildable && mark.tears) && (mark.isBuildable && best.tears)
+        ? mark.tears.val <= best.tears.val
+          ? mark
+          : best
+        : mark.isBuildable
+          ? mark
+          : best.isBuildable
+            ? best
+            : null;
 
     if (next) {
       return dryRun ? 1 : echo(getBtnName(next.bld), clickDom(next.bld));
     }
 
-    const zigTears = game.resPool.get('tears').value + (game.bld.getBuildingExt('ziggurat').meta.on * game.resPool.get('unicorns').value / 2500);
+    const zigTears = game.resPool.get('tears').value + (zig.ratio * game.resPool.get('unicorns').value / 2500);
 
     // only sacrifice when we do have enough available (only every 10 seconds)
     if (best.tears && zigTears > best.tears.val) {
@@ -1167,17 +1140,16 @@
   }
 
   /**
-   * @param {KittensBtn | null | undefined} btn
-   * @param {{ bestBuilding: KittensNamedBldgCrypto, percent?: CheatPercent }} best
+   * @param {{ btn: KittensBtn, percent?: CheatPercent }} best
    * @param {boolean} dryRun
    * @returns {number}
    */
-  function buildTheologyBtn (btn, best, dryRun) {
-    if (!btn || !best?.percent || best.percent.frac < 1 || getInvalidPrices(btn).length) {
+  function buildTheologyBtn (best, dryRun) {
+    if (!best?.btn || !best.btn.model.visible || !best.btn.model.enabled || !best?.percent || best.percent.frac < 1 || getInvalidPrices(best.btn).length) {
       return 0;
     }
 
-    return dryRun ? 1 : clickDom(btn);
+    return dryRun ? 1 : clickDom(best.btn);
   }
 
   /**
@@ -1194,18 +1166,14 @@
     let count = 0;
 
     for (const best of avail) {
-      const btn = game.religionTab.ctPanel.children[0].children.find((b) => b.id === best?.bestBuilding && b.model.visible && b.model.enabled);
-
-      if (buildTheologyBtn(btn, best, dryRun)) {
-        if (dryRun) {
-          return 1;
-        }
-
-        pushBtnName(done, btn);
-        count++;
-      } else {
+      if (!buildTheologyBtn(best, dryRun)) {
         break;
+      } else if (dryRun) {
+        return 1;
       }
+
+      pushBtnName(done, best.btn);
+      count++;
     }
 
     if (done.length) {
@@ -1459,36 +1427,30 @@
   function execTextInfo (delay) {
     renderBgTab(game.religionTab);
 
-    const next = execBuildAll(0, true);
-    const zig = calcZiggurats();
+    const nxt = execBuildAll(0, true);
     const cry = calcTheology()[0];
+    const zig = calcZiggurats();
     const trd = calcTranscend();
-    const bcoin = calcBcoin();
+    const bcn = calcBcoin();
 
     let zigText = /** @type {string | undefined} */ (zig.bestBuilding);
 
     if (zig.bestBuilding && zig.bestPrices) {
       const name = zig.bestBuilding === 'unicornPasture'
         ? 'Unic. Pasture'
-        : findZigBld(zig.bestBuilding)?.opts?.name;
+        : getBtnName(zig.btn);
 
       if (name) {
-        const zigguratRatio = game.bld.getBuildingExt('ziggurat').meta.on;
-        const unicornTotal = ((game.resPool.get('tears').value * 2500) / zigguratRatio) + game.resPool.get('unicorns').value;
-        const unicornPrice = calcZigguratsPrices(zig.bestPrices, zigguratRatio);
-
-        zigText = `${name} ${toPercent(unicornTotal / unicornPrice)?.text || ''}`;
+        zigText = `${name} ${toPercent((((game.resPool.get('tears').value * 2500) / zig.ratio) + game.resPool.get('unicorns').value) / calcZigguratsPrices(zig.bestPrices, zig.ratio))?.text || ''}`;
       }
     }
 
-    const cryText = cry?.bestBuilding && `${findTheologyBld(cry.bestBuilding)?.opts?.name} ${cry.percent?.text || ''}`;
-
-    $('div#kittycheatTxtDryBld').html(`Buildings: ${next.build?.join(', ') || '-'}`);
-    $('div#kittycheatTxtDryUpg').html(`Upgrades : ${next.upgrade?.join(', ') || '-'}`);
+    $('div#kittycheatTxtDryBld').html(`Buildings: ${nxt.build?.join(', ') || '-'}`);
+    $('div#kittycheatTxtDryUpg').html(`Upgrades : ${nxt.upgrade?.join(', ') || '-'}`);
     $('div#kittycheatTxtRelZig').html(`Ziggurat : ${zigText || zig.err || '-'}`);
-    $('div#kittycheatTxtRelCry').html(`Theology : ${cryText || '-'}`);
+    $('div#kittycheatTxtRelCry').html(`Theology : ${cry?.text || '-'}`);
     $('div#kittycheatTxtRelLvl').html(`Transcend: ${trd?.text || '-'}`);
-    $('div#kittycheatTxtBcoins').html(`Blackcoin: ${bcoin?.text || '-'}`);
+    $('div#kittycheatTxtBcoins').html(`Blackcoin: ${bcn?.text || '-'}`);
 
     setTimeout(() => execTextInfo(delay), delay);
   }
