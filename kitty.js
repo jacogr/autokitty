@@ -319,7 +319,7 @@
   }
 
   /** @returns {number} */
-  function clickDom (/** @type {KittensBtn?=} */ btn, /** @type {{ isAll?: Boolean, isBatch?: boolean }=} */ opts = {}) {
+  function clickDom (/** @type {KittensBtn?=} */ btn, /** @type {{ isAll?: boolean, isBatch?: boolean }=} */ opts = {}) {
     if (btn?.domNode) {
       if (opts.isAll) {
         btn.domNode.dispatchEvent(new MouseEvent('click', { shiftKey: true }));
