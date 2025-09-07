@@ -311,8 +311,12 @@
   }
 
   /** @returns {string?=} */
-  function getBtnName (/** @type {(KittensBtn | KittensBldg)?=} */ btn) {
-    return /** @type {KittensBtn} */ (btn)?.opts?.name || btn?.model?.metadata?.label;
+  function getBtnName (/** @type {(KittensBtn | KittensBldg)?=} */ btn, /** @type {string?=} */ extra = null) {
+    const name = /** @type {KittensBtn} */ (btn)?.opts?.name || btn?.model?.metadata?.label;
+
+    return name && extra
+      ? `${name} (${extra})`
+      : name;
   }
 
   /** @returns {number} */
@@ -712,8 +716,8 @@
   }
 
   /** @returns {void} */
-  function pushBtnName (/** @type {string[]} */ arr, /** @type {KittensBtn=} */ btn) {
-    const n = getBtnName(btn);
+  function pushBtnName (/** @type {string[]} */ arr, /** @type {KittensBtn=} */ btn, /** @type {string?=} */ extra = null) {
+    const n = getBtnName(btn, extra);
 
     n && arr.push(n);
   }
@@ -778,8 +782,6 @@
         lastSacrificeTime = nowTime;
         game.religionTab.sacrificeBtn.model.allLink.handler.call(game.religionTab.sacrificeBtn, noop, noop);
       }
-
-      return 1;
     }
 
     return 0;
@@ -856,7 +858,7 @@
           return 1;
         }
 
-        pushBtnName(completed, btn);
+        pushBtnName(completed, btn, /** @type {{ race?: { title: string } }} */ (btn).race?.title);
         count++;
       }
     }
