@@ -41,7 +41,7 @@
 /** @typedef {{ name: KittensNamedRes, val: number }} KittensPrice */
 /** @typedef {{ _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBldg, praise: () => void, resetFaith: (n: number, b: boolean) => void }} KittensReligion */
 /** @typedef {KittensTab & { ctPanel: { children: KittensBtnPanel[] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: () => void } } }, zgUpgradeButtons: KittensBtn[] }} KittensReligionTab */
-/** @typedef {{ maxValue: number, name: KittensNamedRes, type: KittensNamedResType, unlocked: boolean, value: number, visible: boolean }} KittensRes */
+/** @typedef {{ maxValue: number, name: KittensNamedRes, perTickCached: number, type: KittensNamedResType, unlocked: boolean, value: number, visible: boolean }} KittensRes */
 /** @typedef {{ get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }} KittensResPool */
 /** @typedef {KittensTab & { GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }} KittensSpaceTab */
 /** @typedef {{ heat: number }} KittensTime */
@@ -362,7 +362,11 @@
 
   /** @returns {KittensPrice[]} */
   function getInvalidPrices (/** @type {KittensBtn} */ btn, /** @type {string?} */ skip = null) {
-    const noCap = !btn.model.prices.find((p) => game.resPool.get(p.name).maxValue > 0);
+    const noCap = !btn.model.prices.find((p) => {
+      const r = game.resPool.get(p.name);
+
+      return r.maxValue || r.perTickCached;
+    });
 
     return btn.model.prices.filter((p) => {
       if (p.name === skip) {
@@ -376,7 +380,7 @@
           ?  FRACTION.EXOTIC
           : r.name === 'karma' // type=rare, also affects neocorns
             ? FRACTION.KARMA
-            : noCap && !r.maxValue // all uncapped, set limits
+            : noCap && !(r.maxValue || r.perTickCached) // all uncapped, set limits
               ? FRACTION.UNCAPPED
               : 1
       );
