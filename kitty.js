@@ -360,13 +360,22 @@
     return tab;
   }
 
-  /** @returns {KittensPrice[]} */
-  function getInvalidPrices (/** @type {KittensBtn} */ btn, /** @type {string?} */ skip = null) {
-    const noCap = !btn.model.prices.find((p) => {
+  /** @return {boolean} */
+  function isUncapped (/** @type {KittensBtn} */ btn, /** @type {string?} */ skip = null) {
+    return !btn.model.prices.find((p) => {
+      if (p.name === skip) {
+        return false;
+      }
+
       const r = game.resPool.get(p.name);
 
-      return r.maxValue || r.perTickCached;
+      return !!(r.maxValue || r.perTickCached);
     });
+  }
+
+  /** @returns {KittensPrice[]} */
+  function getInvalidPrices (/** @type {KittensBtn} */ btn, /** @type {string?} */ skip = null) {
+    const noCap = isUncapped(btn, skip);
 
     return btn.model.prices.filter((p) => {
       if (p.name === skip) {
@@ -913,7 +922,7 @@
       return 0;
     }
 
-    const noCap = !model.prices.find((p) => game.resPool.get(p.name).maxValue > 0);
+    const noCap = isUncapped(btn);
     const isAll = noCap ? false : model.metadata.on >= 1;
 
     if (noCap && !cheatMap.control.all.uncap.active) {
