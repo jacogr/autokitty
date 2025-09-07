@@ -734,7 +734,7 @@
   }
 
   /** @returns {number} */
-  function buildZig (/** @type {boolean} */ dryRun, /** @style {string} */ completed) {
+  function buildZig (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed) {
     if (!renderBgTab(game.religionTab)) {
       return 0;
     }
@@ -827,7 +827,7 @@
       return 0;
     }
 
-    fillResources();
+    !dryRun && fillResources();
 
     if (getInvalidPrices(btn).length) {
       return 0;
@@ -837,7 +837,7 @@
   }
 
   /** @returns {number} */
-  function unlockTab (/** @type {boolean} */ dryRun, /** @style {string} */ completed, /** @type {KittensTab} */ tab) {
+  function unlockTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab) {
     if (!renderBgTab(tab)) {
       return 0;
     }
@@ -899,7 +899,7 @@
       return 0;
     }
 
-    fillResources();
+    !dryRun && fillResources();
 
     if (getInvalidPrices(btn).length) {
       return 0;
@@ -928,7 +928,7 @@
   }
 
   /** @returns {number} */
-  function buildTab (/** @type {boolean} */ dryRun, /** @style {string} */ completed, /** @type {KittensTab} */ tab) {
+  function buildTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab) {
     if (!renderBgTab(tab)) {
       return 0;
     }
