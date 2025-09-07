@@ -1070,8 +1070,9 @@
 
   /** @returns {void} */
   function execOpts (/** @type {number} */ delay) {
-    for (const group in cheatMap) {
-      const { active, all } = cheatMap[/** @type {'actions'} */ (group)];
+    for (const _group in cheatMap) {
+      const group = /** @type {keyof CheatMap} */ (_group);
+      const { active, all } = cheatMap[group];
 
       if (active && isExecGroup(group)) {
         for (const name in all) {
@@ -1089,7 +1090,7 @@
 
   /** @returns {void} */
   function activateGroup (/** @type {keyof CheatMap} */ group, /** @type {boolean=} */ active = false) {
-    const opt = cheatMap[/** @type {'actions'} */ (group)];
+    const opt = cheatMap[group];
 
     opt.active = active;
     opt.div?.css('opacity', active ? 1 : 0.33);
