@@ -825,7 +825,11 @@
       return 0;
     } else if (btn.id === 'cryochambers' && btn.model.on >= game.bld.getBuildingExt('chronosphere').meta.on) {
       return 0;
-    } else if (getInvalidPrices(btn).length) {
+    }
+
+    fillResources();
+
+    if (getInvalidPrices(btn).length) {
       return 0;
     }
 
@@ -893,7 +897,11 @@
       return 0;
     } else if (!cheatMap.control.all.pollute.active && model.metadata.effects?.cathPollutionPerTickProd) {
       return 0;
-    } else if (getInvalidPrices(btn).length) {
+    }
+
+    fillResources();
+
+    if (getInvalidPrices(btn).length) {
       return 0;
     }
 
