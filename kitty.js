@@ -259,11 +259,6 @@
   /** @returns {void} */
   function noop () {}
 
-  /** @returns {string} */
-  function capitalizeFirst (/** @type {string} */ str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-
   /** @returns {jQuery} */
   function jqAppend (/** @type {jQuery} */ parent, /** @type {jQuery} */ child) {
      parent.append(child);
@@ -1054,12 +1049,12 @@
       }
     }
 
-    $('div#kittycheatTxtDryBld').html(`Buildings: ${nxt.build?.join(', ') || '-'}`);
-    $('div#kittycheatTxtDryUpg').html(`Upgrades : ${nxt.upgrade?.join(', ') || '-'}`);
-    $('div#kittycheatTxtRelZig').html(`Ziggurat : ${zigText || zig.err || '-'}`);
-    $('div#kittycheatTxtRelCry').html(`Theology : ${cry?.text || '-'}`);
-    $('div#kittycheatTxtRelLvl').html(`Transcend: ${trd?.text || '-'}`);
-    $('div#kittycheatTxtBcoins').html(`Blackcoin: ${bcn?.text || '-'}`);
+    $('div#kittycheat-txt-drybld').html(`Buildings: ${nxt.build?.join(', ') || '-'}`);
+    $('div#kittycheat-txt-dryupg').html(`Upgrades : ${nxt.upgrade?.join(', ') || '-'}`);
+    $('div#kittycheat-txt-relzig').html(`Ziggurat : ${zigText || zig.err || '-'}`);
+    $('div#kittycheat-txt-relcry').html(`Theology : ${cry?.text || '-'}`);
+    $('div#kittycheat-txt-rellvl').html(`Transcend: ${trd?.text || '-'}`);
+    $('div#kittycheat-txt-bcoins').html(`Blackcoin: ${bcn?.text || '-'}`);
 
     setTimeout(() => execTextInfo(delay), delay);
   }
@@ -1125,16 +1120,16 @@
       'font-family': 'monospace',
       'font-size': 'small'
     }));
-    const divActGroup = jqAppend(divCont, styleDiv($('<div id="kittycheatAct"></div>')));
-    const divTxtGroup = jqAppend(divCont, styleDiv($('<div id="kittycheatTxt"></div>')));
+    const divActGroup = jqAppend(divCont, styleDiv($('<div id="kittycheat-act"></div>')));
+    const divTxtGroup = jqAppend(divCont, styleDiv($('<div id="kittycheat-txt"></div>')));
 
     for (const _group in cheatMap) {
       const group = /** @type {keyof CheatMap} */ (_group);
       const { active, all } = cheatMap[group];
-      const divGroup = cheatMap[group].div = jqAppend(divActGroup, styleDiv($(`<div id="kittycheatAct${capitalizeFirst(group)}}"></div>`)));
+      const divGroup = cheatMap[group].div = jqAppend(divActGroup, styleDiv($(`<div id="kittycheat-act-${group}}"></div>`)));
 
       if (group !== 'control') {
-        jqAppend(divGroup, styleDiv($(`<div>${capitalizeFirst(group)}:</div>`), true));
+        jqAppend(divGroup, styleDiv($(`<div>${group}:</div>`), true));
       }
 
       activateGroup(group, active);
@@ -1154,8 +1149,8 @@
       }
     }
 
-    for (const id of ['DryBld', 'DryUpg', 'RelZig', 'RelCry', 'RelLvl', 'Bcoins']) {
-      jqAppend(divTxtGroup, styleDiv($(`<div id="kittycheatTxt${id}"></div>`), true));
+    for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
+      jqAppend(divTxtGroup, styleDiv($(`<div id="kittycheat-txt-${id}"></div>`), true));
     }
   }
 
