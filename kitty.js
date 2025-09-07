@@ -412,12 +412,9 @@
     return total;
   }
 
-  /**
-   * Adapted from Kitten Scientists
-   * https://github.com/kitten-science/kitten-scientists/blob/804104d4ddc8b64e74f1ad5b448e0ca334fa6479/source/ReligionManager.ts#L246-L395
-   *
-   * @returns {{ err?: string, bestBuilding?: KittensNamedBldgZU | 'unicornPasture', bestPrices?: KittensPrice[], btn?: KittensBtn | KittensBldg | null, ratio: number }}
-   */
+  // Adapted from Kitten Scientists
+  // https://github.com/kitten-science/kitten-scientists/blob/804104d4ddc8b64e74f1ad5b448e0ca334fa6479/source/ReligionManager.ts#L246-L395
+  /** @returns {{ err?: string, bestBuilding?: KittensNamedBldgZU | 'unicornPasture', bestPrices?: KittensPrice[], btn?: KittensBtn | KittensBldg | null, ratio: number }} */
   function calcZiggurats () {
     const /** @type {KittensNamedBldgZU[]} */ validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
     const pastureImpl = game.bld.getBuildingExt('unicornPasture');
@@ -714,9 +711,11 @@
     setTimeout(() => execOptTimer(group, name, opts), opts.delay);
   }
 
-  /** @returns {boolean} */
-  function isZigBuildable (/** @type {KittensBtn=} */ bld) {
-    return !!bld?.model.visible && !getInvalidPrices(bld).length;
+  /** @returns {void} */
+  function pushBtnName (/** @type {string[]} */ arr, /** @type {KittensBtn=} */ btn) {
+    const n = getBtnName(btn);
+
+    n && arr.push(n);
   }
 
   /** @returns {{ bld?: KittensBtn, isBuildable: boolean, tears?: KittensPrice }} */
@@ -725,13 +724,13 @@
 
     return {
       bld,
-      isBuildable: isZigBuildable(bld),
+      isBuildable: !!bld?.model.visible && !getInvalidPrices(bld).length,
       tears: bld?.model.prices.find((p) => p.name === 'tears')
     };
   }
 
   /** @returns {number} */
-  function buildZig (/** @type {boolean} */ dryRun) {
+  function buildZig (/** @type {boolean} */ dryRun, /** @style {string} */ completed) {
     if (!renderBgTab(game.religionTab)) {
       return 0;
     }
@@ -760,7 +759,11 @@
               : null;
 
     if (next?.bld) {
-      return dryRun ? 1 : echo(getBtnName(next.bld), clickDom(next.bld));
+      const res = dryRun ? 1 : clickDom(next.bld);
+
+      (res && !dryRun) && pushBtnName(completed, next.bld);
+
+      return res;
     }
 
     const nowTears = game.resPool.get('tears').value;
@@ -792,13 +795,12 @@
   }
 
   /** @returns {number}  */
-  function buildTheology (/** @type {boolean} */ dryRun) {
+  function buildTheology (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed) {
     if (!renderBgTab(game.religionTab)) {
       return 0;
     }
 
     const avail = calcTheology();
-    const /** @type {string[]} */ done = [];
     let count = 0;
 
     for (const best of avail) {
@@ -808,12 +810,8 @@
         return 1;
       }
 
-      pushBtnName(done, best.btn);
+      pushBtnName(completed, best.btn);
       count++;
-    }
-
-    if (done.length) {
-      echo(done.join(', '));
     }
 
     return count;
@@ -832,15 +830,8 @@
     return dryRun ? 1 : clickDom(btn, { isAll });
   }
 
-  /** @returns {void} */
-  function pushBtnName (/** @type {string[]} */ arr, /** @type {KittensBtn=} */ btn) {
-    const n = getBtnName(btn);
-
-    n && arr.push(n);
-  }
-
   /** @returns {number} */
-  function unlockTab (/** @type {boolean} */ dryRun, /** @type {KittensTab} */ tab) {
+  function unlockTab (/** @type {boolean} */ dryRun, /** @style {string} */ completed, /** @type {KittensTab} */ tab) {
     if (!renderBgTab(tab)) {
       return 0;
     }
@@ -851,7 +842,6 @@
       /** @type {KittensDiplomacyTab} */ (tab).racePanels?.map((r) => r.embassyButton) ||
       /** @type {KittensTimeTab} */ (tab).vsPanel?.children[0]?.children ||
       /** @type {KittensWorkshopTab} */ (tab).buttons;
-    const /** @type {string[]} */ done = [];
     let count = 0;
 
     // multi for religion & embassy upgrades
@@ -866,7 +856,7 @@
           return 1;
         }
 
-        pushBtnName(done, btn);
+        pushBtnName(completed, btn);
         count++;
       }
     }
@@ -888,10 +878,6 @@
           count += dryRun ? 1 : clickDom(d.exploreBtn);
         }
       }
-    }
-
-    if (done.length) {
-      echo(done.join(', '));
     }
 
     return count;
@@ -932,7 +918,7 @@
   }
 
   /** @returns {number} */
-  function buildTab (/** @type {boolean} */ dryRun, /** @type {KittensTab} */ tab) {
+  function buildTab (/** @type {boolean} */ dryRun, /** @style {string} */ completed, /** @type {KittensTab} */ tab) {
     if (!renderBgTab(tab)) {
       return 0;
     }
@@ -940,7 +926,6 @@
     const areas =
       /** @type {KittensSpaceTab} */ (tab).planetPanels ||
       [/** @type {KittensBldTab} */ (tab)];
-    const /** @type {string[]} */ done = [];
     let count = 0;
 
     for (const area of areas) {
@@ -950,21 +935,17 @@
             return 1;
           }
 
-          pushBtnName(done, btn);
+          pushBtnName(completed, btn);
           count++;
         }
       }
-    }
-
-    if (done.length) {
-      echo(done.join(', '));
     }
 
     return count;
   }
 
   /** @returns {number} */
-  function loopTabs (/** @type {boolean} */ dryRun, /** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, tab: KittensTab) => number} */ fn, /** @type {CheatStats} */ stats) {
+  function loopTabs (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type (dryRun: boolean, completed: string[], tab: KittensTab) => number} */ fn, /** @type {CheatStats} */ stats) {
     const /** @type {KittensNamedTab[]} */ allowedTabs = [];
     const /** @type {string[]} */ indv = [];
     let total = 0;
@@ -978,7 +959,7 @@
         try {
           !dryRun && fillResources();
 
-          const count = fn(dryRun, game[tab]);
+          const count = fn(dryRun, completed, game[tab]);
 
           if (count) {
             indv.push(game[tab].tabId);
@@ -1000,27 +981,32 @@
   /** @returns {CheatStats} */
   function execBuildAll (/** @type {number} */ delay, /** @type {boolean=} */ dryRun = false) {
     const /** @type {CheatStats} */ stats = {};
+    const /** @type {string[]} */ completed = [];
     let total = 0;
 
     if (cheatMap.control.all.upgrade.active || dryRun) {
-      total += loopTabs(dryRun, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab, stats);
+      total += loopTabs(dryRun, completed, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab, stats);
     }
 
     if (cheatMap.control.all.build.active || dryRun) {
-      total += loopTabs(dryRun, 'build', ['bldTab', 'spaceTab'], buildTab, stats);
+      total += loopTabs(dryRun, completed, 'build', ['bldTab', 'spaceTab'], buildTab, stats);
     }
 
     if (!dryRun) {
       if (cheatMap.control.all.zig.active) {
-        total += loopTabs(dryRun, 'zig', ['religionTab'], (dryRun) => buildZig(dryRun), stats);
+        total += loopTabs(dryRun, completed, 'zig', ['religionTab'], (dryRun, completed) => buildZig(dryRun, completed), stats);
       }
 
       if (cheatMap.control.all.crypto.active) {
-        total += loopTabs(dryRun, 'crypto', ['religionTab'], (dryRun) => buildTheology(dryRun), stats);
+        total += loopTabs(dryRun, completed, 'crypto', ['religionTab'], (dryRun, completed) => buildTheology(dryRun, completed), stats);
       }
     }
 
-    if (delay > 0) {
+    if (!dryRun && delay > 0) {
+      if (completed.length) {
+        echo(completed.join(', '));
+      }
+
       setTimeout(() => execBuildAll(delay), Math.ceil(delay / (total ? 2 : 1)));
     }
 
