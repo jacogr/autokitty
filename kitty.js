@@ -362,6 +362,8 @@
 
   /** @returns {KittensPrice[]} */
   function getInvalidPrices (/** @type {KittensBtn} */ btn, /** @type {string?} */ skip = null) {
+    const noCap = !btn.model.prices.find((p) => game.resPool.get(p.name).maxValue > 0);
+
     return btn.model.prices.filter((p) => {
       if (p.name === skip) {
         return false;
@@ -374,7 +376,9 @@
           ?  FRACTION.EXOTIC
           : r.name === 'karma' // type=rare, also affects neocorns
             ? FRACTION.KARMA
-            : 1
+            : noCap && !r.maxValue // all uncapped, set limits
+              ? FRACTION.UNCAPPED
+              : 1
       );
     });
   }
@@ -905,23 +909,11 @@
       return 0;
     }
 
-    const firstMax = model.prices.find((p) => game.resPool.get(p.name).maxValue > 0);
-    const isAll = firstMax ? model.metadata.on >= 1 : false;
+    const noCap = !model.prices.find((p) => game.resPool.get(p.name).maxValue > 0);
+    const isAll = noCap ? false : model.metadata.on >= 1;
 
-    if (!firstMax) {
-      if (!cheatMap.control.all.uncap.active) {
-        return 0;
-      }
-
-      const firstInvalid = model.prices.find((p) => {
-        const r = game.resPool.get(p.name);
-
-        return !r.maxValue && ((p.val / r.value) > FRACTION.UNCAPPED);
-      });
-
-      if (firstInvalid) {
-        return 0;
-      }
+    if (noCap && !cheatMap.control.all.uncap.active) {
+      return 0;
     }
 
     return dryRun ? 1 : clickDom(btn, { isAll });
