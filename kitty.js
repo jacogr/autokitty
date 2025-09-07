@@ -10,6 +10,7 @@
 /** @typedef {'blackCore' | 'blackLibrary' | 'blackNexus' | 'blackObelisk' | 'blackRadiance' | 'blazar' | 'darkNova' | 'holyGenocide' | 'mausoleum' | 'singularity'} KittensNamedBldgCrypto */
 /** @typedef {'satellite'} KittensNamedBldgSpace */
 /** @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamedBldgZU */
+/** @typedef {'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion'} KittensNamedEffect */
 /** @typedef {KittensNamedBldgBld | KittensNamedBldgCrypto | KittensNamedBldgSpace | KittensNamedBldgZU} KittensNamedBldg */
 /** @typedef {'numeromancy' | 'unicornmancy'} KittensNamedPerk */
 /** @typedef {'dragons' | 'griffins' | 'leviathans' | 'lizards' |'nagas' | 'sharks' | 'spiders' | 'zebras'} KittensNamedRace */
@@ -50,12 +51,12 @@
 /** @typedef {KittensTab & { buttons: KittensBtn[], promoteKittensBtn: KittensBtn }} KittensVillageTab */
 /** @typedef {{  craft: (name: KittensNamedRes, count: number) => void, craftAll: (name: KittensNamedRes) => void, getCraftAllCount: (name: KittensNamedRes) => number }} KittensWorkshop */
 /** @typedef {KittensTab & { buttons: KittensBtn[] }} KittensWorkshopTab */
-/** @typedef {{ bld: KittensBld, bldTab: KittensBldTab, calendar: KittensCalendar, console: KittensConsole, diplomacy: KittensDiplomacy, diplomacyTab: KittensDiplomacyTab, getEffect: (name: string) => number, getTicksPerSecondUI: () => number, msg: (text?: string) => { span: HTMLElement }, opts: KittensOpts, prestige: KittensPrestige, religion: KittensReligion, religionTab: KittensReligionTab, resPool: KittensResPool, time: KittensTime, timeTab: KittensTimeTab, spaceTab: KittensSpaceTab, ui: KittensUI, village: KittensVillage, villageTab: KittensVillageTab, workshop: KittensWorkshop, workshopTab: KittensWorkshopTab }} KittensGame */
+/** @typedef {{ bld: KittensBld, bldTab: KittensBldTab, calendar: KittensCalendar, console: KittensConsole, diplomacy: KittensDiplomacy, diplomacyTab: KittensDiplomacyTab, getEffect: (name: KittensNamedEffect) => number, getTicksPerSecondUI: () => number, msg: (text?: string) => { span: HTMLElement }, opts: KittensOpts, prestige: KittensPrestige, religion: KittensReligion, religionTab: KittensReligionTab, resPool: KittensResPool, time: KittensTime, timeTab: KittensTimeTab, spaceTab: KittensSpaceTab, ui: KittensUI, village: KittensVillage, villageTab: KittensVillageTab, workshop: KittensWorkshop, workshopTab: KittensWorkshopTab }} KittensGame */
 
 // Kitty Cheat
 /** @typedef {{ active?: boolean, btn: jQuery, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean }} CheatOpt */
 /** @typedef {Omit<CheatOpt, 'btn' | 'group'> & { fn: (group: string, name: string, opts: CheatOpt) => void }} CheatOptPartialAction */
-/** @typedef {{ actions: { active: boolean, all: { [x: string]: CheatOptPartialAction } }, control: { active: true, all: { [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> } }, crafting: { active: boolean, all: { [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> } }, tabs: { active: true, all: { [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } } }, trading: { active: boolean, all: { [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> } } }} CheatMap */
+/** @typedef {{ actions: { active: boolean, all: { [x: string]: CheatOptPartialAction }, div?: jQuery }, control: { active: true, all: { [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }, div?: jQuery }, crafting: { active: boolean, all: { [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }, div?: jQuery }, tabs: { active: true, all: { [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }, div?: jQuery }, trading: { active: boolean, all: { [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }, div?: jQuery } }} CheatMap */
 /** @typedef {{ frac: number, raw: number, text: string }} CheatPercent */
 /** @typedef {{ [x in 'build' | 'crypto' | 'upgrade' | 'zig']?: string[] }} CheatStats */
 
@@ -63,7 +64,6 @@
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
-  /** @type {{ [x: string]: number }} */
   const FRACTION = {
     // spend 1% maximum on any exotic
     EXOTIC: 0.01,
@@ -75,7 +75,6 @@
     UNCAPPED: 0.1
   };
 
-  /** @type {{ [x: string]: number }} */
   const MAXVAL = {
     // buy bcoin below this value
     BCOIN_BUY: 950,
@@ -85,7 +84,6 @@
     BLDG_GENOCIDE: 25
   };
 
-  /** @type {{ [x: string]: number }} */
   const INTERVAL = {
     ALL_OPT: 99,
     ALL_BLD: 999,
@@ -248,7 +246,6 @@
     }
   };
 
-  /** @type {{ [x: string]: number }} */
   const combustCycles = {
     tenErasLink: 500,
     previousCycleLink: 45,
@@ -685,9 +682,9 @@
   }
 
   /** @returns {void} */
-  function execOpt (/** @type {string} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
+  function execOpt (/** @type {keyof CheatMap} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
     try {
-      if (opts.active && cheatMap[/** @type {'actions'} */ (group)].active) {
+      if (opts.active && cheatMap[group].active) {
         !opts.noFill && fillResources();
 
         switch (group) {
@@ -715,7 +712,7 @@
   }
 
   /** @returns {void} */
-  function execOptTimer (/** @type {string} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
+  function execOptTimer (/** @type {keyof CheatMap} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
     execOpt(group, name, opts);
 
     setTimeout(() => execOptTimer(group, name, opts), opts.delay);
@@ -827,7 +824,7 @@
   }
 
   /** @returns {number} */
-  function unlockTabBtn (/** @type {KittensBtn} */ btn, /** @type {boolean} */ dryRun, /** @type {boolean=} */ isAll = false) {
+  function unlockTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn, /** @type {boolean=} */ isAll = false) {
     if (!btn?.model?.enabled || !btn.model.visible || !btn.model.metadata) {
       return 0;
     } else if (btn.id === 'cryochambers' && btn.model.on >= game.bld.getBuildingExt('chronosphere').meta.on) {
@@ -847,7 +844,7 @@
   }
 
   /** @returns {number} */
-  function unlockTab (/** @type {KittensTab} */ tab, /** @type {boolean} */ dryRun) {
+  function unlockTab (/** @type {boolean} */ dryRun, /** @type {KittensTab} */ tab) {
     if (!renderBgTab(tab)) {
       return 0;
     }
@@ -868,7 +865,7 @@
     )?.length);
 
     for (const btn of buttons) {
-      if (unlockTabBtn(btn, dryRun, isAll)) {
+      if (unlockTabBtn(dryRun, btn, isAll)) {
         if (dryRun) {
           return 1;
         }
@@ -905,7 +902,7 @@
   }
 
   /** @returns {number} */
-  function buildTabBtn (/** @type {KittensBtn} */ btn, /** @type {boolean} */ dryRun) {
+  function buildTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn) {
     const model = btn?.model;
 
     if (!model?.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val)) {
@@ -939,7 +936,7 @@
   }
 
   /** @returns {number} */
-  function buildTab (/** @type {KittensTab} */ tab, /** @type {boolean} */ dryRun) {
+  function buildTab (/** @type {boolean} */ dryRun, /** @type {KittensTab} */ tab) {
     if (!renderBgTab(tab)) {
       return 0;
     }
@@ -952,7 +949,7 @@
 
     for (const area of areas) {
       for (const btn of area.children) {
-        if (buildTabBtn(btn, dryRun)) {
+        if (buildTabBtn(dryRun, btn)) {
           if (dryRun) {
             return 1;
           }
@@ -971,7 +968,7 @@
   }
 
   /** @returns {number} */
-  function loopTabs (/** @type {boolean} */ dryRun, /** @type {CheatStats} */ stats, /** @type {keyof CheatStats} */ statsType, /** @type {KittensNamedTab[]} */ tabs, /** @type {(tab: KittensTab, dryRun: boolean) => number} */ fn) {
+  function loopTabs (/** @type {boolean} */ dryRun, /** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, tab: KittensTab) => number} */ fn, /** @type {CheatStats} */ stats) {
     const /** @type {KittensNamedTab[]} */ allowedTabs = [];
     const /** @type {string[]} */ indv = [];
     let total = 0;
@@ -985,20 +982,20 @@
         try {
           !dryRun && fillResources();
 
-          const count = fn(game[tab], dryRun);
+          const count = fn(dryRun, game[tab]);
 
           if (count) {
             indv.push(game[tab].tabId);
             total += count;
           }
         } catch (e) {
-          console.error('loopTabs', statsType, tab, e);
+          console.error('loopTabs', type, tab, e);
         }
       }
     }
 
     if (total) {
-      stats[statsType] = indv;
+      stats[type] = indv;
     }
 
     return total;
@@ -1010,24 +1007,24 @@
     let total = 0;
 
     if (cheatMap.control.all.upgrade.active || dryRun) {
-      total += loopTabs(dryRun, stats, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
+      total += loopTabs(dryRun, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab, stats);
     }
 
     if (cheatMap.control.all.build.active || dryRun) {
-      total += loopTabs(dryRun, stats, 'build', ['bldTab', 'spaceTab'], buildTab);
+      total += loopTabs(dryRun, 'build', ['bldTab', 'spaceTab'], buildTab, stats);
     }
 
     if (!dryRun) {
       if (cheatMap.control.all.zig.active) {
-        total += loopTabs(dryRun, stats, 'zig', ['religionTab'], (_, dryRun) => buildZig(dryRun));
+        total += loopTabs(dryRun, 'zig', ['religionTab'], (dryRun) => buildZig(dryRun), stats);
       }
 
       if (cheatMap.control.all.crypto.active) {
-        total += loopTabs(dryRun, stats, 'crypto', ['religionTab'], (_, dryRun) => buildTheology(dryRun));
+        total += loopTabs(dryRun, 'crypto', ['religionTab'], (dryRun) => buildTheology(dryRun), stats);
       }
     }
 
-    if (delay) {
+    if (delay > 0) {
       setTimeout(() => execBuildAll(delay), Math.ceil(delay / (total ? 2 : 1)));
     }
 
@@ -1038,7 +1035,7 @@
   function execTextInfo (/** @type {number} */ delay) {
     renderBgTab(game.religionTab);
 
-    const nxt = execBuildAll(0, true);
+    const nxt = execBuildAll(-1, true);
     const cry = calcTheology()[0];
     const zig = calcZiggurats();
     const trd = calcTranscend();
@@ -1081,7 +1078,7 @@
           const opts = /** @type {CheatOpt} */ (all[name]);
 
           if (opts.active && !opts.delay) {
-            execOpt(group, name, opts);
+            execOpt(/** @type {keyof CheatMap} */ (group), name, opts);
           }
         }
       }
@@ -1090,28 +1087,25 @@
     setTimeout(() => execOpts(delay), delay);
   }
 
-  /** @returns {string} */
-  function getGroupId (/** @type {string} */ group) {
-    return `kittycheatAct${capitalizeFirst(group)}`;
+  /** @returns {void} */
+  function activateGroup (/** @type {keyof CheatMap} */ group, /** @type {boolean=} */ active = false) {
+    const opt = cheatMap[/** @type {'actions'} */ (group)];
+
+    opt.active = active;
+    opt.div?.css('opacity', active ? 1 : 0.33);
   }
 
   /** @returns {void} */
-  function activateGroup (/** @type {string} */ group, /** @type {boolean=} */ active = false) {
-    cheatMap[/** @type {'actions'} */ (group)].active = active;
-    $(`div#${getGroupId(group)}`).css('opacity', active ? 1 : 0.33);
-  }
-
-  /** @returns {void} */
-  function clickOptBtn (/** @type {string} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
+  function clickOptBtn (/** @type {keyof CheatMap} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
     activateBtn(opts, !opts.active);
 
-    if (cheatMap[/** @type {'actions'} */ (group)].active) {
+    if (cheatMap[group].active) {
       if (opts.group) {
         activateGroup(opts.group, opts.active);
       } else if (opts.active) {
         if (opts.excl) {
           for (const e of opts.excl) {
-            activateBtn(/** @type {CheatOpt} */ (cheatMap[/** @type {'actions'} */ (group)].all[e]), false);
+            activateBtn(/** @type {CheatOpt} */ (cheatMap[group].all[e]), false);
           }
         }
 
@@ -1132,9 +1126,10 @@
     const divActGroup = jqAppend(divCont, styleDiv($('<div id="kittycheatAct"></div>')));
     const divTxtGroup = jqAppend(divCont, styleDiv($('<div id="kittycheatTxt"></div>')));
 
-    for (const group in cheatMap) {
-      const { active, all } = cheatMap[/** @type {'actions'} */ (group)];
-      const divGroup = jqAppend(divActGroup, styleDiv($(`<div id="${getGroupId(group)}"></div>`)));
+    for (const _group in cheatMap) {
+      const group = /** @type {keyof CheatMap} */ (_group);
+      const { active, all } = cheatMap[group];
+      const divGroup = cheatMap[group].div = jqAppend(divActGroup, styleDiv($(`<div id="kittycheatAct${capitalizeFirst(group)}}"></div>`)));
 
       if (group !== 'control') {
         jqAppend(divGroup, styleDiv($(`<div>${capitalizeFirst(group)}:</div>`), true));
