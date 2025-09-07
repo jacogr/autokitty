@@ -1126,7 +1126,7 @@
     for (const _group in cheatMap) {
       const group = /** @type {keyof CheatMap} */ (_group);
       const { active, all } = cheatMap[group];
-      const divGroup = cheatMap[group].div = jqAppend(divActGroup, styleDiv($(`<div id="kittycheat-act-${group}}"></div>`)));
+      const divGroup = cheatMap[group].div = jqAppend(divActGroup, styleDiv($(`<div id="kittycheat-act-${group}"></div>`)));
 
       if (group !== 'control') {
         jqAppend(divGroup, styleDiv($(`<div>${group}:</div>`), true));
