@@ -53,18 +53,17 @@
 /** @typedef {{ bld: KittensBld, bldTab: KittensBldTab, calendar: KittensCalendar, console: KittensConsole, diplomacy: KittensDiplomacy, diplomacyTab: KittensDiplomacyTab, getEffect: (name: string) => number, getTicksPerSecondUI: () => number, msg: (text?: string) => { span: HTMLElement }, opts: KittensOpts, prestige: KittensPrestige, religion: KittensReligion, religionTab: KittensReligionTab, resPool: KittensResPool, time: KittensTime, timeTab: KittensTimeTab, spaceTab: KittensSpaceTab, ui: KittensUI, village: KittensVillage, villageTab: KittensVillageTab, workshop: KittensWorkshop, workshopTab: KittensWorkshopTab }} KittensGame */
 
 // Kitty Cheat
-/** @typedef {{ active?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean }} CheatOptPartial */
-/** @typedef {CheatOptPartial & { fn: (group: string, name: string, opts: CheatOpt) => void }} CheatOptPartialAction */
-/** @typedef {CheatOptPartial & { btn: jQuery }} CheatOpt */
-/** @typedef {{ active: boolean  }} CheatMapEntry */
-/** @typedef {{ actions: CheatMapEntry & { all: { [x: string]: CheatOptPartialAction } }, control: { active: true, all: { [x: string]: CheatOptPartial } }, crafting: CheatMapEntry & { all: { [x in KittensNamedResCraft]?: CheatOptPartial } }, tabs: { active: true, all: { [x: string]: CheatOptPartial & { tab: KittensNamedTab } } }, trading: CheatMapEntry & { all: { [x in KittensNamedRace]: CheatOptPartial } } }} CheatMap */
+/** @typedef {{ active?: boolean, btn: jQuery, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean }} CheatOpt */
+/** @typedef {Omit<CheatOpt, 'btn' | 'group'> & { fn: (group: string, name: string, opts: CheatOpt) => void }} CheatOptPartialAction */
+/** @typedef {{ actions: { active: boolean, all: { [x: string]: CheatOptPartialAction } }, control: { active: true, all: { [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> } }, crafting: { active: boolean, all: { [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> } }, tabs: { active: true, all: { [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } } }, trading: { active: boolean, all: { [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> } } }} CheatMap */
 /** @typedef {{ frac: number, raw: number, text: string }} CheatPercent */
-/** @typedef {{  build?: string[], crypto?: string[], upgrade?: string[], zig?: string[] }} CheatStats */
+/** @typedef {{ [x in 'build' | 'crypto' | 'upgrade' | 'zig']?: string[] }} CheatStats */
 
 // Window
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
+  /** @type {{ [x: string]: number }} */
   const FRACTION = {
     // spend 1% maximum on any exotic
     EXOTIC: 0.01,
@@ -76,6 +75,7 @@
     UNCAPPED: 0.1
   };
 
+  /** @type {{ [x: string]: number }} */
   const MAXVAL = {
     // buy bcoin below this value
     BCOIN_BUY: 950,
@@ -85,6 +85,7 @@
     BLDG_GENOCIDE: 25
   };
 
+  /** @type {{ [x: string]: number }} */
   const INTERVAL = {
     ALL_OPT: 99,
     ALL_BLD: 999,
@@ -247,6 +248,7 @@
     }
   };
 
+  /** @type {{ [x: string]: number }} */
   const combustCycles = {
     tenErasLink: 500,
     previousCycleLink: 45,
@@ -533,13 +535,12 @@
   /** @returns {{ action: 'buy' | 'hold' | 'sell', price: number, text: string }} */
   function calcBcoin () {
     const price = game.calendar.cryptoPrice;
-    const action = (
+    const action =
       price >= MAXVAL.BCOIN_SELL
         ? 'sell'
         : price <= MAXVAL.BCOIN_BUY
           ? 'buy'
-          : 'hold'
-    );
+          : 'hold';
 
     return {
       action,
@@ -804,7 +805,7 @@
     }
 
     const avail = calcTheology();
-    const done = [];
+    const /** @type {string[]} */ done = [];
     let count = 0;
 
     for (const best of avail) {
@@ -857,7 +858,7 @@
       /** @type {KittensDiplomacyTab} */ (tab).racePanels?.map((r) => r.embassyButton) ||
       /** @type {KittensTimeTab} */ (tab).vsPanel?.children[0]?.children ||
       /** @type {KittensWorkshopTab} */ (tab).buttons;
-    const done = [];
+    const /** @type {string[]} */ done = [];
     let count = 0;
 
     // multi for religion & embassy upgrades
@@ -946,7 +947,7 @@
     const areas =
       /** @type {KittensSpaceTab} */ (tab).planetPanels ||
       [/** @type {KittensBldTab} */ (tab)];
-    const done = [];
+    const /** @type {string[]} */ done = [];
     let count = 0;
 
     for (const area of areas) {
@@ -971,8 +972,8 @@
 
   /** @returns {number} */
   function loopTabs (/** @type {boolean} */ dryRun, /** @type {CheatStats} */ stats, /** @type {keyof CheatStats} */ statsType, /** @type {KittensNamedTab[]} */ tabs, /** @type {(tab: KittensTab, dryRun: boolean) => number} */ fn) {
-    const allowedTabs = [];
-    const indv = [];
+    const /** @type {KittensNamedTab[]} */ allowedTabs = [];
+    const /** @type {string[]} */ indv = [];
     let total = 0;
 
     for (const t in cheatMap.tabs.all) {
