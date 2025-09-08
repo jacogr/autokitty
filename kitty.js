@@ -916,7 +916,6 @@
     const /** @type {string[]} */ completed = [];
     const /** @type {CheatStats} */ stats = {};
     const /** @type {KittensNamedTab[]} */ allowedTabs = [];
-    let total = 0;
 
     for (const t in cheatMap.tabs.all) {
       cheatMap.tabs.all[t]?.active && allowedTabs.push(cheatMap.tabs.all[t].tab);
@@ -930,11 +929,8 @@
           try {
             !dryRun && fillResources();
 
-            const count = fn(dryRun, completed, game[tab]);
-
-            if (count) {
+            if (fn(dryRun, completed, game[tab])) {
               doneTabs.push(game[tab].tabId);
-              total += count;
             }
           } catch (e) {
             console.error('loopTabs', type, tab, e);
@@ -957,7 +953,7 @@
 
       if (delay > 0) {
         echo(completed.join(', '), completed.length);
-        setTimeout(() => execBuildAll(delay), Math.ceil(delay / (total ? 2 : 1)));
+        setTimeout(() => execBuildAll(delay), Math.ceil(delay / (completed.length ? 2 : 1)));
       }
     }
 
