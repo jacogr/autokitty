@@ -695,21 +695,12 @@
       if (opts.active && cheatMap[group].active) {
         !opts.noFill && fillResources();
 
-        switch (group) {
-          case 'actions':
-            /** @type {CheatOptPartialAction} */ (opts).fn(group, name, opts);
-            break;
-
-          case 'crafting':
-            execCraft(/** @type {KittensNamedRes} */ (name));
-            break;
-
-          case 'trading':
-            execTrade(/** @type {KittensNamedRace} */ (name));
-            break;
-
-          default:
-            throw new Error(`Unknown execution group ${group}`);
+        if (group === 'actions') {
+          /** @type {CheatOptPartialAction} */ (opts).fn(group, name, opts);
+        } else if (group === 'crafting') {
+          execCraft(/** @type {KittensNamedRes} */ (name));
+        } else if (group === 'trading') {
+          execTrade(/** @type {KittensNamedRace} */ (name));
         }
 
         !opts.noFill && fillResources();
