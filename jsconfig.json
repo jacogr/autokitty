@@ -1,12 +1,12 @@
 {
-	// As per
-	// https://github.com/tsconfig/bases/blob/ebe629c2857d386a0bc2c5d60cab18b9f1a425d0/bases/strictest.json
+  // As per
+  // https://github.com/tsconfig/bases/blob/ebe629c2857d386a0bc2c5d60cab18b9f1a425d0/bases/strictest.json
   "compilerOptions": {
-		"lib": ["es2016", "dom"],
+    "lib": ["es2016", "dom"],
 
-		// TODO Enable everything
+    // TODO Enable everything
 
-    // "strict": true,
+    "strict": true,
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
     // "exactOptionalPropertyTypes": true,
