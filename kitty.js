@@ -249,7 +249,6 @@
   };
 
   let lastExploreTime = 0;
-  let lastSacrificeTime = 0;
 
   /** @returns {void} */
   function noop () {}
@@ -769,15 +768,8 @@
     const nowTears = game.resPool.get('tears').value;
     const finTears = nowTears + (zig.ratio * game.resPool.get('unicorns').value / 2500);
 
-    // only sacrifice when we can create missing (only every 10 seconds)
-    if (best.tears && nowTears < best.tears.val && finTears > best.tears.val) {
-      const nowTime = Date.now();
-      const nowDelta = nowTime - lastSacrificeTime;
-
-      if (!dryRun && nowDelta > INTERVAL.SACRIFICE) {
-        lastSacrificeTime = nowTime;
-        game.religionTab.sacrificeBtn.model.allLink.handler.call(game.religionTab.sacrificeBtn, noop, noop);
-      }
+    if (best.tears?.val && (nowTears < best.tears.val) && (finTears > best.tears.val)) {
+      game.religionTab.sacrificeBtn.model.allLink.handler.call(game.religionTab.sacrificeBtn, noop, noop);
     }
 
     return 0;
