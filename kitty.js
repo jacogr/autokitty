@@ -59,7 +59,7 @@
 /** @typedef {{ active?: boolean, btn: jQuery, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean }} CheatOpt */
 /** @typedef {Omit<CheatOpt, 'btn' | 'group'> & { fn: (group: string, name: string, opts: CheatOpt) => void }} CheatOptPartialAction */
 /** @template {{ [x: string]: CheatOpt }} T @typedef {{ active: boolean, all: T, div?: jQuery }} CheatMapEntry */
-/** @typedef {{ actions: CheatMapEntry<{ [x: string]: CheatOptPartialAction }>, control: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }> & { active: true }, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }> & { active: true }, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
+/** @typedef {{ actions: CheatMapEntry<{ [x: string]: CheatOptPartialAction }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'pollute' | 'uncap' | 'resources' | 'x10']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }> & { active: true }, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }> & { active: true }, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
 /** @typedef {{ frac: number, raw: number, text: string }} CheatPercent */
 /** @typedef {{ [x in 'build' | 'crypto' | 'upgrade' | 'zig']?: string[] }} CheatStats */
 /** @typedef {{ CRAFT: number, EXOTIC: number, UNCAPPED: number, RESOURCE: { [x in KittensNamedRes]?: number } }} CheatFraction */
@@ -385,13 +385,13 @@
 
   /** @returns {void} */
   function fillResources () {
-    if (!cheatMap.control.all.resources?.active && !cheatMap.control.all.x10?.active) {
+    if (!cheatMap.control.all.resources.active && !cheatMap.control.all.x10.active) {
       return;
     }
 
     for (const r of game.resPool.resources) {
       if (r.maxValue && r.unlocked && r.visible && r.name !== 'kittens' && r.name !== 'zebras') {
-        const max = r.maxValue * (cheatMap.control.all.x10?.active ? 10 : 1);
+        const max = r.maxValue * (cheatMap.control.all.x10.active ? 10 : 1);
 
         if (max && r.value < max) {
           r.value = max;
@@ -885,7 +885,7 @@
 
     if (!model?.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val)) {
       return 0;
-    } else if (!cheatMap.control.all.pollute?.active && model.metadata.effects?.cathPollutionPerTickProd) {
+    } else if (!cheatMap.control.all.pollute.active && model.metadata.effects?.cathPollutionPerTickProd) {
       return 0;
     }
 
@@ -893,7 +893,7 @@
 
     const check = checkPrices(btn.model.prices);
 
-    if (check.isInvalid || (check.isUncapped && !cheatMap.control.all.uncap?.active)) {
+    if (check.isInvalid || (check.isUncapped && !cheatMap.control.all.uncap.active)) {
       return 0;
     }
 
@@ -928,7 +928,7 @@
   }
 
   /** @returns {number} */
-  function loopTabs (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type (dryRun: boolean, completed: string[], tab: KittensTab) => number} */ fn, /** @type {CheatStats} */ stats) {
+  function loopTabs (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab) => number} */ fn, /** @type {CheatStats} */ stats) {
     const /** @type {KittensNamedTab[]} */ allowedTabs = [];
     const /** @type {string[]} */ indv = [];
     let total = 0;
@@ -967,20 +967,20 @@
     const /** @type {string[]} */ completed = [];
     let total = 0;
 
-    if (cheatMap.control.all.upgrade?.active || dryRun) {
+    if (cheatMap.control.all.upgrade.active || dryRun) {
       total += loopTabs(dryRun, completed, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab, stats);
     }
 
-    if (cheatMap.control.all.build?.active || dryRun) {
+    if (cheatMap.control.all.build.active || dryRun) {
       total += loopTabs(dryRun, completed, 'build', ['bldTab', 'spaceTab'], buildTab, stats);
     }
 
     if (!dryRun) {
-      if (cheatMap.control.all.zig?.active) {
+      if (cheatMap.control.all.zig.active) {
         total += loopTabs(dryRun, completed, 'zig', ['religionTab'], (dryRun, completed) => buildZig(dryRun, completed), stats);
       }
 
-      if (cheatMap.control.all.crypto?.active) {
+      if (cheatMap.control.all.crypto.active) {
         total += loopTabs(dryRun, completed, 'crypto', ['religionTab'], (dryRun, completed) => buildTheology(dryRun, completed), stats);
       }
     }
