@@ -66,12 +66,14 @@
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
   const FRACTION = {
+    // only craft 92.5% of max - don't exhaust sources
+    CRAFT: 0.925,
     // spend 1% maximum on any exotic
     EXOTIC: 0.01,
     // spend max 50% maximum on karma (no in-play increase)
     KARMA: 0.5,
-    // only craft 92.5% of max - don't exhaust sources
-    CRAFT: 0.925,
+    // spend all on tears (generated via unicorns)
+    TEARS: 1,
     // build uncapped buildings when we use only 10% of resources
     UNCAPPED: 0.1
   };
@@ -353,7 +355,7 @@
   }
 
   /** @return {boolean} */
-  function isPricesUncapped (/** @type {KittensPrice[]} */ prices, /** @type {string?} */ skip = null) {
+  function isPricesUncapped (/** @type {KittensPrice[]} */ prices, /** @type {KittensNamedRes?} */ skip = null) {
     for (const p of prices) {
       if (p.name !== skip) {
         const r = game.resPool.get(p.name);
@@ -368,7 +370,7 @@
   }
 
   /** @returns {{ isUncapped: boolean, isInvalid: boolean }} */
-  function checkPrices (/** @type {KittensPrice[]} */ prices, /** @type {string?} */ skip = null) {
+  function checkPrices (/** @type {KittensPrice[]} */ prices, /** @type {KittensNamedRes?} */ skip = null) {
     const isUncapped = isPricesUncapped(prices, skip);
 
     for (const p of prices) {
@@ -379,7 +381,9 @@
             ? FRACTION.EXOTIC
             : r.name === 'karma' // type=rare, also affects neocorns
               ? FRACTION.KARMA
-              : (isUncapped ? FRACTION.UNCAPPED : 1);
+              : r.name === 'tears'
+                ? FRACTION.TEARS
+                : (isUncapped ? FRACTION.UNCAPPED : 1);
 
         if ((p.val / r.value) > f) {
           return { isUncapped, isInvalid: true };
