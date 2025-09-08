@@ -57,25 +57,23 @@
 
 // Kitty Cheat
 /** @typedef {{ active?: boolean, btn: jQuery, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean }} CheatOpt */
-/** @typedef {Omit<CheatOpt, 'btn' | 'group'> & { fn: (group: string, name: string, opts: CheatOpt) => void }} CheatOptPartialAction */
 /** @template {{ [x: string]: CheatOpt }} T @typedef {{ active: boolean, all: T, div?: jQuery }} CheatMapEntry */
-/** @typedef {{ actions: CheatMapEntry<{ [x: string]: CheatOptPartialAction }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'pollute' | 'uncap' | 'resources' | 'x10']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }> & { active: true }, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }> & { active: true }, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
-/** @typedef {{ frac: number, raw: number, text: string }} CheatPercent */
+/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'group'> & { fn: (group: string, name: string, opts: CheatOpt) => void } }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'pollute' | 'uncap' | 'resources' | 'x10']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }> & { active: true }, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }> & { active: true }, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
 /** @typedef {{ [x in 'build' | 'crypto' | 'upgrade' | 'zig']?: string[] }} CheatStats */
-/** @typedef {{ CRAFT: number, EXOTIC: number, UNCAPPED: number, RESOURCE: { [x in KittensNamedRes]?: number } }} CheatFraction */
 
 // Window
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
-  /** @type {CheatFraction} */
+  /** @readonly @type {{ CRAFT: number, UNCAPPED: number, RES_NAME: { [x in KittensNamedRes]?: number }, RES_TYPE: { [x in KittensNamedResType]: number } }} */
   const FRACTION = {
     CRAFT: 0.925, // 92.5% spent on crafting
-    EXOTIC: 0.01, // 1% spent from exotic
     UNCAPPED: 0.1, // 10% spent on uncapped
-    RESOURCE: { karma: 0.5, tears: 1 }
+    RES_NAME: /** @readonly */ { karma: 0.5, tears: 1 },
+    RES_TYPE: /** @readonly */ { exotic: 0.01, common: 0, rare: 0 } // exhaustive
   };
 
+  /** @readonly */
   const MAXVAL = {
     BCOIN_BUY: 950, // buy bcoin below this value
     BCOIN_SELL: 1085, // sell bcoin when it hits this amount (1100 is a crash)
@@ -286,7 +284,7 @@
     return div.css({ 'margin-bottom': isSmall ? '5px' : '20px' });
   }
 
-  /** @returns {CheatPercent?} */
+  /** @returns {{ frac: number, raw: number, text: string } | null} */
   function toPercent (/** @type {number} */ frac) {
     if (frac < 0 || frac > Number.MAX_SAFE_INTEGER) {
       return null;
@@ -369,11 +367,7 @@
     for (const p of prices) {
       if (p.name !== skip) {
         const r = game.resPool.get(p.name);
-        const f = FRACTION.RESOURCE[r.name] || (
-          r.type === 'exotic'
-            ? FRACTION.EXOTIC
-            : (isUncapped ? FRACTION.UNCAPPED : 1)
-        );
+        const f = FRACTION.RES_NAME[r.name] || FRACTION.RES_TYPE[r.type] || (isUncapped ? FRACTION.UNCAPPED : 1);
 
         if ((p.val / r.value) > f) {
           return { isUncapped, isInvalid: true };
@@ -533,12 +527,12 @@
     };
   }
 
-  /** @returns {CheatPercent?} */
+  /** @returns {ReturnType<toPercent>} */
   function calcTranscend () {
     return toPercent(game.religion.faithRatio / game.religion._getTranscendNextPrice());
   }
 
-  /** @returns {{ btn: KittensBtn, percent: CheatPercent | null, text?: string | null }[]} */
+  /** @returns {{ btn: KittensBtn, percent: ReturnType<toPercent>, text?: string | null }[]} */
   function calcTheology () {
     return game.religionTab.ctPanel.children[0].children
       .filter((a) => {
@@ -552,7 +546,7 @@
       })
       .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
       .map((btn) => {
-        const percent = toPercent(game.resPool.get('relic').value / (btn.model.prices[0].val * (1 / FRACTION.EXOTIC)));
+        const percent = toPercent(game.resPool.get('relic').value / (btn.model.prices[0].val * (1 / FRACTION.RES_TYPE.exotic)));
         const name = getBtnName(btn);
 
         return {
@@ -677,7 +671,7 @@
         !opts.noFill && fillResources();
 
         if (group === 'actions') {
-          /** @type {CheatOptPartialAction} */ (opts).fn(group, name, opts);
+          /** @type {Required<CheatOpt>} */ (opts).fn(group, name, opts);
         } else if (group === 'crafting') {
           execCraft(/** @type {KittensNamedRes} */ (name));
         } else if (group === 'trading') {
@@ -1032,7 +1026,7 @@
       } else if (opts.active) {
         if (opts.excl) {
           for (const e of opts.excl) {
-            activateBtn(/** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof (typeof cheatMap)[group]['all']} */ (e)]), false);
+            activateBtn(/** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (e)]), false);
           }
         }
 
