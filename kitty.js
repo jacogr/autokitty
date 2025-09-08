@@ -630,13 +630,18 @@
     }
 
     const blck = getZigInfo('blackPyramid');
+    let hasSome = false;
 
     if (blck.isBuildable) {
-      return clickDom(blck.btn, true);
+      if (!clickDom(blck.btn, true)) {
+        return false;
+      }
+
+      pushBtnName(completed, blck.btn);
+      hasSome = true;
     }
 
     let zig = calcZiggurats();;
-    let hasSome = false;
     let count = 0;
 
     while (zig.bestBuilding && count < 7) {
