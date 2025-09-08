@@ -295,9 +295,7 @@
 
       return {
         frac,
-        text: raw >= 100
-          ? '>> 100%'
-          : `${raw.toFixed(3)}%`,
+        text: `${raw >= 100 ? '>> 100' : raw.toFixed(3)}%`,
         raw
       };
     }
@@ -340,13 +338,7 @@
   function clickSpan (/** @type {string} */ label) {
     const elem = $('span').filter((_, e) => $(e).text().indexOf(label) === 0);
 
-    if (elem.length) {
-      elem.click();
-
-      return 1;
-    }
-
-    return 0;
+    return (elem.length && elem.click()) ? 1 : 0;
   }
 
   /** @template {KittensTab} T @returns {T | null | undefined} */
@@ -361,7 +353,7 @@
   }
 
   /** @return {boolean} */
-  function isUncapped (/** @type {KittensPrice[]} */ prices, /** @type {string?} */ skip = null) {
+  function isPricesUncapped (/** @type {KittensPrice[]} */ prices, /** @type {string?} */ skip = null) {
     for (const p of prices) {
       if (p.name !== skip) {
         const r = game.resPool.get(p.name);
@@ -375,27 +367,27 @@
     return true;
   }
 
-  /** @returns {KittensPrice[]} */
-  function getInvalidPrices (/** @type {KittensPrice[]} */ prices, /** @type {string?} */ skip = null) {
-    const noCap = isUncapped(prices, skip);
+  /** @returns {{ isUncapped: boolean, isInvalid: boolean }} */
+  function checkPrices (/** @type {KittensPrice[]} */ prices, /** @type {string?} */ skip = null) {
+    const isUncapped = isPricesUncapped(prices, skip);
 
-    return prices.filter((p) => {
-      if (p.name === skip) {
-        return false;
+    for (const p of prices) {
+      if (p.name !== skip) {
+        const r = game.resPool.get(p.name);
+        const f =
+          r.type === 'exotic'
+            ? FRACTION.EXOTIC
+            : r.name === 'karma' // type=rare, also affects neocorns
+              ? FRACTION.KARMA
+              : (isUncapped ? FRACTION.UNCAPPED : 1);
+
+        if ((p.val / r.value) > f) {
+          return { isUncapped, isInvalid: true };
+        }
       }
+    }
 
-      const r = game.resPool.get(p.name);
-
-      return (p.val / r.value) > (
-        r.type === 'exotic'
-          ?  FRACTION.EXOTIC
-          : r.name === 'karma' // type=rare, also affects neocorns
-            ? FRACTION.KARMA
-            : noCap // all uncapped, set limits
-              ? FRACTION.UNCAPPED
-              : 1
-      );
-    });
+    return { isUncapped, isInvalid: false };
   }
 
   /** @returns {void} */
@@ -577,7 +569,7 @@
           return false;
         }
 
-        return !getInvalidPrices(a.model.prices, 'relic').length;
+        return !checkPrices(a.model.prices, 'relic').isInvalid;
       })
       .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
       .map((btn) => {
@@ -747,7 +739,7 @@
 
     return {
       bld,
-      isBuildable: !!bld?.model.visible && !getInvalidPrices(bld.model.prices).length,
+      isBuildable: !!bld?.model.visible && !checkPrices(bld.model.prices).isInvalid,
       tears: bld?.model.prices.find((p) => p.name === 'tears')
     };
   }
@@ -808,7 +800,7 @@
 
   /** @returns {number} */
   function buildTheologyBtn (/** @type {{ btn: KittensBtn, percent?: CheatPercent }} */ best, /** @type {boolean} */ dryRun) {
-    if (!best.btn.model.visible || !best.btn.model.enabled || !best.percent || best.percent.frac < 1 || getInvalidPrices(best.btn.model.prices).length) {
+    if (!best.btn.model.visible || !best.btn.model.enabled || !best.percent || best.percent.frac < 1 || checkPrices(best.btn.model.prices).isInvalid) {
       return 0;
     }
 
@@ -848,7 +840,7 @@
 
     !dryRun && fillResources();
 
-    if (getInvalidPrices(btn.model.prices).length) {
+    if (checkPrices(btn.model.prices).isInvalid) {
       return 0;
     }
 
@@ -920,18 +912,13 @@
 
     !dryRun && fillResources();
 
-    if (getInvalidPrices(btn.model.prices).length) {
+    const check = checkPrices(btn.model.prices);
+
+    if (check.isInvalid || (check.isUncapped && !cheatMap.control.all.uncap.active)) {
       return 0;
     }
 
-    const noCap = isUncapped(btn.model.prices);
-    const isAll = noCap ? false : model.metadata.on >= 1;
-
-    if (noCap && !cheatMap.control.all.uncap.active) {
-      return 0;
-    }
-
-    return dryRun ? 1 : clickDom(btn, { isAll });
+    return dryRun ? 1 : clickDom(btn, { isAll: !check.isUncapped && model.metadata.on >= 1 });
   }
 
   /** @returns {number} */
