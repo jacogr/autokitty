@@ -141,7 +141,7 @@
         tMythril: {}
       }
     },
-    'trading': {
+    trading: {
       active: false,
       all: {
         leviathans: { active: true },
@@ -154,7 +154,7 @@
         sharks: { active: true }
       }
     },
-    'actions': {
+    actions: {
       active: false,
       all: {
         catnip: {
