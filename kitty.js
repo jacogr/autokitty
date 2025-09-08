@@ -477,10 +477,10 @@
     // We now want to determine how quickly the cost of given building is neutralized
     // by its effect on production of unicorns.
 
-    let /** @type {KittensNamedBldgZU | null} */ bestBuilding = null;
+    let /** @type {KittensBtn?} */ bestBtn = null;
+    let /** @type {KittensNamedBldgZU?} */ bestBuilding = null;
     let /** @type {KittensPrice[]} */ bestPrices = [];
     let bestAmortization = Number.POSITIVE_INFINITY;
-    let bestBtn = null;
 
     for (let i = 0; i < validBuildings.length; i++) {
       const building = validBuildings[i];
@@ -1005,7 +1005,7 @@
           const opts = /** @type {CheatOpt} */ (all[/** @type {keyof typeof all} */ (name)]);
 
           if (opts.active && !opts.delay) {
-            execOpt(/** @type {keyof CheatMap} */ (group), name, opts);
+            execOpt(group, name, opts);
           }
         }
       }
