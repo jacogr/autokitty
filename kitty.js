@@ -361,23 +361,25 @@
   }
 
   /** @return {boolean} */
-  function isUncapped (/** @type {KittensBtn} */ btn, /** @type {string?} */ skip = null) {
-    return !btn.model.prices.find((p) => {
-      if (p.name === skip) {
-        return false;
+  function isUncapped (/** @type {KittensPrice[]} */ prices, /** @type {string?} */ skip = null) {
+    for (const p of prices) {
+      if (p.name !== skip) {
+        const r = game.resPool.get(p.name);
+
+        if (r.maxValue || r.perTickCached) {
+          return false;
+        }
       }
+    }
 
-      const r = game.resPool.get(p.name);
-
-      return !!(r.maxValue || r.perTickCached);
-    });
+    return true;
   }
 
   /** @returns {KittensPrice[]} */
-  function getInvalidPrices (/** @type {KittensBtn} */ btn, /** @type {string?} */ skip = null) {
-    const noCap = isUncapped(btn, skip);
+  function getInvalidPrices (/** @type {KittensPrice[]} */ prices, /** @type {string?} */ skip = null) {
+    const noCap = isUncapped(prices, skip);
 
-    return btn.model.prices.filter((p) => {
+    return prices.filter((p) => {
       if (p.name === skip) {
         return false;
       }
@@ -389,7 +391,7 @@
           ?  FRACTION.EXOTIC
           : r.name === 'karma' // type=rare, also affects neocorns
             ? FRACTION.KARMA
-            : noCap && !(r.maxValue || r.perTickCached) // all uncapped, set limits
+            : noCap // all uncapped, set limits
               ? FRACTION.UNCAPPED
               : 1
       );
@@ -575,7 +577,7 @@
           return false;
         }
 
-        return !getInvalidPrices(a, 'relic').length;
+        return !getInvalidPrices(a.model.prices, 'relic').length;
       })
       .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
       .map((btn) => {
@@ -745,7 +747,7 @@
 
     return {
       bld,
-      isBuildable: !!bld?.model.visible && !getInvalidPrices(bld).length,
+      isBuildable: !!bld?.model.visible && !getInvalidPrices(bld.model.prices).length,
       tears: bld?.model.prices.find((p) => p.name === 'tears')
     };
   }
@@ -806,7 +808,7 @@
 
   /** @returns {number} */
   function buildTheologyBtn (/** @type {{ btn: KittensBtn, percent?: CheatPercent }} */ best, /** @type {boolean} */ dryRun) {
-    if (!best.btn.model.visible || !best.btn.model.enabled || !best.percent || best.percent.frac < 1 || getInvalidPrices(best.btn).length) {
+    if (!best.btn.model.visible || !best.btn.model.enabled || !best.percent || best.percent.frac < 1 || getInvalidPrices(best.btn.model.prices).length) {
       return 0;
     }
 
@@ -846,7 +848,7 @@
 
     !dryRun && fillResources();
 
-    if (getInvalidPrices(btn).length) {
+    if (getInvalidPrices(btn.model.prices).length) {
       return 0;
     }
 
@@ -918,11 +920,11 @@
 
     !dryRun && fillResources();
 
-    if (getInvalidPrices(btn).length) {
+    if (getInvalidPrices(btn.model.prices).length) {
       return 0;
     }
 
-    const noCap = isUncapped(btn);
+    const noCap = isUncapped(btn.model.prices);
     const isAll = noCap ? false : model.metadata.on >= 1;
 
     if (noCap && !cheatMap.control.all.uncap.active) {
