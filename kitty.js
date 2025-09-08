@@ -282,17 +282,19 @@
     return div.css({ 'margin-bottom': isSmall ? '5px' : '20px' });
   }
 
-  /** @returns {CheatPercent=} */
+  /** @returns {CheatPercent?} */
   function toPercent (/** @type {number} */ frac) {
-    if (frac > 0 && frac < Number.MAX_SAFE_INTEGER) {
-      const raw = 100 * frac;
-
-      return {
-        frac,
-        text: `${raw >= 100 ? '>> 100' : raw.toFixed(3)}%`,
-        raw
-      };
+    if (frac < 0 || frac > Number.MAX_SAFE_INTEGER) {
+      return null;
     }
+
+    const raw = 100 * frac;
+
+    return {
+      frac,
+      text: `${raw >= 100 ? '>> 100' : raw.toFixed(3)}%`,
+      raw
+    };
   }
 
   /** @returns {number} */
@@ -547,12 +549,12 @@
     };
   }
 
-  /** @returns {CheatPercent=} */
+  /** @returns {CheatPercent?} */
   function calcTranscend () {
     return toPercent(game.religion.faithRatio / game.religion._getTranscendNextPrice());
   }
 
-  /** @returns {{ btn: KittensBtn, percent?: CheatPercent, text?: string | null }[]} */
+  /** @returns {{ btn: KittensBtn, percent: CheatPercent | null, text?: string | null }[]} */
   function calcTheology () {
     return game.religionTab.ctPanel.children[0].children
       .filter((a) => {
@@ -776,7 +778,7 @@
   }
 
   /** @returns {number} */
-  function buildTheologyBtn (/** @type {{ btn: KittensBtn, percent?: CheatPercent }} */ best, /** @type {boolean} */ dryRun) {
+  function buildTheologyBtn (/** @type {ReturnType<calcTheology>[0]} */ best, /** @type {boolean} */ dryRun) {
     if (!best.btn.model.visible || !best.btn.model.enabled || !best.percent || best.percent.frac < 1 || checkPrices(best.btn.model.prices).isInvalid) {
       return 0;
     }
