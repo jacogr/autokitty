@@ -315,15 +315,10 @@
   }
 
   /** @returns {number} */
-  function clickDom (/** @type {KittensBtn?=} */ btn, /** @type {{ isAll?: boolean, isBatch?: boolean }=} */ opts = {}) {
+  function clickDom (/** @type {KittensBtn?=} */ btn, /** @type {boolean=} */ isAll = false) {
     if (btn?.domNode) {
-      if (opts.isAll) {
-        btn.domNode.dispatchEvent(new MouseEvent('click', { shiftKey: true }));
-      } else if (opts.isBatch) {
-        btn.domNode.dispatchEvent(new MouseEvent('click', { ctrlKey: true, metaKey: true }));
-      } else {
-        btn.domNode.click();
-      }
+      // For 10 batch mode: { ctrlKey: true, metaKey: true }
+      btn.domNode.dispatchEvent(new MouseEvent('click', isAll ? { shiftKey: true } : {}));
 
       return 1;
     }
@@ -824,7 +819,7 @@
       return 0;
     }
 
-    return dryRun ? 1 : clickDom(btn, { isAll });
+    return dryRun ? 1 : clickDom(btn, isAll);
   }
 
   /** @returns {number} */
@@ -898,7 +893,7 @@
       return 0;
     }
 
-    return dryRun ? 1 : clickDom(btn, { isAll: !check.isUncapped && model.metadata.on >= 1 });
+    return dryRun ? 1 : clickDom(btn, !check.isUncapped && model.metadata.on >= 1);
   }
 
   /** @returns {number} */
