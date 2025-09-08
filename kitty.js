@@ -665,7 +665,7 @@
   }
 
   /** @returns {boolean} */
-  function buildZig (/** @type {string[]} */ completed, /** @type {boolean} */ dryRun) {
+  function buildZig (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed) {
     if (dryRun || !renderBgTab(game.religionTab)) {
       return false;
     }
@@ -708,9 +708,9 @@
       }
 
       pushBtnName(completed, next.btn);
+      zig = calcZiggurats();
       count = completed.length;
       hasSome = true;
-      zig = calcZiggurats();
     }
 
     return hasSome;
@@ -726,7 +726,7 @@
   }
 
   /** @returns {boolean}  */
-  function buildTheology (/** @type {string[]} */ completed, /** @type {boolean} */ dryRun) {
+  function buildTheology (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed) {
     if (dryRun || !renderBgTab(game.religionTab)) {
       return false;
     }
@@ -764,7 +764,7 @@
   }
 
   /** @returns {boolean} */
-  function unlockTab (/** @type {string[]} */ completed, /** @type {boolean} */ dryRun, /** @type {KittensTab} */ tab) {
+  function unlockTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab) {
     if (!renderBgTab(tab)) {
       return false;
     }
@@ -838,7 +838,7 @@
   }
 
   /** @returns {boolean} */
-  function buildTab (/** @type {string[]} */ completed, /** @type {boolean} */ dryRun, /** @type {KittensTab} */ tab) {
+  function buildTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab) {
     if (!renderBgTab(tab)) {
       return false;
     }
@@ -874,7 +874,7 @@
       cheatMap.tabs.all[t]?.active && allowedTabs.push(cheatMap.tabs.all[t].tab);
     }
 
-    const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(completed: string[], dryRun: boolean, tab: KittensTab) => boolean} */ fn) => {
+    const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab) => boolean} */ fn) => {
       const /** @type {string[]} */ doneTabs = [];
 
       for (const tab of tabs) {
@@ -882,7 +882,7 @@
           try {
             !dryRun && fillResources();
 
-            if (fn(completed, dryRun, game[tab])) {
+            if (fn(dryRun, completed, game[tab])) {
               doneTabs.push(game[tab].tabId);
             }
           } catch (e) {
