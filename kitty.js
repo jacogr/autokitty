@@ -1011,8 +1011,7 @@
     const zig = calcZiggurats();
     const trd = calcTranscend();
     const bcn = calcBcoin();
-
-    let zigText = /** @type {string | undefined} */ (zig.bestBuilding);
+    let /** @type {string?} */ zigText = null;
 
     if (zig.bestBuilding && zig.bestPrices) {
       const name = zig.bestBuilding === 'unicornPasture'
@@ -1026,7 +1025,7 @@
 
     $('div#kittycheat-txt-drybld').html(`Buildings: ${nxt.build?.join(', ') || '-'}`);
     $('div#kittycheat-txt-dryupg').html(`Upgrades : ${nxt.upgrade?.join(', ') || '-'}`);
-    $('div#kittycheat-txt-relzig').html(`Ziggurat : ${zigText || zig.err || '-'}`);
+    $('div#kittycheat-txt-relzig').html(`Ziggurat : ${zig.err || zigText || '-'}`);
     $('div#kittycheat-txt-relcry').html(`Theology : ${cry?.text || '-'}`);
     $('div#kittycheat-txt-rellvl').html(`Transcend: ${trd?.text || '-'}`);
     $('div#kittycheat-txt-bcoins').html(`Blackcoin: ${bcn?.text || '-'}`);
