@@ -82,6 +82,7 @@
     BLDG_GENOCIDE: 25 // build at most 25 HGs - this is optimal for paragon
   };
 
+  /** @readonly */
   const INTERVAL = {
     ALL_OPT: 99,
     ALL_BLD: 999,
@@ -928,7 +929,7 @@
   }
 
   /** @returns {number} */
-  function loopTabs (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab) => number} */ fn, /** @type {CheatStats} */ stats) {
+  function loopTabs (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {CheatStats} */ stats, /** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab) => number} */ fn) {
     const /** @type {KittensNamedTab[]} */ allowedTabs = [];
     const /** @type {string[]} */ indv = [];
     let total = 0;
@@ -938,7 +939,7 @@
     }
 
     for (const tab of tabs) {
-      if (dryRun || allowedTabs.includes(tab)) {
+      if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tab))) {
         try {
           !dryRun && fillResources();
 
@@ -955,7 +956,7 @@
     }
 
     if (total) {
-      stats[type] = indv;
+      stats[type] = (stats[type] || []).concat(...indv);
     }
 
     return total;
@@ -967,22 +968,13 @@
     const /** @type {string[]} */ completed = [];
     let total = 0;
 
-    if (cheatMap.control.all.upgrade.active || dryRun) {
-      total += loopTabs(dryRun, completed, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab, stats);
-    }
-
-    if (cheatMap.control.all.build.active || dryRun) {
-      total += loopTabs(dryRun, completed, 'build', ['bldTab', 'spaceTab'], buildTab, stats);
-    }
+    total += loopTabs(dryRun, completed, stats, 'upgrade', ['libraryTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
+    total += loopTabs(dryRun, completed, stats, 'build', ['bldTab', 'spaceTab'], buildTab);
+    total += loopTabs(dryRun, completed, stats, 'upgrade', ['diplomacyTab', 'religionTab'], unlockTab);
 
     if (!dryRun) {
-      if (cheatMap.control.all.zig.active) {
-        total += loopTabs(dryRun, completed, 'zig', ['religionTab'], (dryRun, completed) => buildZig(dryRun, completed), stats);
-      }
-
-      if (cheatMap.control.all.crypto.active) {
-        total += loopTabs(dryRun, completed, 'crypto', ['religionTab'], (dryRun, completed) => buildTheology(dryRun, completed), stats);
-      }
+      total += loopTabs(dryRun, completed, stats, 'zig', ['religionTab'], (dryRun, completed) => buildZig(dryRun, completed));
+      total += loopTabs(dryRun, completed, stats, 'crypto', ['religionTab'], (dryRun, completed) => buildTheology(dryRun, completed));
     }
 
     if (!dryRun && delay > 0) {
