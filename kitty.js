@@ -21,39 +21,18 @@
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
 /** @typedef {{ id: string, render: () => void, tabId: string, tabName: string, visible: boolean }} KittensTab */
 /** @typedef {{ children: KittensBtn[] }} KittensBtnPanel */
-/** @typedef {{ cathPollution: number, getBuildingExt: (name: KittensNamedBldgBld) => KittensBldg }} KittensBld */
-/** @typedef {KittensBtnPanel & KittensTab} KittensBldTab */
-/** @typedef {{ effects: KittensEffects, label: string, name: string, on: number, unlocked: boolean, val: number }} KittensBldgMetadata */
-/** @typedef {{ enabled: boolean, metadata: KittensBldgMetadata, on: number, prices: KittensPrice[] | [KittensPrice], visible: boolean }} KittensBldgModel */
-/** @typedef {{ effects?: KittensEffects, meta: KittensBldgMetadata, model?: KittensBldgModel, val?: number }} KittensBldg */
-/** @typedef {{ loadout: { pinned: boolean }, name: string }} KittensBtnOpts */
-/** @typedef {{ domNode: HTMLElement, id: string, model: KittensBldgModel, opts?: KittensBtnOpts }} KittensBtn */
-/** @typedef {{ festivalEffects: { unicorns: number } }} KittensCalendarCycle */
-/** @typedef {{ cryptoPrice: number, cycle: number,  cycles: KittensCalendarCycle[], festivalDays: number, year: number }} KittensCalendar */
-/** @typedef {{ filters: { [x in KittensNamedConsFilt]: { enabled: boolean } }, maxMessages: number }} KittensConsole */
+/** @typedef {{ effects: KittensEffects, label: string, name: string, on: number, unlocked: boolean, val: number }} KittensMetadata */
+/** @typedef {{ enabled: boolean, metadata: KittensMetadata, on: number, prices: KittensPrice[] | [KittensPrice], visible: boolean }} KittensModel */
+/** @typedef {{ effects?: KittensEffects, meta: KittensMetadata, model?: KittensModel, val?: number }} KittensBldg */
+/** @typedef {{ domNode: HTMLElement, id: string, model: KittensModel, opts?: { loadout: { pinned: boolean }, name: string } }} KittensBtn */
 /** @typedef {{ name: KittensNamedRace, unlocked: boolean }} KittensDiplomacyRace */
-/** @typedef {{ get: (name: KittensNamedRace) => KittensDiplomacyRace, unlockElders: () => void }} KittensDiplomacy */
 /** @typedef {{ embassyButton: KittensBtn, race: KittensDiplomacyRace, feedBtn?: KittensBtn, tradeBtn: { tradeAllHref: { link: HTMLElement } } }} KittensDiplomacyRacePanel */
 /** @typedef {KittensDiplomacyRacePanel & { buyBcoin: KittensBtn, sellBcoin: KittensBtn }} KittensDiplomacyRacePanelLeviathans */
 /** @typedef {KittensTab & { exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }} KittensDiplomacyTab */
 /** @typedef {{ cathPollutionPerTickProd?: number, riftChance?: number, unicornsPerTickBase?: number, unicornsRatioReligion?: number }} KittensEffects */
-/** @typedef {{ noConfirm: boolean }} KittensOpts */
-/** @typedef {{ researched: boolean }} KittensPerk */
-/** @typedef {{ getParagonProductionRatio: () => number, getPerk: (name: KittensNamedPerk) => KittensPerk }} KittensPrestige */
 /** @typedef {{ name: KittensNamedRes, val: number }} KittensPrice */
-/** @typedef {{ _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBldg, praise: () => void, resetFaith: (n: number, b: boolean) => void }} KittensReligion */
-/** @typedef {KittensTab & { ctPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: (...args: unknown[]) => void } } }, zgUpgradeButtons: KittensBtn[] }} KittensReligionTab */
 /** @typedef {{ maxValue: number, name: KittensNamedRes, perTickCached: number, type: KittensNamedResType, unlocked: boolean, value: number, visible: boolean }} KittensRes */
-/** @typedef {{ get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }} KittensResPool */
-/** @typedef {KittensTab & { GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }} KittensSpaceTab */
-/** @typedef {{ heat: number }} KittensTime */
-/** @typedef {KittensTab & { cfPanel: { children: [{ children: (KittensBtn & { model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } })[] }] }, vsPanel: { children: [KittensBtnPanel] } }} KittensTimeTab */
-/** @typedef {{ activeTabId: string }} KittensUI */
-/** @typedef {{ huntAll: () => void }} KittensVillage */
-/** @typedef {KittensTab & { buttons: KittensBtn[], promoteKittensBtn: KittensBtn }} KittensVillageTab */
-/** @typedef {{  craft: (name: KittensNamedRes, count: number) => void, craftAll: (name: KittensNamedRes) => void, getCraftAllCount: (name: KittensNamedRes) => number }} KittensWorkshop */
-/** @typedef {KittensTab & { buttons: KittensBtn[] }} KittensWorkshopTab */
-/** @typedef {{ bld: KittensBld, bldTab: KittensBldTab, calendar: KittensCalendar, console: KittensConsole, diplomacy: KittensDiplomacy, diplomacyTab: KittensDiplomacyTab, getEffect: (name: KittensNamedEffect) => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab, msg: (text?: string) => { span: HTMLElement }, opts: KittensOpts, prestige: KittensPrestige, religion: KittensReligion, religionTab: KittensReligionTab, resPool: KittensResPool, time: KittensTime, timeTab: KittensTimeTab, spaceTab: KittensSpaceTab, ui: KittensUI, village: KittensVillage, villageTab: KittensVillageTab, workshop: KittensWorkshop, workshopTab: KittensWorkshopTab }} KittensGame */
+/** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: KittensNamedBldgBld) => KittensBldg }, bldTab: KittensBtnPanel & KittensTab, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in KittensNamedConsFilt]: { enabled: boolean } }, maxMessages: number }, diplomacy: { get: (name: KittensNamedRace) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensDiplomacyTab, getEffect: (name: KittensNamedEffect) => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab, msg: (text?: string) => { span: HTMLElement }, opts: { noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: KittensNamedPerk) => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBldg, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab & { ctPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: (...args: unknown[]) => void } } }, zgUpgradeButtons: KittensBtn[] }, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { heat: number }, timeTab: KittensTab & { cfPanel: { children: [{ children: (KittensBtn & { model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } })[] }] }, vsPanel: { children: [KittensBtnPanel] } }, spaceTab: KittensTab & { GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }, ui: { activeTabId: string }, village: { huntAll: () => void }, villageTab: KittensTab & { buttons: KittensBtn[], promoteKittensBtn: KittensBtn }, workshop: {  craft: (name: KittensNamedRes, count: number) => void, craftAll: (name: KittensNamedRes) => void, getCraftAllCount: (name: KittensNamedRes) => number }, workshopTab: KittensTab & { buttons: KittensBtn[] } }} KittensGame */
 
 // Kitty Cheat
 /** @typedef {{ active?: boolean, btn: jQuery, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean }} CheatOpt */
@@ -811,17 +790,17 @@
     }
 
     const buttons =
-      /** @type {KittensReligionTab} */ (tab).rUpgradeButtons ||
-      /** @type {KittensSpaceTab} */ (tab).GCPanel?.children ||
-      /** @type {KittensDiplomacyTab} */ (tab).racePanels?.map((r) => r.embassyButton) ||
-      /** @type {KittensTimeTab} */ (tab).vsPanel?.children[0].children ||
-      /** @type {KittensWorkshopTab} */ (tab).buttons;
+      /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons ||
+      /** @type {KittensGame['spaceTab']} */ (tab).GCPanel?.children ||
+      /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels?.map((r) => r.embassyButton) ||
+      /** @type {KittensGame['timeTab']} */ (tab).vsPanel?.children[0].children ||
+      /** @type {KittensGame['workshopTab']} */ (tab).buttons;
     let count = 0;
 
     // multi for religion & embassy upgrades
     const isAll = !!(
-      (/** @type {KittensReligionTab} */ (tab).rUpgradeButtons ||
-      /** @type {KittensDiplomacyTab} */ (tab).racePanels
+      (/** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons ||
+      /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels
     )?.length);
 
     for (const btn of buttons) {
@@ -885,8 +864,8 @@
     }
 
     const areas =
-      /** @type {KittensSpaceTab} */ (tab).planetPanels ||
-      [/** @type {KittensBldTab} */ (tab)];
+      /** @type {KittensGame['spaceTab']} */ (tab).planetPanels ||
+      [/** @type {KittensGame['bldTab']} */ (tab)];
     let count = 0;
 
     for (const area of areas) {
@@ -958,7 +937,7 @@
   function execTextInfo (/** @type {number} */ delay) {
     renderBgTab(game.religionTab);
 
-    const nxt = execBuildAll(-1, true);
+    const nxt = execBuildAll(0, true);
     const cry = calcTheology()[0];
     const zig = calcZiggurats();
     const trd = calcTranscend();
