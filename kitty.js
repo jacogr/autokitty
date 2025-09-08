@@ -60,25 +60,24 @@
 /** @typedef {{ actions: CheatMapEntry<{ [x: string]: CheatOptPartialAction }>, control: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }> & { active: true }, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }> & { active: true }, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
 /** @typedef {{ frac: number, raw: number, text: string }} CheatPercent */
 /** @typedef {{ [x in 'build' | 'crypto' | 'upgrade' | 'zig']?: string[] }} CheatStats */
+/** @typedef {{ CRAFT: number, EXOTIC: number, UNCAPPED: number, RESOURCE: { [x in KittensNamedRes]?: number } }} CheatFraction */
 
 // Window
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
+  /** @type {CheatFraction} */
   const FRACTION = {
-    CRAFT: 0.925,
-    EXOTIC: 0.01,
-    UNCAPPED: 0.1,
+    CRAFT: 0.925, // 92.5% spent on crafting
+    EXOTIC: 0.01, // 1% spent from exotic
+    UNCAPPED: 0.1, // 10% spent on uncapped
     RESOURCE: { karma: 0.5, tears: 1 }
   };
 
   const MAXVAL = {
-    // buy bcoin below this value
-    BCOIN_BUY: 950,
-    // sell bcoin when it hits this amount (1100 is a crash)
-    BCOIN_SELL: 1085,
-    // build at most 25 HGs - this is optimal for paragon
-    BLDG_GENOCIDE: 25
+    BCOIN_BUY: 950, // buy bcoin below this value
+    BCOIN_SELL: 1085, // sell bcoin when it hits this amount (1100 is a crash)
+    BLDG_GENOCIDE: 25 // build at most 25 HGs - this is optimal for paragon
   };
 
   const INTERVAL = {
@@ -370,10 +369,11 @@
     for (const p of prices) {
       if (p.name !== skip) {
         const r = game.resPool.get(p.name);
-        const f =
+        const f = FRACTION.RESOURCE[r.name] || (
           r.type === 'exotic'
             ? FRACTION.EXOTIC
-            : FRACTION.RESOURCE[r.name] || (isUncapped ? FRACTION.UNCAPPED : 1);
+            : (isUncapped ? FRACTION.UNCAPPED : 1)
+        );
 
         if ((p.val / r.value) > f) {
           return { isUncapped, isInvalid: true };
