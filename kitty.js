@@ -88,7 +88,6 @@
     crafting: {
       active: false,
       all: {
-        //wood: {},
         beam: { active: true },
         slab: { active: true },
         steel: { active: true },
@@ -269,13 +268,6 @@
     };
   }
 
-  /** @returns {number} */
-  function echo (/** @type {string?=} */ text, /** @type {number=} */ retval = 1) {
-    !!retval && !!text && $(game.msg(text).span).css('opacity', 0.275);
-
-    return retval;
-  }
-
   /** @returns {string?=} */
   function getBtnName (/** @type {(KittensBtn | KittensBldg)?=} */ btn, /** @type {string?=} */ extra = null) {
     const name = /** @type {KittensBtn} */ (btn)?.opts?.name || btn?.model?.metadata?.label;
@@ -285,16 +277,10 @@
       : name;
   }
 
-  /** @returns {number} */
+  /** @returns {boolean} */
   function clickDom (/** @type {KittensBtn?=} */ btn, /** @type {boolean=} */ isAll = false) {
-    if (btn?.domNode) {
-      // For 10 batch mode: { ctrlKey: true, metaKey: true }
-      btn.domNode.dispatchEvent(new MouseEvent('click', isAll ? { shiftKey: true } : {}));
-
-      return 1;
-    }
-
-    return 0;
+    // For 10 batch mode: { ctrlKey: true, metaKey: true }
+    return btn?.domNode.dispatchEvent(new MouseEvent('click', isAll ? { shiftKey: true } : {})) || false;
   }
 
   /** @returns {number} */
@@ -387,7 +373,7 @@
 
   // Adapted from Kitten Scientists
   // https://github.com/kitten-science/kitten-scientists/blob/804104d4ddc8b64e74f1ad5b448e0ca334fa6479/source/ReligionManager.ts#L246-L395
-  /** @returns {{ err?: string, bestBuilding?: KittensNamedBldgZU | null, bestPrices?: KittensPrice[], btn?: KittensBtn | KittensBldg | null, ratio: number }} */
+  /** @returns {{ bestBuilding?: KittensNamedBldgZU | null, btn?: KittensBtn | null, ratio: number, text?: string }} */
   function calcZiggurats () {
     const /** @type {KittensNamedBldgZU[]} */ validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
     const pastureImpl = game.bld.getBuildingExt('unicornPasture');
@@ -395,9 +381,9 @@
     const unicornsPerTickBase = pastureImpl?.meta.effects?.unicornsPerTickBase;
 
     if (!pastureImpl?.meta.unlocked || !pastureImpl.meta.on || !unicornsPerTickBase) {
-      return { err: 'No pasture built', ratio: 0 };
+      return { text: 'No pasture built', ratio: 0 };
     } else if (!zigImpl?.meta.unlocked || !zigImpl.meta.on) {
-      return { err: 'No ziggurat built', ratio: 0 };
+      return { text: 'No ziggurat built', ratio: 0 };
     }
 
     // How many unicorns are produced per second.
@@ -443,7 +429,7 @@
 
     let /** @type {KittensBtn?} */ bestBtn = null;
     let /** @type {KittensNamedBldgZU?} */ bestBuilding = null;
-    let /** @type {KittensPrice[]} */ bestPrices = [];
+    let bestPrice = Number.POSITIVE_INFINITY;
     let bestAmortization = Number.POSITIVE_INFINITY;
 
     for (let i = 0; i < validBuildings.length; i++) {
@@ -472,12 +458,12 @@
       if ((amortization < bestAmortization) && (0 < riftBonus || (religionRatio < religionBonus && 0 < unicornPrice))) {
         bestAmortization = amortization;
         bestBuilding = building;
-        bestPrices = buildingImpl.model.prices;
         bestBtn = buildingImpl;
+        bestPrice = unicornPrice;
       }
     }
 
-    return { bestBuilding, bestPrices, btn: bestBtn, ratio: zigguratRatio };
+    return { bestBuilding, btn: bestBtn, ratio: zigguratRatio, text: bestBtn?.model?.prices && `${getBtnName(bestBtn)} ${toPercent((((game.resPool.get('tears').value * 2500) / zigguratRatio) + game.resPool.get('unicorns').value) / bestPrice)?.text || ''}` };
   }
 
   /** @returns {{ action: 'buy' | 'hold' | 'sell', price: number, text: string }} */
@@ -620,9 +606,7 @@
       game.diplomacy.unlockElders();
     }
 
-    renderBgTab(game.diplomacyTab)
-      ?.racePanels.find((p) => p.race.name === name)
-      ?.tradeBtn.tradeAllHref.link.click();
+    renderBgTab(game.diplomacyTab)?.racePanels.find((p) => p.race.name === name)?.tradeBtn.tradeAllHref.link.click();
   }
 
   /** @returns {void} */
@@ -669,35 +653,37 @@
     n && arr.push(n);
   }
 
-  /** @returns {{ bld?: KittensBtn, isBuildable: boolean, tears?: KittensPrice }} */
-  function getZigInfo (/** @type {string} */ id, /** @type {KittensBtn?} */ btn = null) {
-    const bld = btn || game.religionTab.zgUpgradeButtons.find((b) => b.id === id);
+  /** @returns {{ btn?: KittensBtn, isBuildable: boolean, tears?: KittensPrice }} */
+  function getZigInfo (/** @type {string} */ id, /** @type {KittensBtn?} */ inBtn = null) {
+    const btn = inBtn || game.religionTab.zgUpgradeButtons.find((b) => b.id === id);
 
     return {
-      bld,
-      isBuildable: !!bld?.model.visible && !checkPrices(bld.model.prices).isInvalid,
-      tears: bld?.model.prices.find((p) => p.name === 'tears')
+      btn,
+      isBuildable: !!btn?.model.visible && !checkPrices(btn.model.prices).isInvalid,
+      tears: btn?.model.prices.find((p) => p.name === 'tears')
     };
   }
 
-  /** @returns {number} */
-  function buildZig (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed) {
-    if (!renderBgTab(game.religionTab)) {
-      return 0;
-    }
-
-    const zig = calcZiggurats();
-
-    if (!zig.bestBuilding) {
-      return 0;
+  /** @returns {boolean} */
+  function buildZig (/** @type {string[]} */ completed, /** @type {boolean} */ dryRun) {
+    if (dryRun || !renderBgTab(game.religionTab)) {
+      return false;
     }
 
     const blck = getZigInfo('blackPyramid');
-    const mark = getZigInfo('marker');
-    const best = getZigInfo(zig.bestBuilding);
-    const next = blck.isBuildable
-      ? blck
-      : (best.isBuildable && mark.tears) && (mark.isBuildable && best.tears)
+
+    if (blck.isBuildable) {
+      return clickDom(blck.btn, true);
+    }
+
+    let zig = calcZiggurats();;
+    let hasSome = false;
+    let count = 0;
+
+    while (zig.bestBuilding && count < 7) {
+      const mark = getZigInfo('marker');
+      const best = getZigInfo(zig.bestBuilding, zig.btn);
+      const next = (best.isBuildable && mark.tears) && (mark.isBuildable && best.tears)
         ? mark.tears.val <= best.tears.val
           ? mark
           : best
@@ -707,77 +693,80 @@
             ? best
             : null;
 
-    if (next?.bld) {
-      const res = dryRun ? 1 : clickDom(next.bld);
+      if (!next?.btn) {
+        const nowTears = game.resPool.get('tears').value;
+        const finTears = nowTears + (zig.ratio * game.resPool.get('unicorns').value / 2500);
 
-      (res && !dryRun) && pushBtnName(completed, next.bld);
+        if (best.tears?.val && (nowTears < best.tears.val) && (finTears > best.tears.val)) {
+          game.religionTab.sacrificeBtn.model.allLink.handler.call(game.religionTab.sacrificeBtn, noop, noop);
+          hasSome = true;
+        }
 
-      return res;
+        break;
+      } else if (!clickDom(next.btn)) {
+        break;
+      }
+
+      pushBtnName(completed, next.btn);
+      count = completed.length;
+      hasSome = true;
+      zig = calcZiggurats();
     }
 
-    const nowTears = game.resPool.get('tears').value;
-    const finTears = nowTears + (zig.ratio * game.resPool.get('unicorns').value / 2500);
-
-    if (best.tears?.val && (nowTears < best.tears.val) && (finTears > best.tears.val)) {
-      game.religionTab.sacrificeBtn.model.allLink.handler.call(game.religionTab.sacrificeBtn, noop, noop);
-    }
-
-    return 0;
+    return hasSome;
   }
 
-  /** @returns {number} */
-  function buildTheologyBtn (/** @type {ReturnType<calcTheology>[0]} */ best, /** @type {boolean} */ dryRun) {
+  /** @returns {boolean} */
+  function buildTheologyBtn (/** @type {ReturnType<calcTheology>[0]} */ best) {
     if (!best.btn.model.visible || !best.btn.model.enabled || !best.percent || best.percent.frac < 1 || checkPrices(best.btn.model.prices).isInvalid) {
-      return 0;
+      return false;
     }
 
-    return dryRun ? 1 : clickDom(best.btn);
+    return clickDom(best.btn);
   }
 
-  /** @returns {number}  */
-  function buildTheology (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed) {
-    if (!renderBgTab(game.religionTab)) {
-      return 0;
+  /** @returns {boolean}  */
+  function buildTheology (/** @type {string[]} */ completed, /** @type {boolean} */ dryRun) {
+    if (dryRun || !renderBgTab(game.religionTab)) {
+      return false;
     }
 
     const avail = calcTheology();
-    let count = 0;
+    let hasSome = false;
 
     for (const best of avail) {
-      if (!buildTheologyBtn(best, dryRun)) {
+      if (!buildTheologyBtn(best)) {
         break;
-      } else if (dryRun) {
-        return 1;
       }
 
       pushBtnName(completed, best.btn);
-      count++;
+      hasSome = true;
     }
 
-    return count;
+    return hasSome;
   }
 
-  /** @returns {number} */
+  /** @returns {boolean} */
   function unlockTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn, /** @type {boolean=} */ isAll = false) {
     if (!btn?.model?.enabled || !btn.model.visible || !btn.model.metadata) {
-      return 0;
+      return false;
     } else if (btn.id === 'cryochambers' && btn.model.on >= game.bld.getBuildingExt('chronosphere').meta.on) {
-      return 0;
+      return false;
     }
 
     !dryRun && fillResources();
 
     if (checkPrices(btn.model.prices).isInvalid) {
-      return 0;
+      return false;
     }
 
-    return dryRun ? 1 : clickDom(btn, isAll);
+    return dryRun ? true : clickDom(btn, isAll);
   }
 
-  /** @returns {number} */
-  function unlockTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab) {
+  /** @returns {boolean} */
+  function unlockTab (/** @type {string[]} */ completed, /** @type {boolean} */ dryRun, /** @type {KittensTab} */ tab) {
     if (!renderBgTab(tab)) {
-      return 0;
+      return false;
     }
 
     const buttons =
@@ -786,7 +775,7 @@
       /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels?.map((r) => r.embassyButton) ||
       /** @type {KittensGame['timeTab']} */ (tab).vsPanel?.children[0].children ||
       /** @type {KittensGame['workshopTab']} */ (tab).buttons;
-    let count = 0;
+    let hasSome = false;
 
     // multi for religion & embassy upgrades
     const isAll = !!(
@@ -797,11 +786,11 @@
     for (const btn of buttons) {
       if (unlockTabBtn(dryRun, btn, isAll)) {
         if (dryRun) {
-          return 1;
+          return true;
         }
 
         pushBtnName(completed, btn, /** @type {{ race?: { title: string } }} */ (btn).race?.title);
-        count++;
+        hasSome = true;
       }
     }
 
@@ -819,22 +808,22 @@
 
         if (nowDelta > INTERVAL.EXPLORE) {
           lastExploreTime = nowTime;
-          count += dryRun ? 1 : clickDom(d.exploreBtn);
+          hasSome ||= (dryRun ? true : clickDom(d.exploreBtn));
         }
       }
     }
 
-    return count;
+    return hasSome;
   }
 
-  /** @returns {number} */
+  /** @returns {boolean} */
   function buildTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn) {
     const model = btn?.model;
 
     if (!model?.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val)) {
-      return 0;
+      return false;
     } else if (!cheatMap.control.all.pollute.active && model.metadata.effects?.cathPollutionPerTickProd) {
-      return 0;
+      return false;
     }
 
     !dryRun && fillResources();
@@ -842,37 +831,37 @@
     const check = checkPrices(btn.model.prices);
 
     if (check.isInvalid || (check.isUncapped && !cheatMap.control.all.uncap.active)) {
-      return 0;
+      return false;
     }
 
-    return dryRun ? 1 : clickDom(btn, !check.isUncapped && model.metadata.on >= 1);
+    return dryRun ? true : clickDom(btn, !check.isUncapped && model.metadata.on >= 1);
   }
 
-  /** @returns {number} */
-  function buildTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab) {
+  /** @returns {boolean} */
+  function buildTab (/** @type {string[]} */ completed, /** @type {boolean} */ dryRun, /** @type {KittensTab} */ tab) {
     if (!renderBgTab(tab)) {
-      return 0;
+      return false;
     }
 
     const areas =
       /** @type {KittensGame['spaceTab']} */ (tab).planetPanels ||
       [/** @type {KittensGame['bldTab']} */ (tab)];
-    let count = 0;
+    let hasSome = false;
 
     for (const area of areas) {
       for (const btn of area.children) {
         if (buildTabBtn(dryRun, btn)) {
           if (dryRun) {
-            return 1;
+            return true;
           }
 
           pushBtnName(completed, btn);
-          count++;
+          hasSome = true;
         }
       }
     }
 
-    return count;
+    return hasSome;
   }
 
   /** @returns {CheatStats} */
@@ -885,7 +874,7 @@
       cheatMap.tabs.all[t]?.active && allowedTabs.push(cheatMap.tabs.all[t].tab);
     }
 
-    const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab) => number} */ fn) => {
+    const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(completed: string[], dryRun: boolean, tab: KittensTab) => boolean} */ fn) => {
       const /** @type {string[]} */ doneTabs = [];
 
       for (const tab of tabs) {
@@ -893,7 +882,7 @@
           try {
             !dryRun && fillResources();
 
-            if (fn(dryRun, completed, game[tab])) {
+            if (fn(completed, dryRun, game[tab])) {
               doneTabs.push(game[tab].tabId);
             }
           } catch (e) {
@@ -916,7 +905,7 @@
       loopTabs('crypto', ['religionTab'], buildTheology);
 
       if (delay > 0) {
-        echo(completed.join(', '), completed.length);
+        completed.length && $(game.msg(completed.join(', ')).span).css('opacity', 0.33);
         setTimeout(() => execBuildAll(delay), Math.ceil(delay / (completed.length ? 2 : 1)));
       }
     }
@@ -928,33 +917,20 @@
   function execTextInfo (/** @type {number} */ delay) {
     renderBgTab(game.religionTab);
 
-    const nxt = execBuildAll(0, true);
-    const cry = calcTheology()[0];
-    const zig = calcZiggurats();
-    const trd = calcTranscend();
-    const bcn = calcBcoin();
-    let /** @type {string?} */ zigText = null;
+    const bld = execBuildAll(0, true);
 
-    if (zig.bestBuilding && zig.bestPrices) {
-      const name = getBtnName(zig.btn);
-
-      if (name) {
-        zigText = `${name} ${toPercent((((game.resPool.get('tears').value * 2500) / zig.ratio) + game.resPool.get('unicorns').value) / calcZigguratsPrices(zig.bestPrices, zig.ratio))?.text || ''}`;
-      }
-    }
-
-    $('div#kittycheat-txt-drybld').html(`Buildings: ${nxt.build?.join(', ') || '-'}`);
-    $('div#kittycheat-txt-dryupg').html(`Upgrades : ${nxt.upgrade?.join(', ') || '-'}`);
-    $('div#kittycheat-txt-relzig').html(`Ziggurat : ${zig.err || zigText || '-'}`);
-    $('div#kittycheat-txt-relcry').html(`Theology : ${cry?.text || '-'}`);
-    $('div#kittycheat-txt-rellvl').html(`Transcend: ${trd?.text || '-'}`);
-    $('div#kittycheat-txt-bcoins').html(`Blackcoin: ${bcn?.text || '-'}`);
+    $('div#kittycheat-txt-drybld').html(`Buildings: ${bld.build?.join(', ') || '-'}`);
+    $('div#kittycheat-txt-dryupg').html(`Upgrades : ${bld.upgrade?.join(', ') || '-'}`);
+    $('div#kittycheat-txt-relzig').html(`Ziggurat : ${calcZiggurats().text || '-'}`);
+    $('div#kittycheat-txt-relcry').html(`Theology : ${calcTheology()[0]?.text || '-'}`);
+    $('div#kittycheat-txt-rellvl').html(`Transcend: ${calcTranscend()?.text || '-'}`);
+    $('div#kittycheat-txt-bcoins').html(`Blackcoin: ${calcBcoin()?.text || '-'}`);
 
     setTimeout(() => execTextInfo(delay), delay);
   }
 
   /** @returns {boolean} */
-  function isExecGroup (/** @type {string} */ group) {
+  function isExecGroup (/** @type {keyof CheatMap} */ group) {
     return group !== 'control' && group !== 'tabs';
   }
 
@@ -996,7 +972,7 @@
       } else if (opts.active) {
         if (opts.excl) {
           for (const e of opts.excl) {
-            activateBtn(/** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (e)]), false);
+            activateBtn(/** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof typeof cheatMap[group]['all']} */ (e)]), false);
           }
         }
 
