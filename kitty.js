@@ -579,7 +579,7 @@
         return {
           btn,
           percent,
-          text: name && `${getBtnName(btn)} ${percent?.text || ''}`
+          text: name && `${name} ${percent?.text || ''}`
         };
       });
   }
