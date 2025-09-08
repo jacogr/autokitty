@@ -973,8 +973,8 @@
     total += loopTabs(dryRun, completed, stats, 'upgrade', ['diplomacyTab', 'religionTab'], unlockTab);
 
     if (!dryRun) {
-      total += loopTabs(dryRun, completed, stats, 'zig', ['religionTab'], (dryRun, completed) => buildZig(dryRun, completed));
-      total += loopTabs(dryRun, completed, stats, 'crypto', ['religionTab'], (dryRun, completed) => buildTheology(dryRun, completed));
+      total += loopTabs(dryRun, completed, stats, 'zig', ['religionTab'], buildZig);
+      total += loopTabs(dryRun, completed, stats, 'crypto', ['religionTab'], buildTheology);
 
       if (delay > 0) {
         echo(completed.join(', '), completed.length);
