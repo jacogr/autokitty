@@ -5,46 +5,37 @@
 /** @typedef {(elem: HTMLElement | string) => jQuery} JQuery */
 
 // Kittens Game
-/** @typedef {'craft' | 'faith' | 'hunt' | 'trade'} KittensNamedConsFilt */
-/** @typedef {'chronosphere' | 'unicornPasture' | 'ziggurat'} KittensNamedBldgBld */
 /** @typedef {'blackCore' | 'blackLibrary' | 'blackNexus' | 'blackObelisk' | 'blackRadiance' | 'blazar' | 'darkNova' | 'holyGenocide' | 'mausoleum' | 'singularity'} KittensNamedBldgCrypto */
-/** @typedef {'satellite'} KittensNamedBldgSpace */
 /** @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamedBldgZU */
 /** @typedef {'tenErasLink' | 'previousCycleLink' | 'nextCycleLink'} KittensNamedCombustLink */
-/** @typedef {'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion'} KittensNamedEffect */
-/** @typedef {KittensNamedBldgBld | KittensNamedBldgCrypto | KittensNamedBldgSpace | KittensNamedBldgZU} KittensNamedBldg */
-/** @typedef {'numeromancy' | 'unicornmancy'} KittensNamedPerk */
-/** @typedef {'dragons' | 'griffins' | 'leviathans' | 'lizards' |'nagas' | 'sharks' | 'spiders' | 'zebras'} KittensNamedRace */
-/** @typedef {'alloy' | 'beam' | 'bloodstone' | 'blueprint' | 'compedium' | 'concrate' | 'eludium' | 'gear' | 'kerosene' | 'manuscript' | 'megalith' |'parchment' | 'plate' | 'scaffold' |  'ship' | 'slab' | 'steel' | 'tMythril' | 'thorium'} KittensNamedResCraft */
-/** @typedef {'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'wood' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
-/** @typedef {'common' | 'exotic' | 'rare'} KittensNamedResType */
+/** @typedef {'alloy' | 'beam' | 'bloodstone' | 'blueprint' | 'compedium' | 'concrate' | 'eludium' | 'gear' | 'kerosene' | 'manuscript' | 'megalith' |'parchment' | 'plate' | 'scaffold' |  'ship' | 'slab' | 'steel' | 'tMythril' | 'thorium' | 'wood'} KittensNamedResCraft */
+/** @typedef {'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
-/** @typedef {{ id: string, render: () => void, tabId: string, tabName: string, visible: boolean }} KittensTab */
+/** @typedef {{ render: () => void, tabId: string, tabName: string, visible: boolean }} KittensTab */
 /** @typedef {{ children: KittensBtn[] }} KittensBtnPanel */
 /** @typedef {{ effects: KittensEffects, label: string, name: string, on: number, unlocked: boolean, val: number }} KittensMetadata */
 /** @typedef {{ enabled: boolean, metadata: KittensMetadata, on: number, prices: KittensPrice[] | [KittensPrice], visible: boolean }} KittensModel */
 /** @typedef {{ effects?: KittensEffects, meta: KittensMetadata, model?: KittensModel, val?: number }} KittensBldg */
 /** @typedef {{ domNode: HTMLElement, id: string, model: KittensModel, opts?: { loadout: { pinned: boolean }, name: string } }} KittensBtn */
-/** @typedef {{ name: KittensNamedRace, unlocked: boolean }} KittensDiplomacyRace */
+/** @typedef {{ name: 'dragons' | 'griffins' | 'leviathans' | 'lizards' |'nagas' | 'sharks' | 'spiders' | 'zebras', unlocked: boolean }} KittensDiplomacyRace */
 /** @typedef {{ embassyButton: KittensBtn, race: KittensDiplomacyRace, feedBtn?: KittensBtn, tradeBtn: { tradeAllHref: { link: HTMLElement } } }} KittensDiplomacyRacePanel */
 /** @typedef {KittensDiplomacyRacePanel & { buyBcoin: KittensBtn, sellBcoin: KittensBtn }} KittensDiplomacyRacePanelLeviathans */
-/** @typedef {KittensTab & { exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }} KittensDiplomacyTab */
 /** @typedef {{ cathPollutionPerTickProd?: number, riftChance?: number, unicornsPerTickBase?: number, unicornsRatioReligion?: number }} KittensEffects */
 /** @typedef {{ name: KittensNamedRes, val: number }} KittensPrice */
-/** @typedef {{ maxValue: number, name: KittensNamedRes, perTickCached: number, type: KittensNamedResType, unlocked: boolean, value: number, visible: boolean }} KittensRes */
-/** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: KittensNamedBldgBld) => KittensBldg }, bldTab: KittensBtnPanel & KittensTab, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in KittensNamedConsFilt]: { enabled: boolean } }, maxMessages: number }, diplomacy: { get: (name: KittensNamedRace) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensDiplomacyTab, getEffect: (name: KittensNamedEffect) => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab, msg: (text?: string) => { span: HTMLElement }, opts: { noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: KittensNamedPerk) => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBldg, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab & { ctPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: (...args: unknown[]) => void } } }, zgUpgradeButtons: KittensBtn[] }, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { heat: number }, timeTab: KittensTab & { cfPanel: { children: [{ children: (KittensBtn & { model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } })[] }] }, vsPanel: { children: [KittensBtnPanel] } }, spaceTab: KittensTab & { GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }, ui: { activeTabId: string }, village: { huntAll: () => void }, villageTab: KittensTab & { buttons: KittensBtn[], promoteKittensBtn: KittensBtn }, workshop: {  craft: (name: KittensNamedRes, count: number) => void, craftAll: (name: KittensNamedRes) => void, getCraftAllCount: (name: KittensNamedRes) => number }, workshopTab: KittensTab & { buttons: KittensBtn[] } }} KittensGame */
+/** @typedef {{ maxValue: number, name: KittensNamedRes, perTickCached: number, type: 'common' | 'exotic' | 'rare', unlocked: boolean, value: number, visible: boolean }} KittensRes */
+/** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => KittensBldg }, bldTab: KittensBtnPanel & KittensTab, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab & { exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }, getEffect: (name: 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab, msg: (text?: string) => { span: HTMLElement }, opts: { noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBldg, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab & { ctPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: (...args: unknown[]) => void } } }, zgUpgradeButtons: KittensBtn[] }, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { heat: number }, timeTab: KittensTab & { cfPanel: { children: [{ children: (KittensBtn & { model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } })[] }] }, vsPanel: { children: [KittensBtnPanel] } }, spaceTab: KittensTab & { GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }, ui: { activeTabId: string }, village: { huntAll: () => void }, villageTab: KittensTab & { buttons: KittensBtn[], promoteKittensBtn: KittensBtn }, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab & { buttons: KittensBtn[] } }} KittensGame */
 
 // Kitty Cheat
 /** @typedef {{ active?: boolean, btn: jQuery, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean }} CheatOpt */
 /** @template {{ [x: string]: CheatOpt }} T @typedef {{ active: boolean, all: T, div?: jQuery }} CheatMapEntry */
-/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'group'> & { fn: (group: string, name: string, opts: CheatOpt) => void } }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'pollute' | 'uncap' | 'resources' | 'x10']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }> & { active: true }, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }> & { active: true }, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
+/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'group'> & { fn: (group: string, name: string, opts: CheatOpt) => void } }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'pollute' | 'uncap' | 'resources' | 'x10']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }> & { active: true }, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }> & { active: true }, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
 /** @typedef {{ [x in 'build' | 'crypto' | 'upgrade' | 'zig']?: string[] }} CheatStats */
 
 // Window
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
-  /** @readonly @type {{ CRAFT: number, UNCAPPED: number, RES_NAME: { [x in KittensNamedRes]?: number }, RES_TYPE: { [x in KittensNamedResType]: number } }} */
+  /** @readonly @type {{ CRAFT: number, UNCAPPED: number, RES_NAME: { [x in KittensNamedRes]?: number }, RES_TYPE: { [x in KittensRes['type']]: number } }} */
   const FRACTION = {
     CRAFT: 0.925, // 92.5% spent on crafting
     UNCAPPED: 0.1, // 10% spent on uncapped
@@ -624,7 +615,7 @@
   }
 
   /** @returns {void} */
-  function execTrade (/** @type {KittensNamedRace} */ name) {
+  function execTrade (/** @type {KittensDiplomacyRace['name']} */ name) {
     if ((name === 'leviathans') && !game.diplomacy.get('leviathans').unlocked && game.religion.getZU('blackPyramid').val) {
       game.diplomacy.unlockElders();
     }
@@ -635,7 +626,7 @@
   }
 
   /** @returns {void} */
-  function execCraft (/** @type {KittensNamedRes} */ name) {
+  function execCraft (/** @type {KittensNamedResCraft} */ name) {
     const max = game.workshop.getCraftAllCount(name);
 
     if (max > 0 && max < Number.MAX_VALUE) {
@@ -652,9 +643,9 @@
         if (group === 'actions') {
           /** @type {Required<CheatOpt>} */ (opts).fn(group, name, opts);
         } else if (group === 'crafting') {
-          execCraft(/** @type {KittensNamedRes} */ (name));
+          execCraft(/** @type {KittensNamedResCraft} */ (name));
         } else if (group === 'trading') {
-          execTrade(/** @type {KittensNamedRace} */ (name));
+          execTrade(/** @type {KittensDiplomacyRace['name']} */ (name));
         }
 
         !opts.noFill && fillResources();
@@ -814,7 +805,7 @@
       }
     }
 
-    const d = /** @type {KittensDiplomacyTab} */ (tab);
+    const d = /** @type {KittensGame['diplomacyTab']} */ (tab);
 
     // for trade, unlock new races to trade with
     if (d.exploreBtn && d.racePanels.length !== 8) {
@@ -1016,59 +1007,51 @@
     }
   }
 
-  /** @returns {void} */
-  function initCheat () {
-    const divCont = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>').css({
-      'padding-bottom': '30px',
-      'font-family': 'monospace',
-      'font-size': 'small'
-    }));
-    const divActGroup = jqAppend(divCont, styleDiv($('<div id="kittycheat-act"></div>')));
-    const divTxtGroup = jqAppend(divCont, styleDiv($('<div id="kittycheat-txt"></div>')));
+  const divCont = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>').css({
+    'padding-bottom': '30px',
+    'font-family': 'monospace',
+    'font-size': 'small'
+  }));
+  const divActGroup = jqAppend(divCont, styleDiv($('<div id="kittycheat-act"></div>')));
+  const divTxtGroup = jqAppend(divCont, styleDiv($('<div id="kittycheat-txt"></div>')));
 
-    for (const _group in cheatMap) {
-      const group = /** @type {keyof CheatMap} */ (_group);
-      const { active, all } = cheatMap[group];
-      const divGroup = cheatMap[group].div = jqAppend(divActGroup, styleDiv($(`<div id="kittycheat-act-${group}"></div>`)));
+  for (const _group in cheatMap) {
+    const group = /** @type {keyof CheatMap} */ (_group);
+    const { active, all } = cheatMap[group];
+    const divGroup = cheatMap[group].div = jqAppend(divActGroup, styleDiv($(`<div id="kittycheat-act-${group}"></div>`)));
 
-      if (group !== 'control') {
-        jqAppend(divGroup, styleDiv($(`<div>${group}:</div>`), true));
-      }
-
-      activateGroup(group, active);
-
-      for (const name in all) {
-        const opts = /** @type {CheatOpt} */ (all[/** @type {keyof typeof all} */ (name)]);
-
-        opts.btn = jqAppend(divGroup, $(`<button>${name}</button>`).click(() => {
-          clickOptBtn(group, name, opts);
-        }));
-
-        activateBtn(opts, opts.active);
-
-        if (opts.delay) {
-          execOptTimer(group, name, opts);
-        }
-      }
+    if (group !== 'control') {
+      jqAppend(divGroup, styleDiv($(`<div>${group}:</div>`), true));
     }
 
-    for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
-      jqAppend(divTxtGroup, styleDiv($(`<div id="kittycheat-txt-${id}"></div>`), true));
+    activateGroup(group, active);
+
+    for (const name in all) {
+      const opts = /** @type {CheatOpt} */ (all[/** @type {keyof typeof all} */ (name)]);
+
+      opts.btn = jqAppend(divGroup, $(`<button>${name}</button>`).click(() => {
+        clickOptBtn(group, name, opts);
+      }));
+
+      activateBtn(opts, opts.active);
+
+      if (opts.delay) {
+        execOptTimer(group, name, opts);
+      }
     }
   }
 
-  /** @returns {void} */
-  function initGame () {
-    game.console.maxMessages = 100;
-    game.opts.noConfirm = true;
-
-    for (const f of ['craft', 'faith', 'hunt', 'trade']) {
-      game.console.filters[/** @type {KittensNamedConsFilt} */ (f)].enabled = false;
-    }
+  for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
+    jqAppend(divTxtGroup, styleDiv($(`<div id="kittycheat-txt-${id}"></div>`), true));
   }
 
-  initGame();
-  initCheat();
+  game.console.maxMessages = 100;
+  game.opts.noConfirm = true;
+
+  for (const f of ['craft', 'faith', 'hunt', 'trade']) {
+    game.console.filters[/** @type {keyof KittensGame['console']['filters']} */ (f)].enabled = false;
+  }
+
   execOpts(INTERVAL.ALL_OPT);
   execTextInfo(INTERVAL.ALL_TXT);
   execBuildAll(INTERVAL.ALL_BLD);
