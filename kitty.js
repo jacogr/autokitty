@@ -272,22 +272,17 @@
   function getBtnName (/** @type {(KittensBtn | KittensBldg)?=} */ btn, /** @type {string?=} */ extra = null) {
     const name = /** @type {KittensBtn} */ (btn)?.opts?.name || btn?.model?.metadata?.label;
 
-    return name && extra
-      ? `${name} (${extra})`
-      : name;
+    return name && extra ? `${name} (${extra})` : name;
   }
 
   /** @returns {boolean} */
   function clickDom (/** @type {KittensBtn?=} */ btn, /** @type {boolean=} */ isAll = false) {
-    // For 10 batch mode: { ctrlKey: true, metaKey: true }
     return btn?.domNode.dispatchEvent(new MouseEvent('click', isAll ? { shiftKey: true } : {})) || false;
   }
 
-  /** @returns {number} */
+  /** @returns {boolean} */
   function clickSpan (/** @type {string} */ label) {
-    const elem = $('span').filter((_, e) => $(e).text().indexOf(label) === 0);
-
-    return (elem.length && elem.click()) ? 1 : 0;
+    return $('span').filter((_, e) => $(e).text().indexOf(label) === 0).click().length !== 0;
   }
 
   /** @template {KittensTab} T @returns {T | null | undefined} */
@@ -323,7 +318,7 @@
     for (const p of prices) {
       if (p.name !== skip) {
         const r = game.resPool.get(p.name);
-        const f = FRACTION.RES_NAME[r.name] || FRACTION.RES_TYPE[r.type] || (isUncapped ? FRACTION.UNCAPPED : 1);
+        const f = FRACTION.RES_NAME[r.name] || FRACTION.RES_TYPE[r.type] || (isUncapped && FRACTION.UNCAPPED) || 1;
 
         if ((p.val / r.value) > f) {
           return { isUncapped, isInvalid: true };
@@ -336,16 +331,14 @@
 
   /** @returns {void} */
   function fillResources () {
-    if (!cheatMap.control.all.resources.active && !cheatMap.control.all.x10.active) {
-      return;
-    }
+    if (cheatMap.control.all.resources.active || cheatMap.control.all.x10.active) {
+      for (const r of game.resPool.resources) {
+        if (r.maxValue && r.unlocked && r.visible && r.name !== 'kittens' && r.name !== 'zebras') {
+          const max = r.maxValue * (cheatMap.control.all.x10.active ? 10 : 1);
 
-    for (const r of game.resPool.resources) {
-      if (r.maxValue && r.unlocked && r.visible && r.name !== 'kittens' && r.name !== 'zebras') {
-        const max = r.maxValue * (cheatMap.control.all.x10.active ? 10 : 1);
-
-        if (max && r.value < max) {
-          r.value = max;
+          if (r.value < max) {
+            r.value = max;
+          }
         }
       }
     }
@@ -386,46 +379,20 @@
       return { text: 'No ziggurat built', ratio: 0 };
     }
 
-    // How many unicorns are produced per second.
     const unicornsPerSecondBase = game.getEffect('unicornsPerTickBase') * game.getTicksPerSecondUI();
-    // Unicorn ratio modifier. For example, through 'unicorn selection'.
     const globalRatio = game.getEffect('unicornsGlobalRatio') + 1;
-    // The unicorn ratio modifier through religion buildings.
     const religionRatio = game.getEffect('unicornsRatioReligion') + 1;
-    // The ratio modifier through paragon.
     const paragonRatio = game.prestige.getParagonProductionRatio() + 1;
-    // Bonus from collected faith.
     const faithBonus = game.religion.getSolarRevolutionRatio() + 1;
-
     const currentCycle = game.calendar.cycles[game.calendar.cycle];
 
-    // The modifier applied by the current cycle and holding a festival.
-    let cycleBonus = 1;
-
-    // If the current cycle has an effect on unicorn production during festivals
-    if (currentCycle?.festivalEffects.unicorns !== undefined) {
-      // Numeromancy is the metaphysics upgrade that grants bonuses based on cycles.
-      if (game.prestige.getPerk('numeromancy').researched && game.calendar.festivalDays) {
-        cycleBonus = currentCycle.festivalEffects.unicorns;
-      }
-    }
+    const cycleBonus = (currentCycle?.festivalEffects.unicorns !== undefined && game.prestige.getPerk('numeromancy').researched && game.calendar.festivalDays) ? currentCycle.festivalEffects.unicorns : 1;
 
     const unicornsPerSecond = unicornsPerSecondBase * globalRatio * religionRatio * paragonRatio * faithBonus * cycleBonus;
-
-    // Based on how many ziggurats we have.
-    const zigguratRatio = Math.max(zigImpl.meta.on, 1);
-
-    // How many unicorns do we receive in a unicorn rift?
+    const zigguratRatio = zigImpl.meta.on;
     const baseUnicornsPerRift = 500 * (1 + game.getEffect('unicornsRatioReligion') * 0.1);
-
-    // How likely are unicorn rifts to happen? The unicornmancy metaphysics upgrade increases this chance.
     const riftChanceRatio = game.prestige.getPerk('unicornmancy').researched ? 1.1 : 1;
-
-    // ?
     const unicornRiftChange = ((game.getEffect('riftChance') * riftChanceRatio) / (10000 * 2)) * baseUnicornsPerRift;
-
-    // We now want to determine how quickly the cost of given building is neutralized
-    // by its effect on production of unicorns.
 
     let /** @type {KittensBtn?} */ bestBtn = null;
     let /** @type {KittensNamedBldgZU?} */ bestBuilding = null;
@@ -436,30 +403,22 @@
       const building = validBuildings[i];
       const buildingImpl = game.religionTab.zgUpgradeButtons[i];
 
-      if (!building || !buildingImpl?.model.metadata.unlocked) {
-        continue;
-      }
+      if (building && buildingImpl?.model.metadata.unlocked) {
+        const unicornPrice = calcZigguratsPrices(buildingImpl.model.prices, zigguratRatio);
+        const buildingInfo = game.religion.getZU(building);
+        const religionBonus = religionRatio + (buildingInfo.effects?.unicornsRatioReligion || 0);
+        const riftChance = game.getEffect('riftChance') + (buildingInfo.effects?.riftChance || 0);
+        const unicornsPerRift = 500 * ((religionBonus - 1) * 0.1 + 1);
+        const riftBonus = (((riftChance * riftChanceRatio) / (10000 * 2)) * unicornsPerRift) - unicornRiftChange;
+        const buildingProduction = (unicornsPerSecondBase * globalRatio * religionBonus * paragonRatio * faithBonus * cycleBonus) - unicornsPerSecond + riftBonus;
+        const amortization = unicornPrice / buildingProduction;
 
-      // Determine a price value for this building.
-      const unicornPrice = calcZigguratsPrices(buildingImpl.model.prices, zigguratRatio);
-
-      // Determine the effect the building will have on unicorn production and unicorn rifts.
-      const buildingInfo = game.religion.getZU(building);
-      const religionBonus = religionRatio + (buildingInfo.effects?.unicornsRatioReligion || 0);
-      const riftChance = game.getEffect('riftChance') + (buildingInfo.effects?.riftChance || 0);
-
-      // The rest should be straight forward.
-      const unicornsPerRift = 500 * ((religionBonus - 1) * 0.1 + 1);
-      const riftBonus = (((riftChance * riftChanceRatio) / (10000 * 2)) * unicornsPerRift) - unicornRiftChange;
-      const buildingProduction = (unicornsPerSecondBase * globalRatio * religionBonus * paragonRatio * faithBonus * cycleBonus) - unicornsPerSecond + riftBonus;
-
-      const amortization = unicornPrice / buildingProduction;
-
-      if ((amortization < bestAmortization) && (0 < riftBonus || (religionRatio < religionBonus && 0 < unicornPrice))) {
-        bestAmortization = amortization;
-        bestBuilding = building;
-        bestBtn = buildingImpl;
-        bestPrice = unicornPrice;
+        if ((amortization < bestAmortization) && (0 < riftBonus || (religionRatio < religionBonus && 0 < unicornPrice))) {
+          bestAmortization = amortization;
+          bestBuilding = building;
+          bestBtn = buildingImpl;
+          bestPrice = unicornPrice;
+        }
       }
     }
 
