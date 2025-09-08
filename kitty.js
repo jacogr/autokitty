@@ -975,14 +975,11 @@
     if (!dryRun) {
       total += loopTabs(dryRun, completed, stats, 'zig', ['religionTab'], (dryRun, completed) => buildZig(dryRun, completed));
       total += loopTabs(dryRun, completed, stats, 'crypto', ['religionTab'], (dryRun, completed) => buildTheology(dryRun, completed));
-    }
 
-    if (!dryRun && delay > 0) {
-      if (completed.length) {
-        echo(completed.join(', '));
+      if (delay > 0) {
+        echo(completed.join(', '), completed.length);
+        setTimeout(() => execBuildAll(delay), Math.ceil(delay / (total ? 2 : 1)));
       }
-
-      setTimeout(() => execBuildAll(delay), Math.ceil(delay / (total ? 2 : 1)));
     }
 
     return stats;
