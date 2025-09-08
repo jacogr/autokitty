@@ -66,16 +66,10 @@
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
   const FRACTION = {
-    // only craft 92.5% of max - don't exhaust sources
     CRAFT: 0.925,
-    // spend 1% maximum on any exotic
     EXOTIC: 0.01,
-    // spend max 50% maximum on karma (no in-play increase)
-    KARMA: 0.5,
-    // spend all on tears (generated via unicorns)
-    TEARS: 1,
-    // build uncapped buildings when we use only 10% of resources
-    UNCAPPED: 0.1
+    UNCAPPED: 0.1,
+    RESOURCE: { karma: 0.5, tears: 1 }
   };
 
   const MAXVAL = {
@@ -379,11 +373,7 @@
         const f =
           r.type === 'exotic'
             ? FRACTION.EXOTIC
-            : r.name === 'karma' // type=rare, also affects neocorns
-              ? FRACTION.KARMA
-              : r.name === 'tears'
-                ? FRACTION.TEARS
-                : (isUncapped ? FRACTION.UNCAPPED : 1);
+            : FRACTION.RESOURCE[r.name] || (isUncapped ? FRACTION.UNCAPPED : 1);
 
         if ((p.val / r.value) > f) {
           return { isUncapped, isInvalid: true };
