@@ -47,7 +47,7 @@
 /** @typedef {{ get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }} KittensResPool */
 /** @typedef {KittensTab & { GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }} KittensSpaceTab */
 /** @typedef {{ heat: number }} KittensTime */
-/** @typedef {KittensTab & { cfPanel: { children: { children: (KittensBtn & { model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } })[] }[] }, vsPanel: { children: KittensBtnPanel[] } }} KittensTimeTab */
+/** @typedef {KittensTab & { cfPanel: { children: [{ children: (KittensBtn & { model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } })[] }] }, vsPanel: { children: [KittensBtnPanel] } }} KittensTimeTab */
 /** @typedef {{ activeTabId: string }} KittensUI */
 /** @typedef {{ huntAll: () => void }} KittensVillage */
 /** @typedef {KittensTab & { buttons: KittensBtn[], promoteKittensBtn: KittensBtn }} KittensVillageTab */
@@ -626,7 +626,7 @@
       const c = /** @type {KittensNamedCombustLink} */ (_c);
 
       if ((avail / combustCycles[c]) > 1) {
-        const btn = renderBgTab(game.timeTab)?.cfPanel.children[0]?.children[0];
+        const btn = renderBgTab(game.timeTab)?.cfPanel.children[0].children[0];
 
         btn && btn.model[c].handler.call(btn);
 
@@ -836,7 +836,7 @@
       /** @type {KittensReligionTab} */ (tab).rUpgradeButtons ||
       /** @type {KittensSpaceTab} */ (tab).GCPanel?.children ||
       /** @type {KittensDiplomacyTab} */ (tab).racePanels?.map((r) => r.embassyButton) ||
-      /** @type {KittensTimeTab} */ (tab).vsPanel?.children[0]?.children ||
+      /** @type {KittensTimeTab} */ (tab).vsPanel?.children[0].children ||
       /** @type {KittensWorkshopTab} */ (tab).buttons;
     let count = 0;
 
