@@ -10,6 +10,7 @@
 /** @typedef {'blackCore' | 'blackLibrary' | 'blackNexus' | 'blackObelisk' | 'blackRadiance' | 'blazar' | 'darkNova' | 'holyGenocide' | 'mausoleum' | 'singularity'} KittensNamedBldgCrypto */
 /** @typedef {'satellite'} KittensNamedBldgSpace */
 /** @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamedBldgZU */
+/** @typedef {'tenErasLink' | 'previousCycleLink' | 'nextCycleLink'} KittensNamedCombustLink */
 /** @typedef {'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion'} KittensNamedEffect */
 /** @typedef {KittensNamedBldgBld | KittensNamedBldgCrypto | KittensNamedBldgSpace | KittensNamedBldgZU} KittensNamedBldg */
 /** @typedef {'numeromancy' | 'unicornmancy'} KittensNamedPerk */
@@ -23,7 +24,7 @@
 /** @typedef {{ cathPollution: number, getBuildingExt: (name: KittensNamedBldgBld) => KittensBldg }} KittensBld */
 /** @typedef {KittensBtnPanel & KittensTab} KittensBldTab */
 /** @typedef {{ effects: KittensEffects, label: string, name: string, on: number, unlocked: boolean, val: number }} KittensBldgMetadata */
-/** @typedef {{ enabled: boolean, metadata: KittensBldgMetadata, on: number, prices: KittensPrice[], visible: boolean }} KittensBldgModel */
+/** @typedef {{ enabled: boolean, metadata: KittensBldgMetadata, on: number, prices: KittensPrice[] | [KittensPrice], visible: boolean }} KittensBldgModel */
 /** @typedef {{ effects?: KittensEffects, meta: KittensBldgMetadata, model?: KittensBldgModel, val?: number }} KittensBldg */
 /** @typedef {{ loadout: { pinned: boolean }, name: string }} KittensBtnOpts */
 /** @typedef {{ domNode: HTMLElement, id: string, model: KittensBldgModel, opts?: KittensBtnOpts }} KittensBtn */
@@ -41,12 +42,12 @@
 /** @typedef {{ getParagonProductionRatio: () => number, getPerk: (name: KittensNamedPerk) => KittensPerk }} KittensPrestige */
 /** @typedef {{ name: KittensNamedRes, val: number }} KittensPrice */
 /** @typedef {{ _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBldg, praise: () => void, resetFaith: (n: number, b: boolean) => void }} KittensReligion */
-/** @typedef {KittensTab & { ctPanel: { children: KittensBtnPanel[] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: (...args: unknown[]) => void } } }, zgUpgradeButtons: KittensBtn[] }} KittensReligionTab */
+/** @typedef {KittensTab & { ctPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: (...args: unknown[]) => void } } }, zgUpgradeButtons: KittensBtn[] }} KittensReligionTab */
 /** @typedef {{ maxValue: number, name: KittensNamedRes, perTickCached: number, type: KittensNamedResType, unlocked: boolean, value: number, visible: boolean }} KittensRes */
 /** @typedef {{ get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }} KittensResPool */
 /** @typedef {KittensTab & { GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }} KittensSpaceTab */
 /** @typedef {{ heat: number }} KittensTime */
-/** @typedef {KittensTab & { cfPanel: { children: KittensBtnPanel[] }, vsPanel: { children: KittensBtnPanel[] } }} KittensTimeTab */
+/** @typedef {KittensTab & { cfPanel: { children: { children: (KittensBtn & { model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } })[] }[] }, vsPanel: { children: KittensBtnPanel[] } }} KittensTimeTab */
 /** @typedef {{ activeTabId: string }} KittensUI */
 /** @typedef {{ huntAll: () => void }} KittensVillage */
 /** @typedef {KittensTab & { buttons: KittensBtn[], promoteKittensBtn: KittensBtn }} KittensVillageTab */
@@ -97,7 +98,7 @@
     SACRIFICE: 10000
   };
 
-  /** @type {CheatMap} */
+  /** @type {Readonly<CheatMap>} */
   const cheatMap = {
     control: {
       active: true,
@@ -243,6 +244,7 @@
     }
   };
 
+  /** @type {{ [x in KittensNamedCombustLink]: number }} */
   const combustCycles = {
     tenErasLink: 500,
     previousCycleLink: 45,
@@ -383,13 +385,13 @@
 
   /** @returns {void} */
   function fillResources () {
-    if (!cheatMap.control.all.resources.active && !cheatMap.control.all.x10.active) {
+    if (!cheatMap.control.all.resources?.active && !cheatMap.control.all.x10?.active) {
       return;
     }
 
     for (const r of game.resPool.resources) {
       if (r.maxValue && r.unlocked && r.visible && r.name !== 'kittens' && r.name !== 'zebras') {
-        const max = r.maxValue * (cheatMap.control.all.x10.active ? 10 : 1);
+        const max = r.maxValue * (cheatMap.control.all.x10?.active ? 10 : 1);
 
         if (max && r.value < max) {
           r.value = max;
@@ -620,8 +622,10 @@
   function fnCombust () {
     const avail = (game.getEffect('heatMax') - game.time.heat) / 10;
 
-    for (const c in combustCycles) {
-      if ((avail / combustCycles[/** @type {keyof typeof combustCycles} */ (c)]) > 1) {
+    for (const _c in combustCycles) {
+      const c = /** @type {KittensNamedCombustLink} */ (_c);
+
+      if ((avail / combustCycles[c]) > 1) {
         const btn = renderBgTab(game.timeTab)?.cfPanel.children[0]?.children[0];
 
         btn && btn.model[c].handler.call(btn);
@@ -881,7 +885,7 @@
 
     if (!model?.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val)) {
       return 0;
-    } else if (!cheatMap.control.all.pollute.active && model.metadata.effects?.cathPollutionPerTickProd) {
+    } else if (!cheatMap.control.all.pollute?.active && model.metadata.effects?.cathPollutionPerTickProd) {
       return 0;
     }
 
@@ -889,7 +893,7 @@
 
     const check = checkPrices(btn.model.prices);
 
-    if (check.isInvalid || (check.isUncapped && !cheatMap.control.all.uncap.active)) {
+    if (check.isInvalid || (check.isUncapped && !cheatMap.control.all.uncap?.active)) {
       return 0;
     }
 
@@ -930,7 +934,7 @@
     let total = 0;
 
     for (const t in cheatMap.tabs.all) {
-      cheatMap.tabs.all[t].active && allowedTabs.push(cheatMap.tabs.all[t].tab);
+      cheatMap.tabs.all[t]?.active && allowedTabs.push(cheatMap.tabs.all[t].tab);
     }
 
     for (const tab of tabs) {
@@ -963,20 +967,20 @@
     const /** @type {string[]} */ completed = [];
     let total = 0;
 
-    if (cheatMap.control.all.upgrade.active || dryRun) {
+    if (cheatMap.control.all.upgrade?.active || dryRun) {
       total += loopTabs(dryRun, completed, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab, stats);
     }
 
-    if (cheatMap.control.all.build.active || dryRun) {
+    if (cheatMap.control.all.build?.active || dryRun) {
       total += loopTabs(dryRun, completed, 'build', ['bldTab', 'spaceTab'], buildTab, stats);
     }
 
     if (!dryRun) {
-      if (cheatMap.control.all.zig.active) {
+      if (cheatMap.control.all.zig?.active) {
         total += loopTabs(dryRun, completed, 'zig', ['religionTab'], (dryRun, completed) => buildZig(dryRun, completed), stats);
       }
 
-      if (cheatMap.control.all.crypto.active) {
+      if (cheatMap.control.all.crypto?.active) {
         total += loopTabs(dryRun, completed, 'crypto', ['religionTab'], (dryRun, completed) => buildTheology(dryRun, completed), stats);
       }
     }
@@ -1066,7 +1070,7 @@
       } else if (opts.active) {
         if (opts.excl) {
           for (const e of opts.excl) {
-            activateBtn(/** @type {CheatOpt} */ (cheatMap[group].all[e]), false);
+            activateBtn(/** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof (typeof cheatMap)[group]['all']} */ (e)]), false);
           }
         }
 
@@ -1124,7 +1128,7 @@
     game.opts.noConfirm = true;
 
     for (const f of ['craft', 'faith', 'hunt', 'trade']) {
-      game.console.filters[f].enabled = false;
+      game.console.filters[/** @type {KittensNamedConsFilt} */ (f)].enabled = false;
     }
   }
 
