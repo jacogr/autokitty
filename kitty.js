@@ -423,7 +423,7 @@
 
   // Adapted from Kitten Scientists
   // https://github.com/kitten-science/kitten-scientists/blob/804104d4ddc8b64e74f1ad5b448e0ca334fa6479/source/ReligionManager.ts#L246-L395
-  /** @returns {{ err?: string, bestBuilding?: KittensNamedBldgZU | 'unicornPasture', bestPrices?: KittensPrice[], btn?: KittensBtn | KittensBldg | null, ratio: number }} */
+  /** @returns {{ err?: string, bestBuilding?: KittensNamedBldgZU | null, bestPrices?: KittensPrice[], btn?: KittensBtn | KittensBldg | null, ratio: number }} */
   function calcZiggurats () {
     const /** @type {KittensNamedBldgZU[]} */ validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
     const pastureImpl = game.bld.getBuildingExt('unicornPasture');
@@ -477,25 +477,10 @@
     // We now want to determine how quickly the cost of given building is neutralized
     // by its effect on production of unicorns.
 
-    const pastureProduction = unicornsPerTickBase * game.getTicksPerSecondUI() * globalRatio * religionRatio * paragonRatio * faithBonus * cycleBonus;
-
-    let /** @type {KittensNamedBldgZU | 'unicornPasture'} */ bestBuilding = 'unicornPasture';
+    let /** @type {KittensNamedBldgZU | null} */ bestBuilding = null;
     let /** @type {KittensPrice[]} */ bestPrices = [];
     let bestAmortization = Number.POSITIVE_INFINITY;
     let bestBtn = null;
-
-    // If the unicorn pasture amortizes itself in less than infinity ticks,
-    // set it as the default. This is likely to protect against cases where
-    // production of unicorns is 0.
-    if (pastureImpl.model?.prices[0]) {
-      const pastureAmortization = pastureImpl.model.prices[0].val / pastureProduction;
-
-      if (pastureAmortization < bestAmortization) {
-        bestAmortization = pastureAmortization;
-        bestPrices = pastureImpl.model.prices;
-        bestBtn = pastureImpl;
-      }
-    }
 
     for (let i = 0; i < validBuildings.length; i++) {
       const building = validBuildings[i];
@@ -746,19 +731,17 @@
     const blck = getZigInfo('blackPyramid');
     const mark = getZigInfo('marker');
     const best = getZigInfo(zig.bestBuilding);
-    const next = zig.bestBuilding === 'unicornPasture'
-      ? best
-      : blck.isBuildable
-        ? blck
-        : (best.isBuildable && mark.tears) && (mark.isBuildable && best.tears)
-          ? mark.tears.val <= best.tears.val
-            ? mark
-            : best
-          : mark.isBuildable
-            ? mark
-            : best.isBuildable
-              ? best
-              : null;
+    const next = blck.isBuildable
+      ? blck
+      : (best.isBuildable && mark.tears) && (mark.isBuildable && best.tears)
+        ? mark.tears.val <= best.tears.val
+          ? mark
+          : best
+        : mark.isBuildable
+          ? mark
+          : best.isBuildable
+            ? best
+            : null;
 
     if (next?.bld) {
       const res = dryRun ? 1 : clickDom(next.bld);
@@ -928,53 +911,49 @@
     return count;
   }
 
-  /** @returns {number} */
-  function loopTabs (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {CheatStats} */ stats, /** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab) => number} */ fn) {
+  /** @returns {CheatStats} */
+  function execBuildAll (/** @type {number} */ delay, /** @type {boolean=} */ dryRun = false) {
+    const /** @type {string[]} */ completed = [];
+    const /** @type {CheatStats} */ stats = {};
     const /** @type {KittensNamedTab[]} */ allowedTabs = [];
-    const /** @type {string[]} */ indv = [];
     let total = 0;
 
     for (const t in cheatMap.tabs.all) {
       cheatMap.tabs.all[t]?.active && allowedTabs.push(cheatMap.tabs.all[t].tab);
     }
 
-    for (const tab of tabs) {
-      if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tab))) {
-        try {
-          !dryRun && fillResources();
+    const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab) => number} */ fn) => {
+      const /** @type {string[]} */ doneTabs = [];
 
-          const count = fn(dryRun, completed, game[tab]);
+      for (const tab of tabs) {
+        if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tab))) {
+          try {
+            !dryRun && fillResources();
 
-          if (count) {
-            indv.push(game[tab].tabId);
-            total += count;
+            const count = fn(dryRun, completed, game[tab]);
+
+            if (count) {
+              doneTabs.push(game[tab].tabId);
+              total += count;
+            }
+          } catch (e) {
+            console.error('loopTabs', type, tab, e);
           }
-        } catch (e) {
-          console.error('loopTabs', type, tab, e);
         }
       }
-    }
 
-    if (total) {
-      stats[type] = (stats[type] || []).concat(...indv);
-    }
+      if (doneTabs.length) {
+        stats[type] = (stats[type] || []).concat(...doneTabs);
+      }
+    };
 
-    return total;
-  }
-
-  /** @returns {CheatStats} */
-  function execBuildAll (/** @type {number} */ delay, /** @type {boolean=} */ dryRun = false) {
-    const /** @type {CheatStats} */ stats = {};
-    const /** @type {string[]} */ completed = [];
-    let total = 0;
-
-    total += loopTabs(dryRun, completed, stats, 'upgrade', ['libraryTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
-    total += loopTabs(dryRun, completed, stats, 'build', ['bldTab', 'spaceTab'], buildTab);
-    total += loopTabs(dryRun, completed, stats, 'upgrade', ['diplomacyTab', 'religionTab'], unlockTab);
+    loopTabs('upgrade', ['libraryTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
+    loopTabs('build', ['bldTab', 'spaceTab'], buildTab);
+    loopTabs('upgrade', ['diplomacyTab', 'religionTab'], unlockTab);
 
     if (!dryRun) {
-      total += loopTabs(dryRun, completed, stats, 'zig', ['religionTab'], buildZig);
-      total += loopTabs(dryRun, completed, stats, 'crypto', ['religionTab'], buildTheology);
+      loopTabs('zig', ['religionTab'], buildZig);
+      loopTabs('crypto', ['religionTab'], buildTheology);
 
       if (delay > 0) {
         echo(completed.join(', '), completed.length);
@@ -997,9 +976,7 @@
     let /** @type {string?} */ zigText = null;
 
     if (zig.bestBuilding && zig.bestPrices) {
-      const name = zig.bestBuilding === 'unicornPasture'
-        ? 'Unic. Pasture'
-        : getBtnName(zig.btn);
+      const name = getBtnName(zig.btn);
 
       if (name) {
         zigText = `${name} ${toPercent((((game.resPool.get('tears').value * 2500) / zig.ratio) + game.resPool.get('unicorns').value) / calcZigguratsPrices(zig.bestPrices, zig.ratio))?.text || ''}`;
