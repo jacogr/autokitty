@@ -28,11 +28,12 @@
 /** @typedef {{ loadout: { pinned: boolean }, name: string }} KittensBtnOpts */
 /** @typedef {{ domNode: HTMLElement, id: string, model: KittensBldgModel, opts?: KittensBtnOpts }} KittensBtn */
 /** @typedef {{ festivalEffects: { unicorns: number } }} KittensCalendarCycle */
-/** @typedef {{ cryptoPrice: number, cycle: string,  cycles: KittensCalendarCycle[], festivalDays: number, year: number }} KittensCalendar */
+/** @typedef {{ cryptoPrice: number, cycle: number,  cycles: KittensCalendarCycle[], festivalDays: number, year: number }} KittensCalendar */
 /** @typedef {{ filters: { [x in KittensNamedConsFilt]: { enabled: boolean } }, maxMessages: number }} KittensConsole */
 /** @typedef {{ name: KittensNamedRace, unlocked: boolean }} KittensDiplomacyRace */
 /** @typedef {{ get: (name: KittensNamedRace) => KittensDiplomacyRace, unlockElders: () => void }} KittensDiplomacy */
 /** @typedef {{ embassyButton: KittensBtn, race: KittensDiplomacyRace, feedBtn?: KittensBtn, tradeBtn: { tradeAllHref: { link: HTMLElement } } }} KittensDiplomacyRacePanel */
+/** @typedef {KittensDiplomacyRacePanel & { buyBcoin: KittensBtn, sellBcoin: KittensBtn }} KittensDiplomacyRacePanelLeviathans */
 /** @typedef {KittensTab & { exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }} KittensDiplomacyTab */
 /** @typedef {{ cathPollutionPerTickProd?: number, riftChance?: number, unicornsPerTickBase?: number, unicornsRatioReligion?: number }} KittensEffects */
 /** @typedef {{ noConfirm: boolean }} KittensOpts */
@@ -40,7 +41,7 @@
 /** @typedef {{ getParagonProductionRatio: () => number, getPerk: (name: KittensNamedPerk) => KittensPerk }} KittensPrestige */
 /** @typedef {{ name: KittensNamedRes, val: number }} KittensPrice */
 /** @typedef {{ _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBldg, praise: () => void, resetFaith: (n: number, b: boolean) => void }} KittensReligion */
-/** @typedef {KittensTab & { ctPanel: { children: KittensBtnPanel[] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: () => void } } }, zgUpgradeButtons: KittensBtn[] }} KittensReligionTab */
+/** @typedef {KittensTab & { ctPanel: { children: KittensBtnPanel[] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: (...args: unknown[]) => void } } }, zgUpgradeButtons: KittensBtn[] }} KittensReligionTab */
 /** @typedef {{ maxValue: number, name: KittensNamedRes, perTickCached: number, type: KittensNamedResType, unlocked: boolean, value: number, visible: boolean }} KittensRes */
 /** @typedef {{ get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }} KittensResPool */
 /** @typedef {KittensTab & { GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }} KittensSpaceTab */
@@ -51,7 +52,7 @@
 /** @typedef {KittensTab & { buttons: KittensBtn[], promoteKittensBtn: KittensBtn }} KittensVillageTab */
 /** @typedef {{  craft: (name: KittensNamedRes, count: number) => void, craftAll: (name: KittensNamedRes) => void, getCraftAllCount: (name: KittensNamedRes) => number }} KittensWorkshop */
 /** @typedef {KittensTab & { buttons: KittensBtn[] }} KittensWorkshopTab */
-/** @typedef {{ bld: KittensBld, bldTab: KittensBldTab, calendar: KittensCalendar, console: KittensConsole, diplomacy: KittensDiplomacy, diplomacyTab: KittensDiplomacyTab, getEffect: (name: KittensNamedEffect) => number, getTicksPerSecondUI: () => number, msg: (text?: string) => { span: HTMLElement }, opts: KittensOpts, prestige: KittensPrestige, religion: KittensReligion, religionTab: KittensReligionTab, resPool: KittensResPool, time: KittensTime, timeTab: KittensTimeTab, spaceTab: KittensSpaceTab, ui: KittensUI, village: KittensVillage, villageTab: KittensVillageTab, workshop: KittensWorkshop, workshopTab: KittensWorkshopTab }} KittensGame */
+/** @typedef {{ bld: KittensBld, bldTab: KittensBldTab, calendar: KittensCalendar, console: KittensConsole, diplomacy: KittensDiplomacy, diplomacyTab: KittensDiplomacyTab, getEffect: (name: KittensNamedEffect) => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab, msg: (text?: string) => { span: HTMLElement }, opts: KittensOpts, prestige: KittensPrestige, religion: KittensReligion, religionTab: KittensReligionTab, resPool: KittensResPool, time: KittensTime, timeTab: KittensTimeTab, spaceTab: KittensSpaceTab, ui: KittensUI, village: KittensVillage, villageTab: KittensVillageTab, workshop: KittensWorkshop, workshopTab: KittensWorkshopTab }} KittensGame */
 
 // Kitty Cheat
 /** @typedef {{ active?: boolean, btn: jQuery, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean }} CheatOpt */
@@ -402,9 +403,9 @@
     }
   }
 
-  /** @returns {KittensDiplomacyRacePanel=} */
+  /** @returns {KittensDiplomacyRacePanelLeviathans=} */
   function findLeviathans () {
-    return game.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans');
+    return /** @type {KittensDiplomacyRacePanelLeviathans} */ (game.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans'));
   }
 
   /** @returns {number} */
@@ -454,7 +455,7 @@
     let cycleBonus = 1;
 
     // If the current cycle has an effect on unicorn production during festivals
-    if (currentCycle.festivalEffects.unicorns !== undefined) {
+    if (currentCycle?.festivalEffects.unicorns !== undefined) {
       // Numeromancy is the metaphysics upgrade that grants bonuses based on cycles.
       if (game.prestige.getPerk('numeromancy').researched && game.calendar.festivalDays) {
         cycleBonus = currentCycle.festivalEffects.unicorns;
@@ -481,14 +482,14 @@
     const pastureProduction = unicornsPerTickBase * game.getTicksPerSecondUI() * globalRatio * religionRatio * paragonRatio * faithBonus * cycleBonus;
 
     let /** @type {KittensNamedBldgZU | 'unicornPasture'} */ bestBuilding = 'unicornPasture';
+    let /** @type {KittensPrice[]} */ bestPrices = [];
     let bestAmortization = Number.POSITIVE_INFINITY;
-    let bestPrices = [];
     let bestBtn = null;
 
     // If the unicorn pasture amortizes itself in less than infinity ticks,
     // set it as the default. This is likely to protect against cases where
     // production of unicorns is 0.
-    if (pastureImpl.model?.prices) {
+    if (pastureImpl.model?.prices[0]) {
       const pastureAmortization = pastureImpl.model.prices[0].val / pastureProduction;
 
       if (pastureAmortization < bestAmortization) {
@@ -502,7 +503,7 @@
       const building = validBuildings[i];
       const buildingImpl = game.religionTab.zgUpgradeButtons[i];
 
-      if (!buildingImpl?.model.metadata.unlocked) {
+      if (!building || !buildingImpl?.model.metadata.unlocked) {
         continue;
       }
 
@@ -625,8 +626,8 @@
     const avail = (game.getEffect('heatMax') - game.time.heat) / 10;
 
     for (const c in combustCycles) {
-      if ((avail / combustCycles[c]) > 1) {
-        const btn = renderBgTab(game.timeTab)?.cfPanel.children[0].children[0];
+      if ((avail / combustCycles[/** @type {keyof typeof combustCycles} */ (c)]) > 1) {
+        const btn = renderBgTab(game.timeTab)?.cfPanel.children[0]?.children[0];
 
         btn && btn.model[c].handler.call(btn);
 
@@ -1040,7 +1041,7 @@
 
       if (active && isExecGroup(group)) {
         for (const name in all) {
-          const opts = /** @type {CheatOpt} */ (all[name]);
+          const opts = /** @type {CheatOpt} */ (all[/** @type {keyof typeof all} */ (name)]);
 
           if (opts.active && !opts.delay) {
             execOpt(/** @type {keyof CheatMap} */ (group), name, opts);
@@ -1103,7 +1104,7 @@
       activateGroup(group, active);
 
       for (const name in all) {
-        const opts = /** @type {CheatOpt} */ (all[name]);
+        const opts = /** @type {CheatOpt} */ (all[/** @type {keyof typeof all} */ (name)]);
 
         opts.btn = jqAppend(divGroup, $(`<button>${name}</button>`).click(() => {
           clickOptBtn(group, name, opts);
