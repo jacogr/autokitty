@@ -14,7 +14,7 @@
 /** @typedef {{ render: () => void, tabId: string, tabName: string, visible: boolean }} KittensTab */
 /** @typedef {{ children: KittensBtn[] }} KittensBtnPanel */
 /** @typedef {{ effects: { cathPollutionPerTickProd?: number, riftChance?: number, unicornsPerTickBase?: number, unicornsRatioReligion?: number }, label: string, name: string, on: number, unlocked: boolean, val: number }} KittensMetadata */
-/** @typedef {{ domNode: HTMLElement, id: string, model: { enabled: boolean, metadata: KittensMetadata, on: number, prices: KittensPrice[] | [KittensPrice], visible: boolean }, opts?: { loadout: { pinned: boolean } } }} KittensBtn */
+/** @typedef {{ domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: KittensMetadata, on: number, prices: KittensPrice[] | [KittensPrice], visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } }} KittensBtn */
 /** @typedef {{ name: 'dragons' | 'griffins' | 'leviathans' | 'lizards' |'nagas' | 'sharks' | 'spiders' | 'zebras', unlocked: boolean }} KittensDiplomacyRace */
 /** @typedef {{ embassyButton: KittensBtn, race: KittensDiplomacyRace, feedBtn?: KittensBtn, tradeBtn: { tradeAllHref: { link: HTMLElement } } }} KittensDiplomacyRacePanel */
 /** @typedef {KittensDiplomacyRacePanel & { buyBcoin: KittensBtn, sellBcoin: KittensBtn }} KittensDiplomacyRacePanelLeviathans */
@@ -271,7 +271,7 @@
 
   /** @returns {string?=} */
   function getBtnName (/** @type {(KittensBtn)?=} */ btn, /** @type {string?=} */ extra = null) {
-    const name = btn?.model?.metadata?.label;
+    const name = btn?.model.metadata?.label || btn?.opts?.name;
 
     return name && extra ? `${name} ${extra}` : name;
   }
@@ -367,7 +367,7 @@
 
   // Adapted from Kitten Scientists
   // https://github.com/kitten-science/kitten-scientists/blob/804104d4ddc8b64e74f1ad5b448e0ca334fa6479/source/ReligionManager.ts#L246-L395
-  /** @returns {{ bestBuilding?: KittensNamedBldgZU | null, btn?: KittensBtn | null, ratio: number, text?: string }} */
+  /** @returns {{ bestBuilding?: KittensNamedBldgZU | null, btn?: KittensBtn | null, ratio: number, text?: string | null }} */
   function calcZiggurats () {
     const /** @type {KittensNamedBldgZU[]} */ validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
     const pastureImpl = game.bld.getBuildingExt('unicornPasture');
@@ -404,7 +404,7 @@
       const building = validBuildings[i];
       const buildingImpl = game.religionTab.zgUpgradeButtons[i];
 
-      if (building && buildingImpl?.model.metadata.unlocked) {
+      if (building && buildingImpl?.model.metadata?.unlocked) {
         const unicornPrice = calcZigguratsPrices(buildingImpl.model.prices, zigguratRatio);
         const buildingInfo = game.religion.getZU(building);
         const religionBonus = religionRatio + (buildingInfo.effects?.unicornsRatioReligion || 0);
@@ -423,7 +423,7 @@
       }
     }
 
-    return { bestBuilding, btn: bestBtn, ratio: zigguratRatio, text: bestBtn?.model?.prices && `${getBtnName(bestBtn)} ${toPercent((((game.resPool.get('tears').value * 2500) / zigguratRatio) + game.resPool.get('unicorns').value) / bestPrice)?.text || ''}` };
+    return { bestBuilding, btn: bestBtn, ratio: zigguratRatio, text: bestBtn?.model.prices && getBtnName(bestBtn, toPercent((((game.resPool.get('tears').value * 2500) / zigguratRatio) + game.resPool.get('unicorns').value) / bestPrice)?.text) };
   }
 
   /** @returns {{ action: 'buy' | 'hold' | 'sell', price: number, text: string }} */
@@ -452,7 +452,7 @@
   function calcTheology () {
     return game.religionTab.ctPanel.children[0].children
       .filter((a) => {
-        if (!a.model?.prices.length || a.model.prices[0].name !== 'relic' || (a.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldgCrypto} */ (a.id)] || Number.MAX_SAFE_INTEGER))) {
+        if (a.model.prices[0].name !== 'relic' || (a.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldgCrypto} */ (a.id)] || Number.MAX_SAFE_INTEGER))) {
           return false;
         }
 
@@ -714,9 +714,7 @@
 
   /** @returns {boolean} */
   function unlockTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn, /** @type {boolean=} */ isAll = false) {
-    if (!btn?.model?.enabled || !btn.model.visible || !btn.model.metadata) {
-      return false;
-    } else if (btn.id === 'cryochambers' && btn.model.on >= game.bld.getBuildingExt('chronosphere').meta.on) {
+    if (!btn?.model.enabled || !btn.model.visible || (btn.id === 'cryochambers' && btn.model.on >= game.bld.getBuildingExt('chronosphere').meta.on)) {
       return false;
     }
 
