@@ -16,7 +16,7 @@
 /** @typedef {{ effects: KittensEffects, label: string, name: string, on: number, unlocked: boolean, val: number }} KittensMetadata */
 /** @typedef {{ enabled: boolean, metadata: KittensMetadata, on: number, prices: KittensPrice[] | [KittensPrice], visible: boolean }} KittensModel */
 /** @typedef {{ effects?: KittensEffects, meta: KittensMetadata, model?: KittensModel, val?: number }} KittensBldg */
-/** @typedef {{ domNode: HTMLElement, id: string, model: KittensModel, opts?: { loadout: { pinned: boolean }, name: string } }} KittensBtn */
+/** @typedef {{ domNode: HTMLElement, id: string, model: KittensModel, opts?: { loadout: { pinned: boolean } } }} KittensBtn */
 /** @typedef {{ name: 'dragons' | 'griffins' | 'leviathans' | 'lizards' |'nagas' | 'sharks' | 'spiders' | 'zebras', unlocked: boolean }} KittensDiplomacyRace */
 /** @typedef {{ embassyButton: KittensBtn, race: KittensDiplomacyRace, feedBtn?: KittensBtn, tradeBtn: { tradeAllHref: { link: HTMLElement } } }} KittensDiplomacyRacePanel */
 /** @typedef {KittensDiplomacyRacePanel & { buyBcoin: KittensBtn, sellBcoin: KittensBtn }} KittensDiplomacyRacePanelLeviathans */
@@ -27,8 +27,8 @@
 
 // Kitty Cheat
 /** @typedef {{ active?: boolean, btn: jQuery, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean, noMinCraft?: boolean, noShow?: boolean }} CheatOpt */
-/** @template {{ [x: string]: CheatOpt }} T @typedef {{ active: boolean, all: T, div?: jQuery }} CheatMapEntry */
-/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'group'> & { fn: (group: string, name: string, opts: CheatOpt) => void } }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'pollute' | 'uncap' | 'resources' | 'x10']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }> & { active: true }, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }> & { active: true }, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
+/** @template {{ [x: string]: CheatOpt }} T @typedef {{ active: boolean, all: T, div?: jQuery, noExec?: boolean }} CheatMapEntry */
+/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'group'> & { fn: (group: string, name: string, opts: CheatOpt) => void } }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'pollute' | 'uncap' | 'resources' | 'x10']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }> & { active: true, noExec: true }, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }> & { active: true, noExec: true }, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
 /** @typedef {{ [x in 'build' | 'crypto' | 'upgrade' | 'zig']?: string[] }} CheatStats */
 
 // Window
@@ -84,7 +84,8 @@
         uncap: { active: true, end: true },
         resources: { excl: ['x10'] },
         x10: { excl: ['resources'], end: true }
-      }
+      },
+      noExec: true
     },
     crafting: {
       active: false,
@@ -210,7 +211,8 @@
         religion: { active: true, tab: 'religionTab' },
         space: { active: true, tab: 'spaceTab' },
         time: { active: true, tab: 'timeTab' }
-      }
+      },
+      noExec: true
     }
   };
 
@@ -271,8 +273,8 @@
   }
 
   /** @returns {string?=} */
-  function getBtnName (/** @type {(KittensBtn | KittensBldg)?=} */ btn, /** @type {string?=} */ extra = null) {
-    const name = /** @type {KittensBtn} */ (btn)?.opts?.name || btn?.model?.metadata?.label;
+  function getBtnName (/** @type {(KittensBtn)?=} */ btn, /** @type {string?=} */ extra = null) {
+    const name = btn?.model?.metadata?.label;
 
     return name && extra ? `${name} (${extra})` : name;
   }
@@ -584,7 +586,7 @@
   /** @returns {void} */
   function execOpt (/** @type {keyof CheatMap} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
     try {
-      if (opts.active && cheatMap[group].active) {
+      if (opts.active && cheatMap[group].active && !cheatMap[group].noExec) {
         !opts.noFill && fillResources();
 
         if (group === 'actions') {
@@ -848,24 +850,18 @@
     }
 
     const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab) => boolean} */ fn) => {
-      const /** @type {string[]} */ doneTabs = [];
-
       for (const tab of tabs) {
         if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tab))) {
           try {
             !dryRun && fillResources();
 
             if (fn(dryRun, completed, game[tab])) {
-              doneTabs.push(game[tab].tabId);
+              stats[type] = (stats[type] || []).concat(game[tab].tabId);
             }
           } catch (e) {
             console.error('loopTabs', type, tab, e);
           }
         }
-      }
-
-      if (doneTabs.length) {
-        stats[type] = (stats[type] || []).concat(...doneTabs);
       }
     };
 
@@ -902,20 +898,14 @@
     setTimeout(() => execTextInfo(delay), delay);
   }
 
-  /** @returns {boolean} */
-  function isExecGroup (/** @type {keyof CheatMap} */ group) {
-    return group !== 'control' && group !== 'tabs';
-  }
-
   /** @returns {void} */
   function execOpts (/** @type {number} */ delay) {
     for (const _group in cheatMap) {
       const group = /** @type {keyof CheatMap} */ (_group);
-      const { active, all } = cheatMap[group];
 
-      if (active && isExecGroup(group)) {
-        for (const name in all) {
-          const opts = /** @type {CheatOpt} */ (all[/** @type {keyof typeof all} */ (name)]);
+      if (cheatMap[group].active && !cheatMap[group].noExec) {
+        for (const name in cheatMap[group].all) {
+          const opts = /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (name)]);
 
           if (!opts.delay) {
             execOpt(group, name, opts);
@@ -949,9 +939,7 @@
           }
         }
 
-        if (isExecGroup(group)) {
-          execOpt(group, name, opts);
-        }
+        execOpt(group, name, opts);
       }
     }
   }
