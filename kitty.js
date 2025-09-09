@@ -26,7 +26,7 @@
 /** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => KittensBldg }, bldTab: KittensBtnPanel & KittensTab, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab & { exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }, getEffect: (name: 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab, msg: (text?: string) => { span: HTMLElement }, opts: { noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBldg, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab & { ctPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: (...args: unknown[]) => void } } }, zgUpgradeButtons: KittensBtn[] }, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { heat: number }, timeTab: KittensTab & { cfPanel: { children: [{ children: (KittensBtn & { model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } })[] }] }, vsPanel: { children: [KittensBtnPanel] } }, spaceTab: KittensTab & { GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }, ui: { activeTabId: string }, village: { huntAll: () => void }, villageTab: KittensTab & { buttons: KittensBtn[], promoteKittensBtn: KittensBtn }, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab & { buttons: KittensBtn[] } }} KittensGame */
 
 // Kitty Cheat
-/** @typedef {{ active?: boolean, btn: jQuery, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean }} CheatOpt */
+/** @typedef {{ active?: boolean, btn: jQuery, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean, noMinCraft?: boolean, noShow?: boolean }} CheatOpt */
 /** @template {{ [x: string]: CheatOpt }} T @typedef {{ active: boolean, all: T, div?: jQuery }} CheatMapEntry */
 /** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'group'> & { fn: (group: string, name: string, opts: CheatOpt) => void } }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'pollute' | 'uncap' | 'resources' | 'x10']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }> & { active: true }, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }> & { active: true }, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
 /** @typedef {{ [x in 'build' | 'crypto' | 'upgrade' | 'zig']?: string[] }} CheatStats */
@@ -89,6 +89,7 @@
     crafting: {
       active: false,
       all: {
+        wood: { noShow: true },
         beam: { active: true },
         slab: { active: true },
         steel: { active: true },
@@ -103,11 +104,11 @@
         kerosene: { active: true },
         megalith: {},
         scaffold: { active: true },
-        ship: {},
+        ship: { noMinCraft: true },
         eludium: {},
         thorium: { active: true },
-        bloodstone: {},
-        tMythril: {}
+        bloodstone: { noMinCraft: true },
+        tMythril: { noMinCraft: true}
       }
     },
     trading: {
@@ -842,9 +843,11 @@
     if (!dryRun && cheatMap.control.all.craft.active) {
       fillResources();
 
-      for (const name in cheatMap.crafting.all) {
-        if (name !== 'ship') {
-          execCraft(/** @type {KittensNamedResCraft} */ (name), false);
+      for (const _name in cheatMap.crafting.all) {
+        const name = /** @type {KittensNamedResCraft} */ (_name);
+
+        if (!cheatMap.crafting.all[name]?.noMinCraft) {
+          execCraft(name, false);
         }
       }
     }
@@ -984,14 +987,16 @@
     for (const name in all) {
       const opts = /** @type {CheatOpt} */ (all[/** @type {keyof typeof all} */ (name)]);
 
-      opts.btn = jqAppend(divGroup, $(`<button>${name}</button>`).click(() => {
-        clickOptBtn(group, name, opts);
-      }));
+      if (!opts.noShow) {
+        opts.btn = jqAppend(divGroup, $(`<button>${name}</button>`).click(() => {
+          clickOptBtn(group, name, opts);
+        }));
 
-      activateBtn(opts, opts.active);
+        activateBtn(opts, opts.active);
 
-      if (opts.delay) {
-        execOptTimer(group, name, opts);
+        if (opts.delay) {
+          execOptTimer(group, name, opts);
+        }
       }
     }
   }
