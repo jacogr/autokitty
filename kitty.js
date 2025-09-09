@@ -276,7 +276,7 @@
   function getBtnName (/** @type {(KittensBtn)?=} */ btn, /** @type {string?=} */ extra = null) {
     const name = btn?.model?.metadata?.label;
 
-    return name && extra ? `${name} (${extra})` : name;
+    return name && extra ? `${name} ${extra}` : name;
   }
 
   /** @returns {boolean} */
@@ -464,12 +464,11 @@
       .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
       .map((btn) => {
         const percent = toPercent(game.resPool.get('relic').value / (btn.model.prices[0].val * (1 / FRACTION.RES.TYPE.exotic)));
-        const name = getBtnName(btn);
 
         return {
           btn,
           percent,
-          text: name && `${name} ${percent?.text || ''}`
+          text: getBtnName(btn, percent?.text)
         };
       });
   }
