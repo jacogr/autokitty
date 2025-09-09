@@ -901,10 +901,11 @@
   function execOpts (/** @type {number} */ delay) {
     for (const _group in cheatMap) {
       const group = /** @type {keyof CheatMap} */ (_group);
+      const { active, all, noExec } = cheatMap[group];
 
-      if (cheatMap[group].active && !cheatMap[group].noExec) {
-        for (const name in cheatMap[group].all) {
-          const opts = /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (name)]);
+      if (active && !noExec) {
+        for (const name in all) {
+          const opts = /** @type {CheatOpt} */ (all[/** @type {keyof typeof all} */ (name)]);
 
           if (!opts.delay) {
             execOpt(group, name, opts);
@@ -934,7 +935,7 @@
       } else if (opts.active) {
         if (opts.excl) {
           for (const e of opts.excl) {
-            activateBtn(/** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof typeof cheatMap[group]['all']} */ (e)]), false);
+            activateBtn(/** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (e)]), false);
           }
         }
 
