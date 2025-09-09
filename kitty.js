@@ -35,30 +35,28 @@
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
-  /** @readonly @type {{ CRAFT: number, UNCAPPED: number, RES_NAME: { [x in KittensNamedRes]?: number }, RES_TYPE: { [x in KittensRes['type']]: number } }} */
+  /** @type {Readonly<{CRAFT: Readonly<{ MAX: number, MIN: number }>, RES: Readonly<{ NAME: Readonly<{ [x in KittensNamedRes]?: number }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>, UNCAPPED: number }>} */
   const FRACTION = {
-    CRAFT: 0.925, // 92.5% spent on crafting
+    CRAFT: { MAX: 0.925, MIN: 0.001 }, // 92.5% spent on crafting
+    RES: {
+      NAME: { karma: 0.5, tears: 1 },
+      TYPE: { exotic: 0.01, common: 0, rare: 0 } // exhaustive
+    },
     UNCAPPED: 0.1, // 10% spent on uncapped
-    RES_NAME: /** @readonly */ { karma: 0.5, tears: 1 },
-    RES_TYPE: /** @readonly */ { exotic: 0.01, common: 0, rare: 0 } // exhaustive
   };
 
-  /** @readonly */
+  /** @type {Readonly<{ BCOIN: Readonly<{ BUY: number, SELL: number }>, BUILD: Readonly<{ [x in KittensNamedBldgCrypto]?: number }> }>} */
   const MAXVAL = {
-    BCOIN_BUY: 950, // buy bcoin below this value
-    BCOIN_SELL: 1085, // sell bcoin when it hits this amount (1100 is a crash)
-    BLDG_GENOCIDE: 25 // build at most 25 HGs - this is optimal for paragon
+    BCOIN: { BUY: 925, SELL: 1085 }, // sell bcoin when it hits this amount (1100 is a crash)
+    BUILD: { holyGenocide: 25 } // build at most 25 HGs - this is optimal for paragon
   };
 
   /** @readonly */
   const INTERVAL = {
-    ALL_OPT: 99,
-    ALL_BLD: 999,
-    ALL_TXT: 999,
+    ALL: { OPT: 99, BLD: 999, TXT: 999 },
     ADORE: 120000,
     BCOIN: 60000,
-    CATNIP_GATHER: 5,
-    CATNIP_REFINE: 1000,
+    CATNIP: { GATHER: 5, REFINE: 1000 },
     COMBUST: 1000,
     EXPLORE: 5000,
     FEED: 60000,
@@ -128,13 +126,13 @@
         catnip: {
           fn: fnGather,
           active: true,
-          delay: INTERVAL.CATNIP_GATHER,
+          delay: INTERVAL.CATNIP.GATHER,
           noFill: true
         },
         refine: {
           fn: fnRefine,
           active: true,
-          delay: INTERVAL.CATNIP_REFINE,
+          delay: INTERVAL.CATNIP.REFINE,
           end: true,
           noFill: true
         },
@@ -318,7 +316,7 @@
     for (const p of prices) {
       if (p.name !== skip) {
         const r = game.resPool.get(p.name);
-        const f = FRACTION.RES_NAME[r.name] || FRACTION.RES_TYPE[r.type] || (isUncapped && FRACTION.UNCAPPED) || 1;
+        const f = FRACTION.RES.NAME[r.name] || FRACTION.RES.TYPE[r.type] || (isUncapped && FRACTION.UNCAPPED) || 1;
 
         if ((p.val / r.value) > f) {
           return { isUncapped, isInvalid: true };
@@ -429,9 +427,9 @@
   function calcBcoin () {
     const price = game.calendar.cryptoPrice;
     const action =
-      price >= MAXVAL.BCOIN_SELL
+      price >= MAXVAL.BCOIN.SELL
         ? 'sell'
-        : price <= MAXVAL.BCOIN_BUY
+        : price <= MAXVAL.BCOIN.BUY
           ? 'buy'
           : 'hold';
 
@@ -453,7 +451,7 @@
       .filter((a) => {
         if (!a.model?.prices.length || a.model.prices[0].name !== 'relic') {
           return false;
-        } else if ((a.id === 'holyGenocide') && (a.model.on >= MAXVAL.BLDG_GENOCIDE)) {
+        } else if (a.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldgCrypto} */ (a.id)] || Number.MAX_SAFE_INTEGER)) {
           return false;
         }
 
@@ -461,7 +459,7 @@
       })
       .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
       .map((btn) => {
-        const percent = toPercent(game.resPool.get('relic').value / (btn.model.prices[0].val * (1 / FRACTION.RES_TYPE.exotic)));
+        const percent = toPercent(game.resPool.get('relic').value / (btn.model.prices[0].val * (1 / FRACTION.RES.TYPE.exotic)));
         const name = getBtnName(btn);
 
         return {
@@ -569,11 +567,11 @@
   }
 
   /** @returns {void} */
-  function execCraft (/** @type {KittensNamedResCraft} */ name) {
-    const max = game.workshop.getCraftAllCount(name);
+  function execCraft (/** @type {KittensNamedResCraft} */ name, /** @type {boolean=} */ isMax = true) {
+    const val = Math.ceil(game.workshop.getCraftAllCount(name) * (isMax ? FRACTION.CRAFT.MAX : FRACTION.CRAFT.MIN));
 
-    if (max > 0 && max < Number.MAX_VALUE) {
-      game.workshop.craft(name, Math.ceil(FRACTION.CRAFT * max));
+    if (val > 1 && val < Number.MAX_VALUE) {
+      game.workshop.craft(name, val);
     }
   }
 
@@ -992,7 +990,7 @@
     game.console.filters[/** @type {keyof KittensGame['console']['filters']} */ (f)].enabled = false;
   }
 
-  execOpts(INTERVAL.ALL_OPT);
-  execTextInfo(INTERVAL.ALL_TXT);
-  execBuildAll(INTERVAL.ALL_BLD);
+  execOpts(INTERVAL.ALL.OPT);
+  execTextInfo(INTERVAL.ALL.TXT);
+  execBuildAll(INTERVAL.ALL.BLD);
 })(/** @type {WindowExt} */ (window).$, /** @type {WindowExt} */ (window).game);
