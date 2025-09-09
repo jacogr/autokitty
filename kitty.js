@@ -39,7 +39,7 @@
   const FRACTION = {
     CRAFT: {
       MAX: 0.925, // 92.5% spent on crafting
-      MIN: 0.000025 // 0.0025% for all materials
+      MIN: 0.00025 // 0.025% for all materials
     },
     RES: {
       NAME: { karma: 0.5, tears: 1 },
