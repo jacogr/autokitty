@@ -842,14 +842,9 @@
     if (!dryRun && cheatMap.control.all.craft.active) {
       fillResources();
 
-      for (const _name in cheatMap.crafting.all) {
-        const name = /** @type {KittensNamedResCraft} */ (_name);
-        const allow = !game.workshop.getCraft(name).prices.find((p) =>
-          !(p.name in cheatMap.crafting.all) && !game.resPool.get(p.name).maxValue
-        );
-
-        if (allow) {
-          execCraft(name, false);
+      for (const name in cheatMap.crafting.all) {
+        if (name !== 'ship') {
+          execCraft(/** @type {KittensNamedResCraft} */ (name), false);
         }
       }
     }
