@@ -453,9 +453,7 @@
   function calcTheology () {
     return game.religionTab.ctPanel.children[0].children
       .filter((a) => {
-        if (!a.model?.prices.length || a.model.prices[0].name !== 'relic') {
-          return false;
-        } else if (a.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldgCrypto} */ (a.id)] || Number.MAX_SAFE_INTEGER)) {
+        if (!a.model?.prices.length || a.model.prices[0].name !== 'relic' || (a.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldgCrypto} */ (a.id)] || Number.MAX_SAFE_INTEGER))) {
           return false;
         }
 
@@ -525,7 +523,7 @@
       if ((avail / combustCycles[c]) > 1) {
         const btn = renderBgTab(game.timeTab)?.cfPanel.children[0].children[0];
 
-        btn && btn.model[c].handler.call(btn);
+        btn?.model[c].handler.call(btn);
 
         return;
       }
@@ -748,8 +746,8 @@
     let hasSome = false;
 
     // multi for religion & embassy upgrades
-    const isAll = !!(
-      (/** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons ||
+    const isAll = !!((
+      /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons ||
       /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels
     )?.length);
 
@@ -766,13 +764,8 @@
 
     const d = /** @type {KittensGame['diplomacyTab']} */ (tab);
 
-    // for trade, unlock new races to trade with
     if (d.exploreBtn && d.racePanels.length !== 8) {
-      const maxRaces = d.leviathansInfo
-        ? 8 - (findLeviathans()?.race.unlocked ? 0 : 1)
-        : 7;
-
-      if (d.racePanels.length !== maxRaces) {
+      if (d.racePanels.length !== (8 - (findLeviathans()?.race.unlocked ? 0 : 1))) {
         const nowTime = Date.now();
         const nowDelta = nowTime - lastExploreTime;
 
@@ -790,9 +783,7 @@
   function buildTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn) {
     const model = btn?.model;
 
-    if (!model?.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val)) {
-      return false;
-    } else if (!cheatMap.control.all.pollute.active && model.metadata.effects?.cathPollutionPerTickProd) {
+    if (!model?.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val) || (!cheatMap.control.all.pollute.active && model.metadata.effects?.cathPollutionPerTickProd)) {
       return false;
     }
 
