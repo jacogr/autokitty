@@ -22,7 +22,7 @@
 /** @typedef {KittensDiplomacyRacePanel & { buyBcoin: KittensBtn, sellBcoin: KittensBtn }} KittensDiplomacyRacePanelLeviathans */
 /** @typedef {{ cathPollutionPerTickProd?: number, riftChance?: number, unicornsPerTickBase?: number, unicornsRatioReligion?: number }} KittensEffects */
 /** @typedef {{ name: KittensNamedRes, val: number }} KittensPrice */
-/** @typedef {{ maxValue: number, name: KittensNamedRes, perTickCached: number, type: 'common' | 'exotic' | 'rare', unlocked: boolean, value: number, visible: boolean }} KittensRes */
+/** @typedef {{ isHidden: boolean, maxValue: number, name: KittensNamedRes, perTickCached: number, type: 'common' | 'exotic' | 'rare', unlocked: boolean, value: number }} KittensRes */
 /** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => KittensBldg }, bldTab: KittensBtnPanel & KittensTab, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab & { exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }, getEffect: (name: 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab, msg: (text?: string) => { span: HTMLElement }, opts: { noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBldg, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab & { ctPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: (...args: unknown[]) => void } } }, zgUpgradeButtons: KittensBtn[] }, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { heat: number }, timeTab: KittensTab & { cfPanel: { children: [{ children: (KittensBtn & { model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } })[] }] }, vsPanel: { children: [KittensBtnPanel] } }, spaceTab: KittensTab & { GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }, ui: { activeTabId: string }, village: { huntAll: () => void }, villageTab: KittensTab & { buttons: KittensBtn[], promoteKittensBtn: KittensBtn }, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab & { buttons: KittensBtn[] } }} KittensGame */
 
 // Kitty Cheat
@@ -37,7 +37,10 @@
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
   /** @type {Readonly<{CRAFT: Readonly<{ MAX: number, MIN: number }>, RES: Readonly<{ NAME: Readonly<{ [x in KittensNamedRes]?: number }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>, UNCAPPED: number }>} */
   const FRACTION = {
-    CRAFT: { MAX: 0.925, MIN: 0.001 }, // 92.5% spent on crafting
+    CRAFT: {
+      MAX: 0.925, // 92.5% spent on crafting
+      MIN: 0.00025 // 0.025% for all materials
+    },
     RES: {
       NAME: { karma: 0.5, tears: 1 },
       TYPE: { exotic: 0.01, common: 0, rare: 0 } // exhaustive
@@ -331,7 +334,7 @@
   function fillResources () {
     if (cheatMap.control.all.resources.active || cheatMap.control.all.x10.active) {
       for (const r of game.resPool.resources) {
-        if (r.maxValue && r.unlocked && r.visible && r.name !== 'kittens' && r.name !== 'zebras') {
+        if (r.maxValue && r.unlocked && !r.isHidden && r.name !== 'kittens' && r.name !== 'zebras') {
           const max = r.maxValue * (cheatMap.control.all.x10.active ? 10 : 1);
 
           if (r.value < max) {
@@ -568,10 +571,14 @@
 
   /** @returns {void} */
   function execCraft (/** @type {KittensNamedResCraft} */ name, /** @type {boolean=} */ isMax = true) {
-    const val = Math.ceil(game.workshop.getCraftAllCount(name) * (isMax ? FRACTION.CRAFT.MAX : FRACTION.CRAFT.MIN));
+    const r = game.resPool.get(name);
 
-    if (val > 1 && val < Number.MAX_VALUE) {
-      game.workshop.craft(name, val);
+    if (r.unlocked && r.value && !r.isHidden) {
+      const val = Math.ceil(game.workshop.getCraftAllCount(name) * (isMax ? FRACTION.CRAFT.MAX : FRACTION.CRAFT.MIN));
+
+      if (val > 1 && val < Number.MAX_VALUE) {
+        game.workshop.craft(name, val);
+      }
     }
   }
 
@@ -832,6 +839,14 @@
     const /** @type {CheatStats} */ stats = {};
     const /** @type {KittensNamedTab[]} */ allowedTabs = [];
 
+    if (!dryRun && cheatMap.control.all.craft.active) {
+      fillResources();
+
+      for (const name in cheatMap.crafting.all) {
+        execCraft(/** @type {KittensNamedResCraft} */ (name), false);
+      }
+    }
+
     for (const t in cheatMap.tabs.all) {
       cheatMap.tabs.all[t]?.active && allowedTabs.push(cheatMap.tabs.all[t].tab);
     }
@@ -906,7 +921,7 @@
         for (const name in all) {
           const opts = /** @type {CheatOpt} */ (all[/** @type {keyof typeof all} */ (name)]);
 
-          if (opts.active && !opts.delay) {
+          if (!opts.delay) {
             execOpt(group, name, opts);
           }
         }
