@@ -8,7 +8,7 @@
 /** @typedef {'blackCore' | 'blackLibrary' | 'blackNexus' | 'blackObelisk' | 'blackRadiance' | 'blazar' | 'darkNova' | 'holyGenocide' | 'mausoleum' | 'singularity'} KittensNamedBldgCrypto */
 /** @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamedBldgZU */
 /** @typedef {'tenErasLink' | 'previousCycleLink' | 'nextCycleLink'} KittensNamedCombustLink */
-/** @typedef {'alloy' | 'beam' | 'bloodstone' | 'blueprint' | 'compedium' | 'concrate' | 'eludium' | 'gear' | 'kerosene' | 'manuscript' | 'megalith' |'parchment' | 'plate' | 'scaffold' |  'ship' | 'slab' | 'steel' | 'tMythril' | 'thorium' | 'wood'} KittensNamedResCraft */
+/** @typedef {'alloy' | 'beam' | 'bloodstone' | 'blueprint' | 'compedium' | 'concrate' | 'eludium' | 'gear' | 'kerosene' | 'manuscript' | 'megalith' |'parchment' | 'plate' | 'scaffold' |  'ship' | 'slab' | 'steel' | 'tMythril' | 'tanker' | 'thorium' | 'wood'} KittensNamedResCraft */
 /** @typedef {'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
 /** @typedef {{ render: () => void, tabId: string, tabName: string, visible: boolean }} KittensTab */
@@ -36,7 +36,7 @@
   const FRACTION = {
     CRAFT: {
       MAX: 0.925, // 92.5% spent on crafting
-      MIN: 0.00025 // 0.025% for all materials
+      MIN: 0.000375 // 0.0375% for all materials
     },
     RES: {
       NAME: { karma: 0.5, tears: 1 },
@@ -102,9 +102,10 @@
         kerosene: { active: true },
         megalith: {},
         scaffold: { active: true },
-        ship: { noMinCraft: true },
         eludium: {},
         thorium: { active: true },
+        ship: { noMinCraft: true },
+        tanker: { noMinCraft: true },
         bloodstone: { noMinCraft: true },
         tMythril: { noMinCraft: true}
       }
