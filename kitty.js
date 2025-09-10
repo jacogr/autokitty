@@ -8,6 +8,7 @@
 /** @typedef {'blackCore' | 'blackLibrary' | 'blackNexus' | 'blackObelisk' | 'blackRadiance' | 'blazar' | 'darkNova' | 'holyGenocide' | 'mausoleum' | 'singularity'} KittensNamedBldgCrypto */
 /** @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamedBldgZU */
 /** @typedef {'tenErasLink' | 'previousCycleLink' | 'nextCycleLink'} KittensNamedCombustLink */
+
 /** @typedef {'alloy' | 'beam' | 'bloodstone' | 'blueprint' | 'compedium' | 'concrate' | 'eludium' | 'gear' | 'kerosene' | 'manuscript' | 'megalith' |'parchment' | 'plate' | 'scaffold' |  'ship' | 'slab' | 'steel' | 'tMythril' | 'tanker' | 'thorium' | 'wood'} KittensNamedResCraft */
 /** @typedef {'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
@@ -24,8 +25,8 @@
 
 // Kitty Cheat
 /** @typedef {{ active?: boolean, btn: jQuery, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean, noMinCraft?: boolean, noShow?: boolean }} CheatOpt */
-/** @template {{ [x: string]: CheatOpt }} T @typedef {{ active: boolean, all: T, div?: jQuery, noExec?: boolean }} CheatMapEntry */
-/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'group'> & { fn: (group: string, name: string, opts: CheatOpt) => void } }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'pollute' | 'uncap' | 'resources' | 'x10']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }> & { active: true, noExec: true }, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }> & { active: true, noExec: true }, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
+/** @template {{ [x: string]: CheatOpt }} T @typedef {{ active?: boolean, all: T, div?: jQuery, noExec?: boolean }} CheatMapEntry */
+/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'group'> & { fn: (group: string, name: string, opts: CheatOpt) => void } }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'pollute' | 'uncap' | 'resources' | 'x10']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }> & { noExec: true }, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> & { tab: KittensNamedTab } }> & { noExec: true }, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
 /** @typedef {{ [x in 'build' | 'crypto' | 'upgrade' | 'zig']?: string[] }} CheatStats */
 
 // Window
@@ -68,7 +69,6 @@
   /** @type {Readonly<CheatMap>} */
   const cheatMap = {
     control: {
-      active: true,
       all: {
         build: {},
         upgrade: { end: true },
@@ -85,7 +85,6 @@
       noExec: true
     },
     crafting: {
-      active: false,
       all: {
         wood: { noShow: true },
         beam: { active: true },
@@ -111,7 +110,6 @@
       }
     },
     trading: {
-      active: false,
       all: {
         leviathans: { active: true },
         dragons: { active: true },
@@ -124,7 +122,6 @@
       }
     },
     actions: {
-      active: false,
       all: {
         catnip: {
           fn: fnGather,
@@ -199,7 +196,6 @@
       }
     },
     tabs: {
-      active: true,
       all: {
         bonfire: { active: true, tab: 'bldTab' },
         village: { active: true, tab: 'villageTab' },
@@ -214,7 +210,7 @@
     }
   };
 
-  /** @type {{ [x in KittensNamedCombustLink]: number }} */
+  /** @type {Readonly<{ [x in KittensNamedCombustLink]: number }>} */
   const combustCycles = {
     tenErasLink: 500,
     previousCycleLink: 45,
@@ -930,17 +926,16 @@
 
   for (const _group in cheatMap) {
     const group = /** @type {keyof CheatMap} */ (_group);
-    const { active, all } = cheatMap[group];
     const divGrp = cheatMap[group].div = jqAppend(divAct, $(`<div id="kittycheat-act-${group}" class="kittycheat-div"></div>`));
 
     if (group !== 'control') {
       jqAppend(divGrp, $(`<div class="kittycheat-div kittycheat-div-small">${group}:</div>`));
     }
 
-    activateGroup(group, active);
+    activateGroup(group, cheatMap[group].active || cheatMap[group].noExec);
 
-    for (const name in all) {
-      const opts = /** @type {CheatOpt} */ (all[/** @type {keyof typeof all} */ (name)]);
+    for (const name in cheatMap[group].all) {
+      const opts = /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (name)]);
 
       if (!opts.noShow) {
         opts.btn = jqAppend(divGrp, $(`<button class="kittycheat-btn kittycheat-btn-${opts.end ? 'end' : opts.excl ? 'excl' : 'default'}">${name}</button>`).click(() => {
