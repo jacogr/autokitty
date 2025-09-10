@@ -1,7 +1,7 @@
 // @ts-check
 
 // jQuery
-/** @typedef {{ append: (elem: jQuery) => jQuery, click: (fn?: () => unknown) => jQuery, css: (style: { [x: string]: string | number } | string, val?: string | number) => jQuery, filter: (fn: (index: number, elem: HTMLElement) => boolean) => jQuery, html: (html: string) => jQuery, length: number, text: () => string }} jQuery */
+/** @typedef {{ addClass: (classes: string) => jQuery, append: (elem: jQuery | string) => jQuery, click: (fn?: () => unknown) => jQuery, css: (style: { [x: string]: string | number } | string, val?: string | number) => jQuery, filter: (fn: (index: number, elem: HTMLElement) => boolean) => jQuery, html: (html: string) => jQuery, length: number, removeClass: (classes: string) => jQuery, text: () => string }} jQuery */
 /** @typedef {(elem: HTMLElement | string) => jQuery} JQuery */
 
 // Kittens Game
@@ -45,7 +45,7 @@
     UNCAPPED: 0.1, // 10% spent on uncapped
   };
 
-  /** @type {Readonly<{ BCOIN: Readonly<{ BUY: number, SELL: number }>, BUILD: Readonly<{ [x in KittensNamedBldgCrypto]?: number }> }>} */
+  /** @type {Readonly<{ BCOIN: Readonly<{ [x in 'BUY' | 'SELL']: number }>, BUILD: Readonly<{ [x in KittensNamedBldgCrypto]?: number }> }>} */
   const MAXVAL = {
     BCOIN: { BUY: 925, SELL: 1085 }, // sell bcoin when it hits this amount (1100 is a crash)
     BUILD: { holyGenocide: 25 } // build at most 25 HGs - this is optimal for paragon
@@ -237,22 +237,7 @@
   function activateBtn (/** @type {CheatOpt} */ opts, /** @type {boolean=} */ active = false) {
     opts.active = active;
 
-    return opts.btn.css({
-      'background': active ? 'red' : 'white',
-      'color': active ? 'white' : 'black',
-      'font-family': 'monospace',
-      'font-size': 'small',
-      'border-radius': '2px',
-      'border-width': '1px',
-      'padding-inline': '4px',
-      'margin-right': opts.end ? '5px' : (opts.excl ? '-2px' : '2px'),
-      'margin-bottom': '2px'
-    });
-  }
-
-  /** @returns {jQuery} */
-  function styleDiv (/** @type {jQuery} */ div, /** @type {boolean=} */ isSmall = false) {
-    return div.css({ 'margin-bottom': isSmall ? '5px' : '20px' });
+    return opts.btn[active ? 'addClass' : 'removeClass']('kittycheat-btn-active');
   }
 
   /** @returns {{ frac: number, raw: number, text: string } | null} */
@@ -869,7 +854,7 @@
       loopTabs('crypto', ['religionTab'], buildTheology);
 
       if (delay > 0) {
-        completed.length && $(game.msg(completed.join(', ')).span).css('opacity', 0.33);
+        completed.length && $(game.msg(completed.join(', ')).span).addClass('kittycheat-log');
         setTimeout(() => execBuildAll(delay), Math.ceil(delay / (completed.length ? 2 : 1)));
       }
     }
@@ -918,7 +903,7 @@
     const opt = cheatMap[group];
 
     opt.active = active;
-    opt.div?.css('opacity', active ? 1 : 0.33);
+    opt.div?.[active ? 'removeClass' : 'addClass']('kittycheat-div-disabled');
   }
 
   /** @returns {void} */
@@ -940,21 +925,19 @@
     }
   }
 
-  const divCont = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>').css({
-    'padding-bottom': '30px',
-    'font-family': 'monospace',
-    'font-size': 'small'
-  }));
-  const divActGroup = jqAppend(divCont, styleDiv($('<div id="kittycheat-act"></div>')));
-  const divTxtGroup = jqAppend(divCont, styleDiv($('<div id="kittycheat-txt"></div>')));
+  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; color: black; font-family: monospace; font-size: small; padding-inline: 4px; margin-bottom: 2px; } .kittycheat-btn-active { background: red; color: white; } .kittycheat-btn-default { margin-right: 2px; } .kittycheat-btn-end { margin-right: 5px; } .kittycheat-btn-excl { margin-right: -2px; } .kittycheat-div {} .kittycheat-div-normal { margin-bottom: 20px; } .kittycheat-div-small { margin-bottom: 5px; } .kittycheat-div-disabled { opacity: 0.33; } .kittycheat-log { opacity: 0.33; }</style>');
+
+  const divCont = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
+  const divActGroup = jqAppend(divCont, $('<div id="kittycheat-act" class="kittycheat-div kittycheat-div-normal"></div>'));
+  const divTxtGroup = jqAppend(divCont, $('<div id="kittycheat-txt" class="kittycheat-div kittycheat-div-normal"></div>'));
 
   for (const _group in cheatMap) {
     const group = /** @type {keyof CheatMap} */ (_group);
     const { active, all } = cheatMap[group];
-    const divGroup = cheatMap[group].div = jqAppend(divActGroup, styleDiv($(`<div id="kittycheat-act-${group}"></div>`)));
+    const divGroup = cheatMap[group].div = jqAppend(divActGroup, $(`<div id="kittycheat-act-${group}" class="kittycheat-div kittycheat-div-normal"></div>`));
 
     if (group !== 'control') {
-      jqAppend(divGroup, styleDiv($(`<div>${group}:</div>`), true));
+      jqAppend(divGroup, $(`<div class="kittycheat-div kittycheat-div-small">${group}:</div>`));
     }
 
     activateGroup(group, active);
@@ -963,7 +946,7 @@
       const opts = /** @type {CheatOpt} */ (all[/** @type {keyof typeof all} */ (name)]);
 
       if (!opts.noShow) {
-        opts.btn = jqAppend(divGroup, $(`<button>${name}</button>`).click(() => {
+        opts.btn = jqAppend(divGroup, $(`<button class="kittycheat-btn ${opts.end ? 'kittycheat-btn-end' : opts.excl ? 'kittycheat-btn-excl' : 'kittycheat-btn-default'}">${name}</button>`).click(() => {
           clickOptBtn(group, name, opts);
         }));
 
@@ -977,7 +960,7 @@
   }
 
   for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
-    jqAppend(divTxtGroup, styleDiv($(`<div id="kittycheat-txt-${id}"></div>`), true));
+    jqAppend(divTxtGroup, $(`<div id="kittycheat-txt-${id}" class="kittycheat-div kittycheat-div-small"></div>`));
   }
 
   game.console.maxMessages = 100;
