@@ -233,11 +233,18 @@
      return child;
   }
 
-  /** @returns {jQuery} */
+  /** @returns {void} */
   function activateBtn (/** @type {CheatOpt} */ opts, /** @type {boolean=} */ active = false) {
     opts.active = active;
+    opts.btn[active ? 'addClass' : 'removeClass']('kittycheat-btn-active');
+  }
 
-    return opts.btn[active ? 'addClass' : 'removeClass']('kittycheat-btn-active');
+  /** @returns {void} */
+  function activateGroup (/** @type {keyof CheatMap} */ group, /** @type {boolean=} */ active = false) {
+    const opt = cheatMap[group];
+
+    opt.active = active;
+    opt.div?.[active ? 'removeClass' : 'addClass']('kittycheat-div-disabled');
   }
 
   /** @returns {{ frac: number, raw: number, text: string } | null} */
@@ -409,7 +416,7 @@
       }
     }
 
-    return { bestBuilding, btn: bestBtn, ratio: zigguratRatio, text: bestBtn?.model.prices && getBtnName(bestBtn, toPercent((((game.resPool.get('tears').value * 2500) / zigguratRatio) + game.resPool.get('unicorns').value) / bestPrice)?.text) };
+    return { bestBuilding, btn: bestBtn, ratio: zigguratRatio, text: getBtnName(bestBtn, toPercent((((game.resPool.get('tears').value * 2500) / zigguratRatio) + game.resPool.get('unicorns').value) / bestPrice)?.text) };
   }
 
   /** @returns {{ action: 'buy' | 'hold' | 'sell', price: number, text: string }} */
@@ -505,9 +512,7 @@
       const c = /** @type {KittensNamedCombustLink} */ (_c);
 
       if ((avail / combustCycles[c]) > 1) {
-        const btn = renderBgTab(game.timeTab)?.cfPanel.children[0].children[0];
-
-        btn?.model[c].handler.call(btn);
+        renderBgTab(game.timeTab)?.cfPanel.children[0].children[0]?.model[c].handler.call(noop);
 
         return;
       }
@@ -629,7 +634,7 @@
       hasSome = true;
     }
 
-    let zig = calcZiggurats();;
+    let zig = calcZiggurats();
     let count = 0;
 
     while (zig.bestBuilding && count < 7) {
@@ -650,7 +655,7 @@
         const finTears = nowTears + (zig.ratio * game.resPool.get('unicorns').value / 2500);
 
         if (best.tears?.val && (nowTears < best.tears.val) && (finTears > best.tears.val)) {
-          game.religionTab.sacrificeBtn.model.allLink.handler.call(game.religionTab.sacrificeBtn, noop, noop);
+          game.religionTab.sacrificeBtn.model.allLink.handler.call(noop, noop, noop);
           hasSome = true;
         }
 
@@ -899,14 +904,6 @@
   }
 
   /** @returns {void} */
-  function activateGroup (/** @type {keyof CheatMap} */ group, /** @type {boolean=} */ active = false) {
-    const opt = cheatMap[group];
-
-    opt.active = active;
-    opt.div?.[active ? 'removeClass' : 'addClass']('kittycheat-div-disabled');
-  }
-
-  /** @returns {void} */
   function clickOptBtn (/** @type {keyof CheatMap} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
     activateBtn(opts, !opts.active);
 
@@ -925,19 +922,19 @@
     }
   }
 
-  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; color: black; font-family: monospace; font-size: small; padding-inline: 4px; margin-bottom: 2px; } .kittycheat-btn-active { background: red; color: white; } .kittycheat-btn-default { margin-right: 2px; } .kittycheat-btn-end { margin-right: 5px; } .kittycheat-btn-excl { margin-right: -2px; } .kittycheat-div {} .kittycheat-div-normal { margin-bottom: 20px; } .kittycheat-div-small { margin-bottom: 5px; } .kittycheat-div-disabled { opacity: 0.33; } .kittycheat-log { opacity: 0.33; }</style>');
+  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; padding-inline: 4px; margin-bottom: 2px; } .kittycheat-btn-active { background: red; color: white; } .kittycheat-btn-default { margin-right: 2px; } .kittycheat-btn-end { margin-right: 5px; } .kittycheat-btn-excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div-small { margin-bottom: 5px; } .kittycheat-div-disabled { opacity: 0.33; } .kittycheat-log { opacity: 0.33; }</style>');
 
-  const divCont = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
-  const divActGroup = jqAppend(divCont, $('<div id="kittycheat-act" class="kittycheat-div kittycheat-div-normal"></div>'));
-  const divTxtGroup = jqAppend(divCont, $('<div id="kittycheat-txt" class="kittycheat-div kittycheat-div-normal"></div>'));
+  const divAll = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
+  const divAct = jqAppend(divAll, $('<div id="kittycheat-act" class="kittycheat-div"></div>'));
+  const divTxt = jqAppend(divAll, $('<div id="kittycheat-txt" class="kittycheat-div"></div>'));
 
   for (const _group in cheatMap) {
     const group = /** @type {keyof CheatMap} */ (_group);
     const { active, all } = cheatMap[group];
-    const divGroup = cheatMap[group].div = jqAppend(divActGroup, $(`<div id="kittycheat-act-${group}" class="kittycheat-div kittycheat-div-normal"></div>`));
+    const divGrp = cheatMap[group].div = jqAppend(divAct, $(`<div id="kittycheat-act-${group}" class="kittycheat-div"></div>`));
 
     if (group !== 'control') {
-      jqAppend(divGroup, $(`<div class="kittycheat-div kittycheat-div-small">${group}:</div>`));
+      jqAppend(divGrp, $(`<div class="kittycheat-div kittycheat-div-small">${group}:</div>`));
     }
 
     activateGroup(group, active);
@@ -946,7 +943,7 @@
       const opts = /** @type {CheatOpt} */ (all[/** @type {keyof typeof all} */ (name)]);
 
       if (!opts.noShow) {
-        opts.btn = jqAppend(divGroup, $(`<button class="kittycheat-btn ${opts.end ? 'kittycheat-btn-end' : opts.excl ? 'kittycheat-btn-excl' : 'kittycheat-btn-default'}">${name}</button>`).click(() => {
+        opts.btn = jqAppend(divGrp, $(`<button class="kittycheat-btn kittycheat-btn-${opts.end ? 'end' : opts.excl ? 'excl' : 'default'}">${name}</button>`).click(() => {
           clickOptBtn(group, name, opts);
         }));
 
@@ -960,7 +957,7 @@
   }
 
   for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
-    jqAppend(divTxtGroup, $(`<div id="kittycheat-txt-${id}" class="kittycheat-div kittycheat-div-small"></div>`));
+    jqAppend(divTxt, $(`<div id="kittycheat-txt-${id}" class="kittycheat-div kittycheat-div-small"></div>`));
   }
 
   game.console.maxMessages = 100;
