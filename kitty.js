@@ -33,7 +33,7 @@
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
-  /** @type {Readonly<{CRAFT: Readonly<{ MAX: number, MIN: number }>, RES: Readonly<{ NAME: Readonly<{ [x in KittensNamedRes]?: number }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>, UNCAPPED: number }>} */
+  /** @type {Readonly<{CRAFT: Readonly<{ MAX: number, MIN: number }>, RES: Readonly<{ NAME: Readonly<{ [x in KittensNamedRes]?: number }>, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>, UNCAPPED: number }>} */
   const FRACTION = {
     CRAFT: {
       MAX: 0.925, // 92.5% spent on crafting
@@ -41,6 +41,7 @@
     },
     RES: {
       NAME: { karma: 0.5, tears: 1 },
+      SKIP: { kittens: true, zebras: true }, // skip these when maxing
       TYPE: { exotic: 0.01, common: 0, rare: 0 } // exhaustive
     },
     UNCAPPED: 0.1, // 10% spent on uncapped
@@ -259,15 +260,15 @@
   }
 
   /** @returns {string?=} */
-  function getBtnName (/** @type {(KittensBtn)?=} */ btn, /** @type {string?=} */ extra = null) {
+  function getBtnName (/** @type {KittensBtn?=} */ btn, /** @type {string?=} */ extra = null) {
     const name = btn?.model.metadata?.label || btn?.opts?.name;
 
     return name && extra ? `${name} ${extra}` : name;
   }
 
   /** @returns {boolean} */
-  function clickDom (/** @type {KittensBtn?=} */ btn, /** @type {boolean=} */ isAll = false) {
-    return btn?.domNode.dispatchEvent(new MouseEvent('click', isAll ? { shiftKey: true } : {})) || false;
+  function clickBtn (/** @type {KittensBtn?=} */ btn, /** @type {boolean=} */ isAll = false) {
+    return !!btn && btn.domNode.dispatchEvent(new MouseEvent('click', isAll ? { shiftKey: true } : {}));
   }
 
   /** @returns {boolean} */
@@ -323,7 +324,7 @@
   function fillResources () {
     if (cheatMap.control.all.resources.active || cheatMap.control.all.x10.active) {
       for (const r of game.resPool.resources) {
-        if (r.maxValue && r.unlocked && !r.isHidden && r.name !== 'kittens' && r.name !== 'zebras') {
+        if (r.maxValue && r.unlocked && !r.isHidden && !FRACTION.RES.SKIP[r.name]) {
           const max = r.maxValue * (cheatMap.control.all.x10.active ? 10 : 1);
 
           if (r.value < max) {
@@ -462,17 +463,21 @@
   /** @returns {void} */
   function fnAdore () {
     game.religion.resetFaith(1.01, false);
-    clickDom(renderBgTab(game.religionTab)?.praiseBtn);
+  }
+
+  /** @returns {void} */
+  function fnPraise () {
+    game.religion.praise();
   }
 
   /** @returns {void} */
   function fnPromote () {
-    clickDom(renderBgTab(game.villageTab)?.promoteKittensBtn);
+    clickBtn(renderBgTab(game.villageTab)?.promoteKittensBtn);
   }
 
   /** @returns {void} */
   function fnLoadout () {
-    clickDom(renderBgTab(game.villageTab)?.buttons.find((b) => b?.opts?.loadout?.pinned));
+    clickBtn(renderBgTab(game.villageTab)?.buttons.find((b) => b?.opts?.loadout?.pinned));
   }
 
   /** @returns {void} */
@@ -483,11 +488,6 @@
   /** @returns {void} */
   function fnRefine () {
     clickSpan('Refine catnip');
-  }
-
-  /** @returns {void} */
-  function fnPraise () {
-    game.religion.praise();
   }
 
   /** @returns {void} */
@@ -527,7 +527,7 @@
   /** @returns {void} */
   function fnFeed () {
     if (game.resPool.get('necrocorn').value > 1 && renderBgTab(game.diplomacyTab)) {
-      clickDom(findLeviathans()?.feedBtn);
+      clickBtn(findLeviathans()?.feedBtn);
     }
   }
 
@@ -539,7 +539,7 @@
       const bcoin = game.resPool.get('blackcoin').value;
 
       if (((info.action === 'sell' && bcoin > 0) || (info.action === 'buy' && bcoin === 0)) && renderBgTab(game.diplomacyTab)) {
-        clickDom(findLeviathans()?.[`${info.action}Bcoin`]);
+        clickBtn(findLeviathans()?.[`${info.action}Bcoin`]);
       }
     }
   }
@@ -622,7 +622,7 @@
     let hasSome = false;
 
     if (blck.isBuildable) {
-      if (!clickDom(blck.btn, true)) {
+      if (!clickBtn(blck.btn, true)) {
         return false;
       }
 
@@ -656,7 +656,7 @@
         }
 
         break;
-      } else if (!clickDom(next.btn)) {
+      } else if (!clickBtn(next.btn)) {
         break;
       }
 
@@ -675,7 +675,7 @@
       return false;
     }
 
-    return clickDom(best.btn);
+    return clickBtn(best.btn);
   }
 
   /** @returns {boolean}  */
@@ -711,7 +711,7 @@
       return false;
     }
 
-    return dryRun ? true : clickDom(btn, isAll);
+    return dryRun || clickBtn(btn, isAll);
   }
 
   /** @returns {boolean} */
@@ -747,15 +747,13 @@
 
     const d = /** @type {KittensGame['diplomacyTab']} */ (tab);
 
-    if (d.exploreBtn && d.racePanels.length !== 8) {
-      if (d.racePanels.length !== (8 - (findLeviathans()?.race.unlocked ? 0 : 1))) {
-        const nowTime = Date.now();
-        const nowDelta = nowTime - lastExploreTime;
+    if (d.exploreBtn && d.racePanels.length !== 8 && d.racePanels.length !== (8 - (findLeviathans()?.race.unlocked ? 0 : 1))) {
+      const nowTime = Date.now();
+      const nowDelta = nowTime - lastExploreTime;
 
-        if (nowDelta > INTERVAL.EXPLORE) {
-          lastExploreTime = nowTime;
-          hasSome ||= (dryRun ? true : clickDom(d.exploreBtn));
-        }
+      if (nowDelta > INTERVAL.EXPLORE) {
+        lastExploreTime = nowTime;
+        hasSome ||= (dryRun || clickBtn(d.exploreBtn));
       }
     }
 
@@ -778,7 +776,7 @@
       return false;
     }
 
-    return dryRun ? true : clickDom(btn, !check.isUncapped && model.metadata.on >= 1);
+    return dryRun || clickBtn(btn, !check.isUncapped && model.metadata.on >= 1);
   }
 
   /** @returns {boolean} */
@@ -814,22 +812,6 @@
     const /** @type {CheatStats} */ stats = {};
     const /** @type {KittensNamedTab[]} */ allowedTabs = [];
 
-    if (!dryRun && cheatMap.control.all.craft.active) {
-      fillResources();
-
-      for (const _name in cheatMap.crafting.all) {
-        const name = /** @type {KittensNamedResCraft} */ (_name);
-
-        if (!cheatMap.crafting.all[name]?.noMinCraft) {
-          execCraft(name, false);
-        }
-      }
-    }
-
-    for (const t in cheatMap.tabs.all) {
-      cheatMap.tabs.all[t]?.active && allowedTabs.push(cheatMap.tabs.all[t].tab);
-    }
-
     const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab) => boolean} */ fn) => {
       for (const tab of tabs) {
         if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tab))) {
@@ -846,6 +828,22 @@
       }
     };
 
+    if (!dryRun && cheatMap.control.all.craft.active) {
+      fillResources();
+
+      for (const _name in cheatMap.crafting.all) {
+        const name = /** @type {KittensNamedResCraft} */ (_name);
+
+        if (!cheatMap.crafting.all[name]?.noMinCraft) {
+          execCraft(name, false);
+        }
+      }
+    }
+
+    for (const t in cheatMap.tabs.all) {
+      cheatMap.tabs.all[t]?.active && allowedTabs.push(cheatMap.tabs.all[t].tab);
+    }
+
     loopTabs('upgrade', ['libraryTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
     loopTabs('build', ['bldTab', 'spaceTab'], buildTab);
     loopTabs('upgrade', ['diplomacyTab', 'religionTab'], unlockTab);
@@ -856,7 +854,7 @@
 
       if (delay > 0) {
         completed.length && $(game.msg(completed.join(', ')).span).addClass('kittycheat-log');
-        setTimeout(() => execBuildAll(delay), Math.ceil(delay / (completed.length ? 2 : 1)));
+        setTimeout(() => execBuildAll(delay), delay);
       }
     }
 
@@ -918,7 +916,7 @@
     }
   }
 
-  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; padding-inline: 4px; margin-bottom: 2px; } .kittycheat-btn-active { background: red; color: white; } .kittycheat-btn-default { margin-right: 2px; } .kittycheat-btn-end { margin-right: 5px; } .kittycheat-btn-excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div-small { margin-bottom: 5px; } .kittycheat-div-disabled { opacity: 0.33; } .kittycheat-log { opacity: 0.33; }</style>');
+  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; padding: 1px 4px; margin-bottom: 2px; } .kittycheat-btn-active { background: red; color: white; } .kittycheat-btn-default { margin-right: 2px; } .kittycheat-btn-end { margin-right: 5px; } .kittycheat-btn-excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div-small { margin-bottom: 5px; } .kittycheat-div-disabled { opacity: 0.33; } .kittycheat-log { opacity: 0.33; }</style>');
 
   const divAll = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
   const divAct = jqAppend(divAll, $('<div id="kittycheat-act" class="kittycheat-div"></div>'));
