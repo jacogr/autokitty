@@ -13,7 +13,7 @@
 /** @typedef {'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
 /** @typedef {{ effects: { cathPollutionPerTickProd?: number, riftChance?: number, unicornsPerTickBase?: number, unicornsRatioReligion?: number }, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }} KittensMetadata */
-/** @template {{}} [E={}] @typedef {{ domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: KittensMetadata, on: number, prices: KittensPrice[] | [KittensPrice], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: (() => unknown) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
+/** @template {{}} [E={}] @typedef {{ domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: KittensMetadata, on: number, prices: KittensPrice[] | [KittensPrice], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
 /** @typedef {{ children: KittensBtn[] }} KittensBtnPanel */
 /** @typedef {{ name: 'dragons' | 'griffins' | 'leviathans' | 'lizards' |'nagas' | 'sharks' | 'spiders' | 'zebras', unlocked: boolean }} KittensDiplomacyRace */
 /** @template {{}} [E={}] @typedef {{ embassyButton: KittensBtn, race: KittensDiplomacyRace, feedBtn?: KittensBtn, tradeBtn: { tradeAllHref: { link: HTMLElement } } } & E} KittensDiplomacyRacePanel */
@@ -276,6 +276,17 @@
     return $('span').filter((_, e) => $(e).text().indexOf(label) === 0).click().length !== 0;
   }
 
+  /** @returns {boolean} */
+  function callHandler (/** @type {{ handler?: (...args: unknown[]) => void }?=} */ link) {
+    if (!link?.handler) {
+      return false;
+    }
+
+    link.handler.call(noop, noop, noop);
+
+    return true;
+  }
+
   /** @template {KittensTab} T @returns {T | null | undefined} */
   function renderBgTab (/** @type {T?=} */ tab) {
     if (!tab?.visible) {
@@ -508,8 +519,7 @@
       const c = /** @type {KittensNamedCombustLink} */ (_c);
 
       if ((avail / combustCycles[c]) > 1) {
-        renderBgTab(game.timeTab)?.cfPanel.children[0].children[0]?.model[c].handler.call(noop);
-
+        callHandler(renderBgTab(game.timeTab)?.cfPanel.children[0].children[0]?.model[c]);
         return;
       }
     }
@@ -651,8 +661,7 @@
         const finTears = nowTears + (zig.ratio * game.resPool.get('unicorns').value / 2500);
 
         if (best.tears?.val && (nowTears < best.tears.val) && (finTears > best.tears.val)) {
-          game.religionTab.sacrificeBtn.model.allLink.handler.call(noop, noop, noop);
-          hasSome = true;
+          hasSome = callHandler(game.religionTab.sacrificeBtn.model.allLink);
         }
 
         break;
@@ -761,18 +770,10 @@
   }
 
   /** @returns {boolean} */
-  function buildTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn) {
-    const model = btn?.model;
-
-    if (!model?.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val) || (!cheatMap.control.all.pollute.active && model.metadata.effects?.cathPollutionPerTickProd)) {
+  function buildTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn?=} */ btn) {
+    if (!btn?.model?.visible || !btn.model.enabled || !btn.model.metadata || (btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata.effects?.cathPollutionPerTickProd)) {
       return false;
-    }
-
-    const upLink = model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler');
-
-    if (!dryRun && upLink) {
-      upLink.handler.call(noop);
-
+    } else if (!dryRun && callHandler(btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler'))) {
       return true;
     }
 
@@ -784,7 +785,7 @@
       return false;
     }
 
-    return dryRun || clickBtn(btn, !check.isUncapped && model.metadata.on >= 1);
+    return dryRun || clickBtn(btn, !check.isUncapped && btn.model.metadata.on >= 1);
   }
 
   /** @returns {boolean} */
