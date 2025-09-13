@@ -13,7 +13,7 @@
 /** @typedef {'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
 /** @typedef {{ effects: { cathPollutionPerTickProd?: number, riftChance?: number, unicornsPerTickBase?: number, unicornsRatioReligion?: number }, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }} KittensMetadata */
-/** @template {{}} [E={}] @typedef {{ domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: KittensMetadata, on: number, prices: KittensPrice[] | [KittensPrice], visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
+/** @template {{}} [E={}] @typedef {{ domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: KittensMetadata, on: number, prices: KittensPrice[] | [KittensPrice], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: (() => unknown) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
 /** @typedef {{ children: KittensBtn[] }} KittensBtnPanel */
 /** @typedef {{ name: 'dragons' | 'griffins' | 'leviathans' | 'lizards' |'nagas' | 'sharks' | 'spiders' | 'zebras', unlocked: boolean }} KittensDiplomacyRace */
 /** @template {{}} [E={}] @typedef {{ embassyButton: KittensBtn, race: KittensDiplomacyRace, feedBtn?: KittensBtn, tradeBtn: { tradeAllHref: { link: HTMLElement } } } & E} KittensDiplomacyRacePanel */
@@ -766,6 +766,14 @@
 
     if (!model?.visible || !model.enabled || !model.metadata || (model.metadata.on !== model.metadata.val) || (!cheatMap.control.all.pollute.active && model.metadata.effects?.cathPollutionPerTickProd)) {
       return false;
+    }
+
+    const upLink = model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler');
+
+    if (!dryRun && upLink) {
+      upLink.handler.call(noop);
+
+      return true;
     }
 
     !dryRun && fillResources();
