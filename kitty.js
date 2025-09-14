@@ -55,7 +55,7 @@
 
   /** @readonly */
   const INTERVAL = {
-    ALL: { OPT: 99, BLD: 999, TXT: 999 },
+    ALL: { BUILD: 950, OPTION: 95 },
     ADORE: 120000,
     BCOIN: 60000,
     CATNIP: { GATHER: 5, REFINE: 1000 },
@@ -387,9 +387,7 @@
     const paragonRatio = game.prestige.getParagonProductionRatio() + 1;
     const faithBonus = game.religion.getSolarRevolutionRatio() + 1;
     const currentCycle = game.calendar.cycles[game.calendar.cycle];
-
     const cycleBonus = (currentCycle?.festivalEffects.unicorns !== undefined && game.prestige.getPerk('numeromancy').researched && game.calendar.festivalDays) ? currentCycle.festivalEffects.unicorns : 1;
-
     const unicornsPerSecond = unicornsPerSecondBase * globalRatio * religionRatio * paragonRatio * faithBonus * cycleBonus;
     const zigguratRatio = zigImpl.meta.on;
     const baseUnicornsPerRift = 500 * (1 + game.getEffect('unicornsRatioReligion') * 0.1);
@@ -641,9 +639,8 @@
     }
 
     let zig = calcZiggurats();
-    let count = 0;
 
-    while (zig.bestBuilding && count < 7) {
+    while (zig.bestBuilding && completed.length < 7) {
       const mark = getZigInfo('marker');
       const best = getZigInfo(zig.bestBuilding, zig.btn);
       const next = (best.isBuildable && mark.tears) && (mark.isBuildable && best.tears)
@@ -671,7 +668,6 @@
 
       pushBtnName(completed, next.btn);
       zig = calcZiggurats();
-      count = completed.length;
       hasSome = true;
     }
 
@@ -679,12 +675,12 @@
   }
 
   /** @returns {boolean} */
-  function buildTheologyBtn (/** @type {ReturnType<calcTheology>[0]} */ best) {
+  function buildTheologyBtn (/** @type {boolean} */ dryRun, /** @type {ReturnType<calcTheology>[0]} */ best) {
     if (!best.btn.model.visible || !best.btn.model.enabled || !best.percent || best.percent.frac < 1 || checkPrices(best.btn.model.prices).isInvalid) {
       return false;
     }
 
-    return clickBtn(best.btn);
+    return dryRun || clickBtn(best.btn);
   }
 
   /** @returns {boolean}  */
@@ -697,7 +693,7 @@
     let hasSome = false;
 
     for (const best of avail) {
-      if (!buildTheologyBtn(best)) {
+      if (!buildTheologyBtn(dryRun, best)) {
         break;
       }
 
@@ -756,13 +752,13 @@
 
     const d = /** @type {KittensGame['diplomacyTab']} */ (tab);
 
-    if (d.exploreBtn && d.racePanels.length !== 8 && d.racePanels.length !== (8 - (findLeviathans()?.race.unlocked ? 0 : 1))) {
+    if (!dryRun && d.exploreBtn && d.racePanels.length !== 8 && d.racePanels.length !== (8 - (findLeviathans()?.race.unlocked ? 0 : 1))) {
       const nowTime = Date.now();
       const nowDelta = nowTime - lastExploreTime;
 
       if (nowDelta > INTERVAL.EXPLORE) {
         lastExploreTime = nowTime;
-        hasSome ||= (dryRun || clickBtn(d.exploreBtn));
+        hasSome ||= clickBtn(d.exploreBtn);
       }
     }
 
@@ -969,7 +965,7 @@
     game.console.filters[/** @type {keyof KittensGame['console']['filters']} */ (f)].enabled = false;
   }
 
-  execOpts(INTERVAL.ALL.OPT);
-  execTextInfo(INTERVAL.ALL.TXT);
-  execBuildAll(INTERVAL.ALL.BLD);
+  execOpts(INTERVAL.ALL.OPTION);
+  execTextInfo(INTERVAL.ALL.BUILD);
+  execBuildAll(INTERVAL.ALL.BUILD);
 })(/** @type {WindowExt} */ (window).$, /** @type {WindowExt} */ (window).game);
