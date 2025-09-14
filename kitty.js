@@ -33,12 +33,9 @@
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
-  /** @type {Readonly<{CRAFT: Readonly<{ MAX: number, MIN: number }>, RES: Readonly<{ NAME: Readonly<{ [x in KittensNamedRes]?: number }>, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>, UNCAPPED: number }>} */
+  /** @type {Readonly<{ CRAFT: Readonly<{ MAX: number, MIN: number }>, RES: Readonly<{ NAME: Readonly<{ [x in KittensNamedRes]?: number }>, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }> }> & Readonly<{ [x in 'UNCAPPED']: number }>} */
   const FRACTION = {
-    CRAFT: {
-      MAX: 0.925, // 92.5% spent on crafting
-      MIN: 0.0005 // 0.05% for all materials
-    },
+    CRAFT: { MAX: 0.925, MIN: 0.0005 }, // max of 92.5% for full, 0.05% for trickle
     RES: {
       NAME: { karma: 0.5, tears: 1 },
       SKIP: { kittens: true, zebras: true }, // skip these when maxing
@@ -53,7 +50,7 @@
     BUILD: { holyGenocide: 25 } // build at most 25 HGs - this is optimal for paragon
   };
 
-  /** @readonly */
+  /** @type {Readonly<{ ALL: Readonly<{ [x in 'BUILD' | 'OPTION']: number}>, CATNIP: Readonly<{ [x in 'GATHER' | 'REFINE']: number }> } & { [x in 'ADORE' | 'BCOIN' | 'COMBUST' | 'EXPLORE' | 'FEED' | 'PRAISE' | 'PROMOTE' | 'SACRIFICE']: number }> }} */
   const INTERVAL = {
     ALL: { BUILD: 950, OPTION: 95 },
     ADORE: 120000,
