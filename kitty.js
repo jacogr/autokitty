@@ -177,7 +177,6 @@
         },
         bcoin: {
           fn: fnTradeBcoin,
-          active: true,
           delay: INTERVAL.BCOIN,
           end: true
         },
