@@ -13,7 +13,7 @@
 /** @typedef {'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
 /** @typedef {{ effects: { cathPollutionPerTickProd?: number, riftChance?: number, unicornsPerTickBase?: number, unicornsRatioReligion?: number }, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }} KittensMetadata */
-/** @template {{}} [E={}] @typedef {{ domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: KittensMetadata, on: number, name?: string, prices: KittensPrice[] | [KittensPrice], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
+/** @template {{}} [E={}] @typedef {{ domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: KittensMetadata, on: number, prices: KittensPrice[] | [KittensPrice], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
 /** @typedef {{ children: KittensBtn[] }} KittensBtnPanel */
 /** @typedef {{ name: 'dragons' | 'griffins' | 'leviathans' | 'lizards' |'nagas' | 'sharks' | 'spiders' | 'zebras', unlocked: boolean }} KittensDiplomacyRace */
 /** @template {{}} [E={}] @typedef {{ embassyButton: KittensBtn, race: KittensDiplomacyRace, feedBtn?: KittensBtn, tradeBtn: { tradeAllHref: { link: HTMLElement } } } & E} KittensDiplomacyRacePanel */
@@ -720,7 +720,7 @@
       return false;
     }
 
-    return dryRun || clickBtn(btn, isAll || btn.model.name === 'Fix Cryochamber');
+    return dryRun || clickBtn(btn, isAll);
   }
 
   /** @returns {boolean} */
