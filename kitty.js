@@ -777,7 +777,7 @@
           return true;
         }
 
-        pushBtnName(completed, btn, 'Policy');
+        pushBtnName(completed, btn);
         hasSome = true;
       }
     }
