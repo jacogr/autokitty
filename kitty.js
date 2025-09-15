@@ -235,7 +235,7 @@
   /** @returns {void} */
   function activateBtn (/** @type {CheatOpt} */ opts, /** @type {boolean=} */ active = false) {
     opts.active = active;
-    opts.btn[active ? 'addClass' : 'removeClass']('kittycheat-btn-active');
+    opts.btn[active ? 'addClass' : 'removeClass']('active');
   }
 
   /** @returns {void} */
@@ -243,7 +243,7 @@
     const opt = cheatMap[group];
 
     opt.active = active;
-    opt.div?.[active ? 'removeClass' : 'addClass']('kittycheat-div-disabled');
+    opt.div?.[active ? 'removeClass' : 'addClass']('disabled');
   }
 
   /** @returns {{ frac: number, raw: number, text: string } | null} */
@@ -948,7 +948,7 @@
     }
   }
 
-  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; padding: 1px 4px; margin-bottom: 2px; } .kittycheat-btn-active { background: red; color: white; } .kittycheat-btn-default { margin-right: 2px; } .kittycheat-btn-end { margin-right: 5px; } .kittycheat-btn-excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div-small { margin-bottom: 5px; } .kittycheat-div-disabled { opacity: 0.33; } .kittycheat-log { opacity: 0.33; }</style>');
+  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; padding: 1px 4px; margin-bottom: 2px; } .kittycheat-btn.active { background: red; color: white; } .kittycheat-btn.default { margin-right: 2px; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { opacity: 0.33; }</style>');
 
   const divAll = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
   const divAct = jqAppend(divAll, $('<div id="kittycheat-act" class="kittycheat-div"></div>'));
@@ -959,7 +959,7 @@
     const divGrp = cheatMap[group].div = jqAppend(divAct, $(`<div id="kittycheat-act-${group}" class="kittycheat-div"></div>`));
 
     if (group !== 'control') {
-      jqAppend(divGrp, $(`<div class="kittycheat-div kittycheat-div-small">${group}:</div>`));
+      jqAppend(divGrp, $(`<div class="kittycheat-div small">${group}:</div>`));
     }
 
     activateGroup(group, cheatMap[group].active || cheatMap[group].noExec);
@@ -968,7 +968,7 @@
       const opts = /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (name)]);
 
       if (!opts.noShow) {
-        opts.btn = jqAppend(divGrp, $(`<button class="kittycheat-btn kittycheat-btn-${opts.end ? 'end' : opts.excl ? 'excl' : 'default'}">${name}</button>`).click(() => {
+        opts.btn = jqAppend(divGrp, $(`<button class="kittycheat-btn ${opts.end ? 'end' : opts.excl ? 'excl' : 'default'}">${name}</button>`).click(() => {
           clickOptBtn(group, name, opts);
         }));
 
@@ -982,7 +982,7 @@
   }
 
   for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
-    jqAppend(divTxt, $(`<div id="kittycheat-txt-${id}" class="kittycheat-div kittycheat-div-small"></div>`));
+    jqAppend(divTxt, $(`<div id="kittycheat-txt-${id}" class="kittycheat-div small"></div>`));
   }
 
   game.console.maxMessages = 100;
