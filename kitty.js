@@ -39,7 +39,13 @@
     RES: {
       NAME: { karma: 0.5, tears: 1 },
       SKIP: { kittens: true, zebras: true }, // skip these when maxing
-      TYPE: { exotic: 0.01, common: 0, rare: 0 } // exhaustive
+      TYPE: {
+        get exotic () {
+          return Math.max(0.01, (game.bld.getBuildingExt('chronosphere').meta.on || 1) * 0.00015);
+        },
+        common: 0,
+        rare: 0
+      } // exhaustive
     },
     UNCAPPED: 0.1, // 10% spent on uncapped
   };
