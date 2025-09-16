@@ -303,29 +303,20 @@
     return tab;
   }
 
-  /** @returns {boolean} */
-  function isBtnBuildable (/** @type {KittensBtn?=} */ btn) {
-    return !(!btn?.model?.visible || !btn.model.enabled || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) || (btn.model.metadata?.val && btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata?.effects?.cathPollutionPerTickProd));
-  }
+  /** @returns {{ isUncapped: boolean, isInvalid: boolean }} */
+  function checkPrices (/** @type {KittensPrice[]} */ prices, /** @type {KittensNamedRes?} */ skip = null) {
+    let isUncapped = true;
 
-  /** @returns {boolean} */
-  function isPricesUncapped (/** @type {KittensPrice[]} */ prices, /** @type {KittensNamedRes?} */ skip = null) {
     for (const p of prices) {
       if (p.name !== skip) {
         const r = game.resPool.get(p.name);
 
         if (r.maxValue || r.perTickCached) {
-          return false;
+          isUncapped = false;
+          break
         }
       }
     }
-
-    return true;
-  }
-
-  /** @returns {{ isUncapped: boolean, isInvalid: boolean }} */
-  function checkPrices (/** @type {KittensPrice[]} */ prices, /** @type {KittensNamedRes?} */ skip = null) {
-    const isUncapped = isPricesUncapped(prices, skip);
 
     for (const p of prices) {
       if (p.name !== skip) {
@@ -340,6 +331,19 @@
     }
 
     return { isUncapped, isInvalid: false };
+  }
+
+  /** @returns {{ isBuildable: boolean, isUncapped: boolean }} */
+  function checkBuilding (/** @type {KittensBtn?=} */ btn, /** @type {boolean=} */ withFill = false, /** @type {boolean=} */ withCap = false) {
+    if (!btn?.model?.visible || !btn.model.enabled || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) || (btn.model.metadata?.val && btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata?.effects?.cathPollutionPerTickProd)) {
+      return { isBuildable: false,  isUncapped: false };
+    }
+
+    withFill && fillResources();
+
+    const check = checkPrices(btn.model.prices);
+
+    return { isBuildable: !(check.isInvalid || (withCap && check.isUncapped && !cheatMap.control.all.uncap.active)), isUncapped: check.isUncapped };
   }
 
   /** @returns {void} */
@@ -626,7 +630,7 @@
 
     return {
       btn,
-      isBuildable: !!btn && isBtnBuildable(btn) && !checkPrices(btn.model.prices).isInvalid,
+      isBuildable: checkBuilding(btn).isBuildable,
       tears: btn?.model.prices.find((p) => p.name === 'tears')
     };
   }
@@ -687,7 +691,7 @@
 
   /** @returns {boolean} */
   function buildTheologyBtn (/** @type {boolean} */ dryRun, /** @type {ReturnType<calcTheology>[0]} */ best) {
-    if (!isBtnBuildable(best.btn) || !best.percent || best.percent.frac < 1 || checkPrices(best.btn.model.prices).isInvalid) {
+    if (!best.percent || best.percent.frac < 1 || !checkBuilding(best.btn).isBuildable) {
       return false;
     }
 
@@ -717,13 +721,7 @@
 
   /** @returns {boolean} */
   function unlockTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
-    if (!isBtnBuildable(btn)) {
-      return false;
-    }
-
-    !dryRun && fillResources();
-
-    if (checkPrices(btn.model.prices).isInvalid) {
+    if (!checkBuilding(btn, !dryRun).isBuildable) {
       return false;
     }
 
@@ -802,18 +800,12 @@
 
   /** @returns {boolean} */
   function buildTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn) {
-    if (!isBtnBuildable(btn)) {
+    const check = checkBuilding(btn, !dryRun, true);
+
+    if (!check.isBuildable) {
       return false;
     } else if (!dryRun && callHandler(btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler'))) {
       return true;
-    }
-
-    !dryRun && fillResources();
-
-    const check = checkPrices(btn.model.prices);
-
-    if (check.isInvalid || (check.isUncapped && !cheatMap.control.all.uncap.active)) {
-      return false;
     }
 
     return dryRun || clickBtn(btn, !check.isUncapped && !!btn.model.metadata && btn.model.metadata.on >= 1);
