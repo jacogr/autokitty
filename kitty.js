@@ -814,7 +814,7 @@
 
     for (const area of areas) {
       for (const btn of area.children) {
-        if (buildTabBtn(dryRun, btn)) {
+        if (btn.model.metadata && buildTabBtn(dryRun, btn)) {
           if (dryRun) {
             return true;
           }
