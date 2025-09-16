@@ -691,11 +691,7 @@
 
   /** @returns {boolean} */
   function buildTheologyBtn (/** @type {boolean} */ dryRun, /** @type {ReturnType<calcTheology>[0]} */ best) {
-    if (!best.percent || best.percent.frac < 1 || !checkBuilding(best.btn).isBuildable) {
-      return false;
-    }
-
-    return dryRun || clickBtn(best.btn);
+    return (!!best.percent && best.percent.frac >= 1 && checkBuilding(best.btn).isBuildable) && (dryRun || clickBtn(best.btn));
   }
 
   /** @returns {boolean}  */
@@ -721,11 +717,7 @@
 
   /** @returns {boolean} */
   function unlockTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
-    if (!checkBuilding(btn, !dryRun).isBuildable) {
-      return false;
-    }
-
-    return dryRun || clickBtn(btn, isAll);
+    return checkBuilding(btn, !dryRun).isBuildable && (dryRun || clickBtn(btn, isAll));
   }
 
   /** @returns {boolean} */
@@ -800,15 +792,13 @@
 
   /** @returns {boolean} */
   function buildTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn) {
-    const check = checkBuilding(btn, !dryRun, true);
-
-    if (!check.isBuildable) {
-      return false;
-    } else if (!dryRun && callHandler(btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler'))) {
+    if (!dryRun && btn.model.enabled && btn.model.visible && callHandler(btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler'))) {
       return true;
     }
 
-    return dryRun || clickBtn(btn, !check.isUncapped && !!btn.model.metadata && btn.model.metadata.on >= 1);
+    const check = checkBuilding(btn, !dryRun, true);
+
+    return check.isBuildable && (dryRun || clickBtn(btn, !check.isUncapped && !!btn.model.metadata && btn.model.metadata.on >= 1));
   }
 
   /** @returns {boolean} */
