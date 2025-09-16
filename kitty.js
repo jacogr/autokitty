@@ -33,22 +33,25 @@
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
-  /** @type {Readonly<{ CRAFT: Readonly<{ MAX: number, MIN: number }>, RES: Readonly<{ NAME: Readonly<{ [x in KittensNamedRes]?: number }>, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }> }> & Readonly<{ [x in 'UNCAPPED']: number }>} */
-  const FRACTION = {
+  /** @type {Readonly<{ CRAFT: Readonly<{ MAX: number, MIN: number }> }> & Readonly<{ [x in 'UNCAPPED']: number }>} */
+  const SPEND = {
     CRAFT: { MAX: 0.925, MIN: 0.0005 }, // max of 92.5% for full, 0.05% for trickle
-    RES: {
-      NAME: { karma: 0.5, tears: 1 },
-      SKIP: { kittens: true, zebras: true }, // skip these when maxing
-      TYPE: {
-        get exotic () {
-          return Math.max(0.01, (game.bld.getBuildingExt('chronosphere').meta.on || 1) * 0.00015);
-        },
-        common: 0,
-        rare: 0
-      } // exhaustive
-    },
     UNCAPPED: 0.1, // 10% spent on uncapped
   };
+
+  /** @type {Readonly<{ LEAST: Readonly<{ [x in KittensNamedRes]?: number }>, NAME: Readonly<{ [x in KittensNamedRes]?: number }>, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>} */
+  const RESOURCES = {
+    LEAST: { necrocorn: 1 }, // have at least this left
+    NAME: { karma: 0.5, tears: 1 }, // fractions for name spend
+    SKIP: { kittens: true, zebras: true }, // skip these when maxing
+    TYPE: {
+      get exotic () {
+        return Math.max(0.01, (game.bld.getBuildingExt('chronosphere').meta.on || 1) * 0.00015);
+      },
+      common: 0,
+      rare: 0
+    } // exhaustive fractions for type spend
+  }
 
   /** @type {Readonly<{ BCOIN: Readonly<{ [x in 'BUY' | 'SELL']: number }>, BUILD: Readonly<{ [x in KittensNamedBldgCrypto]?: number }> }>} */
   const MAXVAL = {
@@ -322,9 +325,10 @@
     for (const p of prices) {
       if (p.name !== skip) {
         const r = game.resPool.get(p.name);
-        const f = FRACTION.RES.NAME[r.name] || FRACTION.RES.TYPE[r.type] || (isUncapped && FRACTION.UNCAPPED) || 1;
+        const f = RESOURCES.NAME[r.name] || RESOURCES.TYPE[r.type] || (isUncapped && SPEND.UNCAPPED) || 1;
+        const m = RESOURCES.LEAST[r.name] || 0;
 
-        if ((p.val / r.value) > f) {
+        if (((r.value - p.val) < m) || ((p.val / r.value) > f)) {
           return { isUncapped, isInvalid: true };
         }
       }
@@ -337,7 +341,7 @@
   function fillResources () {
     if (cheatMap.control.all.resources.active || cheatMap.control.all.x10.active) {
       for (const r of game.resPool.resources) {
-        if (r.maxValue && r.unlocked && !r.isHidden && !FRACTION.RES.SKIP[r.name]) {
+        if (r.maxValue && r.unlocked && !r.isHidden && !RESOURCES.SKIP[r.name]) {
           const max = r.maxValue * (cheatMap.control.all.x10.active ? 10 : 1);
 
           if (r.value < max) {
@@ -461,7 +465,7 @@
       })
       .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
       .map((btn) => {
-        const percent = toPercent(game.resPool.get('relic').value / (btn.model.prices[0].val * (1 / FRACTION.RES.TYPE.exotic)));
+        const percent = toPercent(game.resPool.get('relic').value / (btn.model.prices[0].val * (1 / RESOURCES.TYPE.exotic)));
 
         return {
           btn,
@@ -536,7 +540,7 @@
 
   /** @returns {void} */
   function fnFeed () {
-    if (game.resPool.get('necrocorn').value > 1 && renderBgTab(game.diplomacyTab)) {
+    if ((game.resPool.get('necrocorn').value > (RESOURCES.LEAST.necrocorn || 0)) && renderBgTab(game.diplomacyTab)) {
       clickBtn(findLeviathans()?.feedBtn);
     }
   }
@@ -568,7 +572,7 @@
     const r = game.resPool.get(name);
 
     if (r.unlocked && r.value && !r.isHidden) {
-      const val = Math.ceil(game.workshop.getCraftAllCount(name) * (isMax ? FRACTION.CRAFT.MAX : FRACTION.CRAFT.MIN));
+      const val = Math.ceil(game.workshop.getCraftAllCount(name) * (isMax ? SPEND.CRAFT.MAX : SPEND.CRAFT.MIN));
 
       if (val > 1 && val < Number.MAX_VALUE) {
         game.workshop.craft(name, val);
