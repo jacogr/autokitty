@@ -13,7 +13,7 @@
 /** @typedef {'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
 /** @typedef {{ effects: { cathPollutionPerTickProd?: number, riftChance?: number, unicornsPerTickBase?: number, unicornsRatioReligion?: number }, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }} KittensMetadata */
-/** @template {{}} [E={}] @typedef {{ domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: KittensMetadata, on: number, prices: KittensPrice[] | [KittensPrice], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
+/** @template {{}} [E={}] @typedef {{ domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: KittensMetadata, on: number, prices: KittensPrice[], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
 /** @typedef {{ children: KittensBtn[] }} KittensBtnPanel */
 /** @typedef {{ name: 'dragons' | 'griffins' | 'leviathans' | 'lizards' |'nagas' | 'sharks' | 'spiders' | 'zebras', unlocked: boolean }} KittensDiplomacyRace */
 /** @template {{}} [E={}] @typedef {{ embassyButton: KittensBtn, race: KittensDiplomacyRace, tradeBtn: { tradeAllHref: { link: HTMLElement } } } & E} KittensDiplomacyRacePanel */
@@ -313,7 +313,7 @@
 
         if (r.maxValue || r.perTickCached) {
           isUncapped = false;
-          break
+          break;
         }
       }
     }
@@ -333,10 +333,10 @@
     return { isUncapped, isInvalid: false };
   }
 
-  /** @returns {{ isBuildable: boolean, isUncapped: boolean }} */
+  /** @returns {{ isBuildable: boolean, isUncapped?: boolean }} */
   function checkBuilding (/** @type {KittensBtn?=} */ btn, /** @type {boolean=} */ withFill = false, /** @type {boolean=} */ withCap = false) {
     if (!btn?.model?.visible || !btn.model.enabled || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) || (btn.model.metadata?.val && btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata?.effects?.cathPollutionPerTickProd)) {
-      return { isBuildable: false,  isUncapped: false };
+      return { isBuildable: false };
     }
 
     withFill && fillResources();
@@ -465,16 +465,16 @@
   /** @returns {{ btn: KittensBtn, percent: ReturnType<toPercent>, text?: string | null }[]} */
   function calcTheology () {
     return game.religionTab.ctPanel.children[0].children
-      .filter((a) => {
-        if (a.model.prices[0].name !== 'relic' || (a.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldgCrypto} */ (a.id)] || Number.MAX_SAFE_INTEGER))) {
+      .filter((btn) => {
+        if (!btn.model.prices[0] || btn.model.prices[0].name !== 'relic' || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldgCrypto} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
           return false;
         }
 
-        return !checkPrices(a.model.prices, 'relic').isInvalid;
+        return !checkPrices(btn.model.prices, 'relic').isInvalid;
       })
-      .sort((a, b) => a.model.prices[0].val - b.model.prices[0].val)
+      .sort((a, b) => /** @type {KittensPrice} */ (a.model.prices[0]).val - /** @type {KittensPrice} */ (b.model.prices[0]).val)
       .map((btn) => {
-        const percent = toPercent(game.resPool.get('relic').value / (btn.model.prices[0].val * (1 / RESOURCES.TYPE.exotic)));
+        const percent = toPercent(game.resPool.get('relic').value / (/** @type {KittensPrice} */ (btn.model.prices[0]).val * (1 / RESOURCES.TYPE.exotic)));
 
         return {
           btn,
