@@ -303,7 +303,14 @@
     return tab;
   }
 
-  /** @return {boolean} */
+  /** @returns {boolean} */
+  function isBtnBuildable (/** @type {KittensBtn?=} */ btn) {
+    return (!btn?.model?.visible || !btn.model.enabled || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) || (btn.model.metadata?.val && btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata?.effects?.cathPollutionPerTickProd))
+      ? false
+      : true;
+  }
+
+  /** @returns {boolean} */
   function isPricesUncapped (/** @type {KittensPrice[]} */ prices, /** @type {KittensNamedRes?} */ skip = null) {
     for (const p of prices) {
       if (p.name !== skip) {
@@ -621,7 +628,7 @@
 
     return {
       btn,
-      isBuildable: !!btn?.model.visible && !checkPrices(btn.model.prices).isInvalid,
+      isBuildable: !!btn && isBtnBuildable(btn) && !checkPrices(btn.model.prices).isInvalid,
       tears: btn?.model.prices.find((p) => p.name === 'tears')
     };
   }
@@ -682,7 +689,7 @@
 
   /** @returns {boolean} */
   function buildTheologyBtn (/** @type {boolean} */ dryRun, /** @type {ReturnType<calcTheology>[0]} */ best) {
-    if (!best.btn.model.visible || !best.btn.model.enabled || !best.percent || best.percent.frac < 1 || checkPrices(best.btn.model.prices).isInvalid) {
+    if (!isBtnBuildable(best.btn) || !best.percent || best.percent.frac < 1 || checkPrices(best.btn.model.prices).isInvalid) {
       return false;
     }
 
@@ -712,7 +719,7 @@
 
   /** @returns {boolean} */
   function unlockTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
-    if (!btn?.model.enabled || !btn.model.visible || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild)) {
+    if (!isBtnBuildable(btn)) {
       return false;
     }
 
@@ -796,8 +803,8 @@
   }
 
   /** @returns {boolean} */
-  function buildTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn?=} */ btn) {
-    if (!btn?.model?.visible || !btn.model.enabled || !btn.model.metadata || (btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata.effects?.cathPollutionPerTickProd)) {
+  function buildTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn) {
+    if (!isBtnBuildable(btn)) {
       return false;
     } else if (!dryRun && callHandler(btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler'))) {
       return true;
@@ -811,7 +818,7 @@
       return false;
     }
 
-    return dryRun || clickBtn(btn, !check.isUncapped && btn.model.metadata.on >= 1);
+    return dryRun || clickBtn(btn, !check.isUncapped && !!btn.model.metadata && btn.model.metadata.on >= 1);
   }
 
   /** @returns {boolean} */
