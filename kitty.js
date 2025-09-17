@@ -61,7 +61,7 @@
 
   /** @type {Readonly<{ ALL: Readonly<{ [x in 'BUILD' | 'OPTION']: number}>, CATNIP: Readonly<{ [x in 'GATHER' | 'REFINE']: number }> } & { [x in 'ADORE' | 'BCOIN' | 'COMBUST' | 'EXPLORE' | 'FEED' | 'PRAISE' | 'PROMOTE' | 'SACRIFICE']: number }> }} */
   const INTERVAL = {
-    ALL: { BUILD: 950, OPTION: 95 },
+    ALL: { BUILD: 750, OPTION: 95 },
     ADORE: 120000,
     BCOIN: 60000,
     CATNIP: { GATHER: 5, REFINE: 1000 },
@@ -871,9 +871,9 @@
     loopTabs('upgrade', ['diplomacyTab', 'religionTab'], unlockTab);
 
     if (!dryRun) {
-      loopTabs('upgrade', ['libraryTab'], policyTab);
       loopTabs('zig', ['religionTab'], buildZig);
       loopTabs('crypto', ['religionTab'], buildTheology);
+      loopTabs('upgrade', ['libraryTab'], policyTab);
 
       if (delay > 0) {
         completed.length && $(game.msg(completed.join(', ')).span).addClass('kittycheat-log');
