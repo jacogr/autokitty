@@ -13,7 +13,7 @@
 /** @typedef {'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
 /** @typedef {{ effects: { cathPollutionPerTickProd?: number, riftChance?: number, unicornsPerTickBase?: number, unicornsRatioReligion?: number }, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }} KittensMetadata */
-/** @typedef {{ enabled: boolean, metadata?: KittensMetadata, on: number, prices: KittensPrice[], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], visible: boolean }} KittensBtnModel */
+/** @typedef {{ enabled: boolean, metadata?: KittensMetadata, name?: string, on: number, prices: KittensPrice[], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], visible: boolean }} KittensBtnModel */
 /** @template {{}} [E={}] @typedef {{ controller: { sellInternal: (model: KittensBtnModel, remain: number, check: boolean) => void }, domNode: HTMLElement, id: string, model: KittensBtnModel, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
 /** @typedef {{ children: KittensBtn[] }} KittensBtnPanel */
 /** @typedef {{ name: 'dragons' | 'griffins' | 'leviathans' | 'lizards' |'nagas' | 'sharks' | 'spiders' | 'zebras', unlocked: boolean }} KittensDiplomacyRace */
@@ -279,11 +279,6 @@
   }
 
   /** @returns {boolean} */
-  function clickSpan (/** @type {string} */ label) {
-    return $('span').filter((_, e) => $(e).text().indexOf(label) === 0).click().length !== 0;
-  }
-
-  /** @returns {boolean} */
   function callHandler (/** @type {{ handler?: (...args: unknown[]) => void }?=} */ link) {
     if (!link?.handler) {
       return false;
@@ -508,12 +503,12 @@
 
   /** @returns {void} */
   function fnGather () {
-    clickSpan('Gather catnip');
+    clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model.name === 'Gather catnip'));
   }
 
   /** @returns {void} */
   function fnRefine () {
-    clickSpan('Refine catnip');
+    clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model.name === 'Refine catnip'));
   }
 
   /** @returns {void} */
