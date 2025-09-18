@@ -60,9 +60,9 @@
     BUILD: { holyGenocide: 25 } // build at most 25 HGs - this is optimal for paragon
   };
 
-  /** @type {Readonly<{ ALL: Readonly<{ [x in 'BUILD' | 'OPTION']: number}>, CATNIP: Readonly<{ [x in 'GATHER' | 'REFINE']: number }> } & { [x in 'ADORE' | 'BCOIN' | 'COMBUST' | 'EXPLORE' | 'FEED' | 'PRAISE' | 'PROMOTE' | 'SACRIFICE']: number }> }} */
+  /** @type {Readonly<{ ALL: Readonly<{ [x in 'BUILD' | 'OPTION' | 'TEXT']: number}>, CATNIP: Readonly<{ [x in 'GATHER' | 'REFINE']: number }> } & { [x in 'ADORE' | 'BCOIN' | 'COMBUST' | 'EXPLORE' | 'FEED' | 'PRAISE' | 'PROMOTE' | 'SACRIFICE']: number }> }} */
   const INTERVAL = {
-    ALL: { BUILD: 750, OPTION: 95 },
+    ALL: { BUILD: 750, OPTION: 95, TEXT: 1000 },
     ADORE: 120000,
     BCOIN: 60000,
     CATNIP: { GATHER: 5, REFINE: 1000 },
@@ -115,7 +115,7 @@
         ship: { noMinCraft: true },
         tanker: { noMinCraft: true },
         bloodstone: { noMinCraft: true },
-        tMythril: { noMinCraft: true}
+        tMythril: { noMinCraft: true }
       }
     },
     trading: {
@@ -579,7 +579,7 @@
   }
 
   /** @returns {void} */
-  function execCraft (/** @type {KittensNamedResCraft} */ name, /** @type {boolean=} */ isMax = true) {
+  function execCraft (/** @type {KittensNamedResCraft} */ name, /** @type {boolean} */ isMax) {
     const r = game.resPool.get(name);
 
     if (r.unlocked && r.value && !r.isHidden) {
@@ -600,7 +600,7 @@
         if (group === 'actions') {
           /** @type {Required<CheatOpt>} */ (opts).fn(group, name, opts);
         } else if (group === 'crafting') {
-          execCraft(/** @type {KittensNamedResCraft} */ (name));
+          execCraft(/** @type {KittensNamedResCraft} */ (name), true);
         } else if (group === 'trading') {
           execTrade(/** @type {KittensDiplomacyRace['name']} */ (name));
         }
@@ -1000,6 +1000,6 @@
   }
 
   execOpts(INTERVAL.ALL.OPTION);
-  execTextInfo(INTERVAL.ALL.BUILD);
+  execTextInfo(INTERVAL.ALL.TEXT);
   execBuildAll(INTERVAL.ALL.BUILD);
 })(/** @type {WindowExt} */ (window).$, /** @type {WindowExt} */ (window).game);
