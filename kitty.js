@@ -541,30 +541,8 @@
 
   /** @returns {void} */
   function fnCombust40k (/** @type {string} */ _group, /** @type {string} */ _name, /** @type {CheatOpt} */ opts) {
-    const amt = 40000;
-
     if (game.calendar.year < 40000) {
-      const factor = game.challenges.getChallenge('1000Years').researched ? 5 : 10;
-      const heat_acutoconverted = 1 - 1 / (1 + game.getEffect('heatCompression'));
-      const addHeat = heat_acutoconverted
-        ? amt * factor * (1 - heat_acutoconverted)
-        : amt * factor;
-
-      if (addHeat < game.getEffect('heatMax')) {
-        fnCombust();
-      } else {
-        if (!renderBgTab(game.timeTab)) {
-          return;
-        }
-
-        const /** @type {KittensNamedBldgTimeCF[]} */ bldgs = ['blastFurnace', 'ressourceRetrieval', 'temporalAccelerator', 'temporalImpedance', 'timeBoiler'];
-
-        for (const btn of game.timeTab.cfPanel.children[0].children) {
-          if (btn.id && bldgs.includes(/** @type {KittensNamedBldgTimeCF} */ (btn.id)) && checkBuilding(btn).isBuildable) {
-            clickBtn(btn);
-          }
-        }
-      }
+      fnCombust();
     } else {
       activateBtn(opts, false);
     }
@@ -814,6 +792,39 @@
   }
 
   /** @returns {boolean} */
+  function furnaceTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab) {
+    if (dryRun || !renderBgTab(tab)) {
+      return false;
+    }
+
+    const amt = 40000;
+    const factor = game.challenges.getChallenge('1000Years').researched ? 5 : 10;
+    const heatAcutoconverted = 1 - 1 / (1 + game.getEffect('heatCompression'));
+    const reqHeat =  amt * factor * (heatAcutoconverted ? (1 - heatAcutoconverted) : 1);
+
+    if (reqHeat < game.getEffect('heatMax')) {
+      return false;
+    }
+
+    const /** @type {KittensNamedBldgTimeCF[]} */ bldgs = ['blastFurnace', 'ressourceRetrieval', 'temporalAccelerator', 'temporalImpedance', 'timeBoiler'];
+    const buttons = /** @type {KittensGame['timeTab']} */ (tab).cfPanel.children[0].children;
+    let hasSome = false;
+
+    for (const btn of buttons) {
+      if (bldgs.includes(/** @type {KittensNamedBldgTimeCF} */ (btn.id)) && unlockTabBtn(dryRun, btn, false)) {
+        if (dryRun) {
+          return true;
+        }
+
+        pushBtnName(completed, btn);
+        hasSome = true;
+      }
+    }
+
+    return hasSome;
+  }
+
+  /** @returns {boolean} */
   function buyTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn) {
     if (!dryRun && btn.model.enabled && btn.model.visible && callHandler(btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler'))) {
       return true;
@@ -910,6 +921,7 @@
       loopTabs('zig', ['religionTab'], buildZig);
       loopTabs('crypto', ['religionTab'], buildTheology);
       loopTabs('upgrade', ['libraryTab'], policyTab);
+      loopTabs('upgrade', ['timeTab'], furnaceTab);
 
       if (delay > 0) {
         completed.length && $(game.msg(completed.join(', ')).span).addClass('kittycheat-log');
