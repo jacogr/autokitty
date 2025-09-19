@@ -768,50 +768,18 @@
   }
 
   /** @returns {boolean} */
-  function policyTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab) {
+  function unlockNamedTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab, /** @type {string[]} */ allowed) {
     if (dryRun || !renderBgTab(tab)) {
       return false;
     }
 
-    const /** @type {KittensNamedPolicy[]} */ policies = ['authocracy', 'diplomacy', 'dragonRelationsAstrologers', 'epicurianism', 'extravagance', 'fascism', 'fullIndustrialization', 'griffinRelationsScouts', 'knowledgeSharing', 'lizardRelationsPriests', 'militarizeSpace', 'mysticism', 'nagaRelationsCultists', 'sharkRelationsScribes', 'socialism', 'spiderRelationsPaleontologists', 'stripMining', 'technocracy', 'tradition', 'transkittenism', 'zebraRelationsBellicosity'];
-    const buttons = /** @type {KittensGame['libraryTab']} */ (tab).policyPanel.children;
+    const buttons =
+      /** @type {KittensGame['libraryTab']} */ (tab).policyPanel.children ||
+      /** @type {KittensGame['timeTab']} */ (tab).cfPanel.children[0].children;
     let hasSome = false;
 
     for (const btn of buttons) {
-      if (policies.includes(/** @type {KittensNamedPolicy} */ (btn.id)) && unlockTabBtn(dryRun, btn, false)) {
-        if (dryRun) {
-          return true;
-        }
-
-        pushBtnName(completed, btn);
-        hasSome = true;
-      }
-    }
-
-    return hasSome;
-  }
-
-  /** @returns {boolean} */
-  function furnaceTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab) {
-    if (dryRun || !renderBgTab(tab)) {
-      return false;
-    }
-
-    const amt = 40000;
-    const factor = game.challenges.getChallenge('1000Years').researched ? 5 : 10;
-    const heatAcutoconverted = 1 - 1 / (1 + game.getEffect('heatCompression'));
-    const reqHeat =  amt * factor * (heatAcutoconverted ? (1 - heatAcutoconverted) : 1);
-
-    if (reqHeat < game.getEffect('heatMax')) {
-      return false;
-    }
-
-    const /** @type {KittensNamedBldgTimeCF[]} */ bldgs = ['blastFurnace', 'ressourceRetrieval', 'temporalAccelerator', 'temporalImpedance', 'timeBoiler'];
-    const buttons = /** @type {KittensGame['timeTab']} */ (tab).cfPanel.children[0].children;
-    let hasSome = false;
-
-    for (const btn of buttons) {
-      if (bldgs.includes(/** @type {KittensNamedBldgTimeCF} */ (btn.id)) && unlockTabBtn(dryRun, btn, false)) {
+      if (btn.id && allowed.includes(btn.id) && unlockTabBtn(dryRun, btn, false)) {
         if (dryRun) {
           return true;
         }
@@ -880,13 +848,17 @@
     const /** @type {CheatStats} */ stats = {};
     const /** @type {KittensNamedTab[]} */ allowedTabs = [];
 
-    const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab) => boolean} */ fn) => {
+    const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowed = [], /** @type {() => boolean} */ checkFn = () => true) => {
+      if (!checkFn()) {
+        return;
+      }
+
       for (const tab of tabs) {
         if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tab))) {
           try {
             !dryRun && fillResources();
 
-            if (fn(dryRun, completed, game[tab])) {
+            if (execFn(dryRun, completed, game[tab], allowed)) {
               stats[type] = (stats[type] || []).concat(game[tab].tabId);
             }
           } catch (e) {
@@ -920,8 +892,17 @@
       loopTabs('sell', ['bldTab', 'spaceTab'], buildTab(sellTabBtn));
       loopTabs('zig', ['religionTab'], buildZig);
       loopTabs('crypto', ['religionTab'], buildTheology);
-      loopTabs('upgrade', ['libraryTab'], policyTab);
-      loopTabs('upgrade', ['timeTab'], furnaceTab);
+
+      const /** @type {KittensNamedPolicy[]} */ policies = ['authocracy', 'diplomacy', 'dragonRelationsAstrologers', 'epicurianism', 'extravagance', 'fascism', 'fullIndustrialization', 'griffinRelationsScouts', 'knowledgeSharing', 'lizardRelationsPriests', 'militarizeSpace', 'mysticism', 'nagaRelationsCultists', 'sharkRelationsScribes', 'socialism', 'spiderRelationsPaleontologists', 'stripMining', 'technocracy', 'tradition', 'transkittenism', 'zebraRelationsBellicosity'];
+      const /** @type {KittensNamedBldgTimeCF[]} */ cfbldgs = ['blastFurnace', 'ressourceRetrieval', 'temporalAccelerator', 'temporalImpedance', 'timeBoiler'];
+
+      loopTabs('upgrade', ['libraryTab'], unlockNamedTab, policies);
+      loopTabs('upgrade', ['timeTab'], unlockNamedTab, cfbldgs, () => {
+        const heatAcutoconverted = 1 - 1 / (1 + game.getEffect('heatCompression'));
+        const reqHeat =  40000 * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (heatAcutoconverted ? (1 - heatAcutoconverted) : 1);
+
+        return reqHeat >= game.getEffect('heatMax');
+      });
 
       if (delay > 0) {
         completed.length && $(game.msg(completed.join(', ')).span).addClass('kittycheat-log');
