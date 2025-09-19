@@ -7,6 +7,8 @@
 // Kittens Game
 /** @typedef {'blackCore' | 'blackLibrary' | 'blackNexus' | 'blackObelisk' | 'blackRadiance' | 'blazar' | 'darkNova' | 'holyGenocide' | 'mausoleum' | 'singularity'} KittensNamedBldgCrypto */
 /** @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamedBldgZU */
+/** @typedef {'blastFurnace' | 'temporalAccelerator' | 'temporalImpedance' | 'timeBoiler' | 'ressourceRetrieval'} KittensNamedBldgTimeCF */
+/** @typedef {KittensNamedBldgCrypto | KittensNamedBldgZU | KittensNamedBldgTimeCF} KittensNamedBldg */
 /** @typedef {'tenErasLink' | 'previousCycleLink' | 'nextCycleLink'} KittensNamedCombustLink */
 /** @typedef {'authocracy' | 'bigStickPolicy' | 'carnivale' | 'cityOnAHill' | 'clearCutting' | 'communism' | 'conservation' | 'cryochamberExtraction' | 'culturalExchange' | 'diplomacy' | 'dragonRelationsAstrologers' | 'dragonRelationsDynamicists' | 'dragonRelationsPhysicists' | 'environmentalism' | 'epicurianism' | 'expansionism' | 'extravagance' | 'fascism' | 'frugality' | 'fullIndustrialization' | 'griffinRelationsMachinists' | 'griffinRelationsMetallurgists' | 'griffinRelationsScouts' | 'isolationism' | 'knowledgeSharing' | 'liberalism' | 'liberty' | 'lizardRelationsDiplomats' | 'lizardRelationsEcologists' | 'lizardRelationsPriests' | 'militarizeSpace' | 'monarchy' | 'mysticism' | 'nagaRelationsArchitects' | 'nagaRelationsCultists' | 'nagaRelationsMasons' | 'necrocracy' | 'openWoodlands' | 'outerSpaceTreaty' | 'radicalXenophobia' | 'rationality' | 'rationing' | 'republic' | 'scientificCommunism' | 'sharkRelationsBotanists' | 'sharkRelationsMerchants' | 'sharkRelationsScribes' | 'siphoning' | 'socialism' | 'spiderRelationsChemists' | 'spiderRelationsGeologists' | 'spiderRelationsPaleontologists' | 'stoicism' | 'stripMining' | 'sustainability' | 'technocracy' | 'terraformingInsight' | 'theocracy' | 'tradition' | 'transkittenism' | 'zebraRelationsAppeasement' | 'zebraRelationsBellicosity'} KittensNamedPolicy */
 /** @typedef {'alloy' | 'beam' | 'bloodstone' | 'blueprint' | 'compedium' | 'concrate' | 'eludium' | 'gear' | 'kerosene' | 'manuscript' | 'megalith' |'parchment' | 'plate' | 'scaffold' |  'ship' | 'slab' | 'steel' | 'tMythril' | 'tanker' | 'thorium' | 'wood'} KittensNamedResCraft */
@@ -22,7 +24,7 @@
 /** @typedef {{ name: KittensNamedRes, val: number }} KittensPrice */
 /** @typedef {{ isHidden: boolean, maxValue: number, name: KittensNamedRes, perTickCached: number, type: 'common' | 'exotic' | 'rare', unlocked: boolean, value: number }} KittensRes */
 /** @template {{}} [E={}] @typedef {{ render: () => void, tabId: string, tabName: string, visible: boolean } & E} KittensTab */
-/** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => { meta: KittensMetadata} }, bldTab: KittensTab<KittensBtnPanel>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: KittensBtnPanel }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensMetadata, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: (...args: unknown[]) => void } } }, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { heat: number }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: [KittensBtnPanel] } }>, spaceTab: KittensTab<{ GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }>, ui: { activeTabId: string }, village: { huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
+/** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => { meta: KittensMetadata} }, bldTab: KittensTab<KittensBtnPanel>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: '1000Years') => { researched: boolean } }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: 'heatCompression' | 'heatEfficiency' | 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: KittensBtnPanel }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensMetadata, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: (...args: unknown[]) => void } } }, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: [KittensBtnPanel] } }>, space: { getProgram: (name: 'orbitalLaunch') => { val: number } }, spaceTab: KittensTab<{ GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }>, ui: { activeTabId: string }, village: { huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
 
 // Kitty Cheat
 /** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
@@ -54,10 +56,10 @@
     } // exhaustive fractions for type spend
   }
 
-  /** @type {Readonly<{ BCOIN: Readonly<{ [x in 'BUY' | 'SELL']: number }>, BUILD: Readonly<{ [x in KittensNamedBldgCrypto]?: number }> }>} */
+  /** @type {Readonly<{ BCOIN: Readonly<{ [x in 'BUY' | 'SELL']: number }>, BUILD: Readonly<{ [x in KittensNamedBldg]?: number }> }>} */
   const MAXVAL = {
     BCOIN: { BUY: 899, SELL: 1089 }, // sell bcoin when it hits this amount (1100 is a crash)
-    BUILD: { holyGenocide: 25 } // build at most 25 HGs - this is optimal for paragon
+    BUILD: { holyGenocide: 25, temporalImpedance: 1 } // build at most 25 HGs - this is optimal for paragon
   };
 
   /** @type {Readonly<{ ALL: Readonly<{ [x in 'BUILD' | 'OPTION' | 'TEXT']: number}>, CATNIP: Readonly<{ [x in 'GATHER' | 'REFINE']: number }> } & { [x in 'ADORE' | 'BCOIN' | 'COMBUST' | 'EXPLORE' | 'FEED' | 'PRAISE' | 'PROMOTE' | 'SACRIFICE']: number }> }} */
@@ -332,9 +334,11 @@
 
   /** @returns {{ isBuildable: boolean, isUncapped?: boolean }} */
   function checkBuilding (/** @type {KittensBtn?=} */ btn, /** @type {boolean=} */ withFill = false, /** @type {boolean=} */ withCap = false) {
-    if (!btn?.model?.visible || !btn.model.enabled || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) || (btn.model.metadata?.val && btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata?.effects?.cathPollutionPerTickProd)) {
+    if (!btn?.model?.visible || !btn.model.enabled || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) || (btn.model.metadata?.val && btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata?.effects?.cathPollutionPerTickProd) || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
       return { isBuildable: false };
     }
+
+
 
     withFill && fillResources();
 
@@ -463,7 +467,7 @@
   function calcTheology () {
     return game.religionTab.ctPanel.children[0].children
       .filter((btn) => {
-        if (!btn.model.prices[0] || btn.model.prices[0].name !== 'relic' || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldgCrypto} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
+        if (!btn.model.prices[0] || btn.model.prices[0].name !== 'relic' || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
           return false;
         }
 
@@ -537,8 +541,30 @@
 
   /** @returns {void} */
   function fnCombust40k (/** @type {string} */ _group, /** @type {string} */ _name, /** @type {CheatOpt} */ opts) {
+    const amt = 40000;
+
     if (game.calendar.year < 40000) {
-      fnCombust();
+      const factor = game.challenges.getChallenge('1000Years').researched ? 5 : 10;
+      const heat_acutoconverted = 1 - 1 / (1 + game.getEffect('heatCompression'));
+      const addHeat = heat_acutoconverted
+        ? amt * factor * (1 - heat_acutoconverted)
+        : amt * factor;
+
+      if (addHeat < game.getEffect('heatMax')) {
+        fnCombust();
+      } else {
+        if (!renderBgTab(game.timeTab)) {
+          return;
+        }
+
+        const /** @type {KittensNamedBldgTimeCF[]} */ bldgs = ['blastFurnace', 'ressourceRetrieval', 'temporalAccelerator', 'temporalImpedance', 'timeBoiler'];
+
+        for (const btn of game.timeTab.cfPanel.children[0].children) {
+          if (btn.id && bldgs.includes(/** @type {KittensNamedBldgTimeCF} */ (btn.id)) && checkBuilding(btn).isBuildable) {
+            clickBtn(btn);
+          }
+        }
+      }
     } else {
       activateBtn(opts, false);
     }
