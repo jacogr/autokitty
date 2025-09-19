@@ -774,8 +774,8 @@
     }
 
     const buttons =
-      /** @type {KittensGame['libraryTab']} */ (tab).policyPanel.children ||
-      /** @type {KittensGame['timeTab']} */ (tab).cfPanel.children[0].children;
+      /** @type {KittensGame['libraryTab']} */ (tab).policyPanel?.children ||
+      /** @type {KittensGame['timeTab']} */ (tab).cfPanel?.children[0].children;
     let hasSome = false;
 
     for (const btn of buttons) {
