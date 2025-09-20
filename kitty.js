@@ -873,8 +873,6 @@
 
   /** @returns {void} */
   function execTextInfo (/** @type {number} */ delay) {
-    renderBgTab(game.religionTab);
-
     const bld = execBuildAll(0, true);
 
     $('div#kittycheat-txt-drybld').html(`Buildings: ${bld.build?.join(', ') || '-'}`);
