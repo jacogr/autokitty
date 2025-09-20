@@ -339,8 +339,6 @@
       return { isBuildable: false };
     }
 
-
-
     withFill && fillResources();
 
     const check = checkPrices(btn.model.prices);
@@ -619,11 +617,11 @@
     setTimeout(() => execOptTimer(group, name, opts), opts.delay);
   }
 
-  /** @returns {void} */
+  /** @returns {boolean} */
   function pushBtnName (/** @type {string[]} */ arr, /** @type {KittensBtn=} */ btn, /** @type {string?=} */ extra = null) {
     const n = getBtnName(btn, extra);
 
-    n && arr.push(n);
+    return !!(n && arr.push(n));
   }
 
   /** @returns {{ btn?: KittensBtn, isBuildable: boolean, tears?: KittensPrice }} */
@@ -646,8 +644,7 @@
       const bldg = getZigInfo(name);
 
       if (bldg.isBuildable && (dryRun || clickBtn(bldg.btn, true))) {
-        pushBtnName(completed, bldg.btn);
-        hasSome = true;
+        hasSome ||= pushBtnName(completed, bldg.btn);
       }
     }
 
@@ -671,7 +668,7 @@
         const finTears = nowTears + (zig.ratio * game.resPool.get('unicorns').value / 2500);
 
         if (!dryRun && best.tears?.val && (nowTears < best.tears.val) && (finTears > best.tears.val)) {
-          hasSome = callHandler(game.religionTab.sacrificeBtn.model.allLink);
+          hasSome ||= callHandler(game.religionTab.sacrificeBtn.model.allLink);
         }
 
         break;
@@ -679,9 +676,8 @@
         break;
       }
 
-      pushBtnName(completed, next.btn);
+      hasSome ||= pushBtnName(completed, next.btn);
       zig = calcZiggurats();
-      hasSome = true;
     }
 
     return hasSome;
@@ -698,8 +694,7 @@
             return true;
           }
 
-          pushBtnName(completed, btn, /** @type {{ race?: { title: string } }} */ (btn).race?.title);
-          hasSome = true;
+          hasSome ||= pushBtnName(completed, btn, /** @type {{ race?: { title: string } }} */ (btn).race?.title);
         }
       }
     }
@@ -722,8 +717,7 @@
         break;
       }
 
-      pushBtnName(completed, best.btn);
-      hasSome = true;
+      hasSome ||= pushBtnName(completed, best.btn);
     }
 
     return hasSome;
