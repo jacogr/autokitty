@@ -29,8 +29,8 @@
 // Kitty Cheat
 /** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
 /** @template {{ [x: string]: CheatOpt }} T @template {{}} [E={}] @typedef {{ active?: boolean, all: T, div?: jQuery, noExec?: boolean } & E} CheatMapEntry */
-/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: string, name: string, opts: CheatOpt) => void }>, 'btn' | 'group'> }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'pollute' | 'uncap' | 'resources' | 'x10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
-/** @typedef {{ [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig']?: string[] }} CheatStats */
+/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: string, name: string, opts: CheatOpt) => void }>, 'btn' | 'group'> }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pollute' | 'uncap' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
+/** @typedef {{ [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time']?: string[] }} CheatStats */
 
 // Window
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
@@ -85,12 +85,13 @@
         craft: { group: 'crafting' },
         trade: { group: 'trading' },
         exec: { group: 'actions', end: true },
+        max: { excl: ['max10'] },
+        max10: { excl: ['max'], end: true },
         zig: {},
-        crypto: { end: true },
+        crypto: {},
+        time: { end: true },
         pollute: {},
         uncap: { active: true, end: true },
-        resources: { excl: ['x10'] },
-        x10: { excl: ['resources'], end: true },
         sell: { danger: true, excl: ['build'] }
       },
       noExec: true
@@ -147,17 +148,6 @@
           end: true,
           noFill: true
         },
-        praise: {
-          fn: fnPraise,
-          active: true,
-          delay: INTERVAL.PRAISE
-        },
-        adore: {
-          fn: fnAdore,
-          active: true,
-          delay: INTERVAL.ADORE,
-          end: true
-        },
         observe: {
           fn: fnObserve,
           active: true,
@@ -179,6 +169,17 @@
           delay: INTERVAL.PROMOTE,
           end: true,
           noFill: true
+        },
+        praise: {
+          fn: fnPraise,
+          active: true,
+          delay: INTERVAL.PRAISE
+        },
+        adore: {
+          fn: fnAdore,
+          active: true,
+          delay: INTERVAL.ADORE,
+          end: true
         },
         feed: {
           fn: fnFeed,
@@ -349,10 +350,10 @@
 
   /** @returns {void} */
   function fillResources () {
-    if (cheatMap.control.all.resources.active || cheatMap.control.all.x10.active) {
+    if (cheatMap.control.all.max.active || cheatMap.control.all.max10.active) {
       for (const r of game.resPool.resources) {
         if (r.maxValue && r.unlocked && !r.isHidden && !RESOURCES.SKIP[r.name]) {
-          const max = r.maxValue * (cheatMap.control.all.x10.active ? 10 : 1);
+          const max = r.maxValue * (cheatMap.control.all.max10.active ? 10 : 1);
 
           if (r.value < max) {
             r.value = max;
@@ -852,7 +853,7 @@
       const /** @type {KittensNamedBldgTimeCF[]} */ cfbldgs = ['blastFurnace', 'ressourceRetrieval', 'temporalAccelerator', 'temporalImpedance', 'timeBoiler'];
 
       loopTabs('upgrade', ['libraryTab'], unlockNamedTab, policies);
-      loopTabs('upgrade', ['timeTab'], unlockNamedTab, cfbldgs, () =>
+      loopTabs('time', ['timeTab'], unlockNamedTab, cfbldgs, () =>
         game.getEffect('heatMax') < (40000 * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (1 - (1 - (1 / (1 + game.getEffect('heatCompression'))))))
       );
 
@@ -918,7 +919,7 @@
     }
   }
 
-  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; margin-bottom: 2px; margin-right: 2px; padding: 1px 4px; } .kittycheat-btn.active { background: red; color: white; } .kittycheat-btn.danger { background: lightblue; border-style: dashed; } .kittycheat-btn.danger.active { background: darkblue; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { opacity: 0.33; }</style>');
+  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; margin-bottom: 2px; margin-right: 2px; padding: 1px 4px; } .kittycheat-btn.active { background: red; color: white; } .kittycheat-btn.danger { background: lightblue; border-style: dashed; } .kittycheat-btn.danger.active { background: darkblue; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { opacity: 0.33; } .kittycheat-span {} #game .kittycheat-span.nobr { white-space: nowrap; }</style>');
 
   const divAll = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
   const divAct = jqAppend(divAll, $('<div id="kittycheat-act" class="kittycheat-div"></div>'));
@@ -927,6 +928,7 @@
   for (const _group in cheatMap) {
     const group = /** @type {keyof CheatMap} */ (_group);
     const divGrp = cheatMap[group].div = jqAppend(divAct, $(`<div id="kittycheat-act-${group}" class="kittycheat-div"></div>`));
+    const hasEnd = Object.values(cheatMap[group].all).find((o) => /** @type {CheatOpt} */ (o).end);
 
     if (group !== 'control') {
       jqAppend(divGrp, $(`<div class="kittycheat-div small">${group}:</div>`));
@@ -934,11 +936,13 @@
 
     activateGroup(group, cheatMap[group].active || cheatMap[group].noExec);
 
+    let spanSub = jqAppend(divGrp, $(`<span class="kittycheat-span ${hasEnd ? 'nobr' : ''}"></span>`));
+
     for (const name in cheatMap[group].all) {
       const opts = /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (name)]);
 
       if (!opts.noShow) {
-        opts.btn = jqAppend(divGrp, $(`<button class="kittycheat-btn ${opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : ''} ${opts.danger ? 'danger' : ''}">${name}</button>`).click(() => {
+        opts.btn = jqAppend(spanSub, $(`<button class="kittycheat-btn ${opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : ''} ${opts.danger ? 'danger' : ''}">${name}</button>`).click(() => {
           clickOptBtn(group, name, opts);
         }));
 
@@ -946,6 +950,10 @@
 
         if (opts.delay) {
           execOptTimer(group, name, opts);
+        }
+
+        if (opts.end) {
+          spanSub = jqAppend(divGrp, $('<span class="kittycheat-span nobr"></span>'));
         }
       }
     }
