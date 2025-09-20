@@ -638,18 +638,10 @@
 
   /** @returns {boolean} */
   function buildZig (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed) {
-    if (dryRun || !renderBgTab(game.religionTab)) {
-      return false;
-    }
-
     const blck = getZigInfo('blackPyramid');
     let hasSome = false;
 
-    if (blck.isBuildable) {
-      if (!clickBtn(blck.btn, true)) {
-        return false;
-      }
-
+    if (blck.isBuildable && (dryRun || clickBtn(blck.btn, true))) {
       pushBtnName(completed, blck.btn);
       hasSome = true;
     }
@@ -673,12 +665,12 @@
         const nowTears = game.resPool.get('tears').value;
         const finTears = nowTears + (zig.ratio * game.resPool.get('unicorns').value / 2500);
 
-        if (best.tears?.val && (nowTears < best.tears.val) && (finTears > best.tears.val)) {
+        if (!dryRun && best.tears?.val && (nowTears < best.tears.val) && (finTears > best.tears.val)) {
           hasSome = callHandler(game.religionTab.sacrificeBtn.model.allLink);
         }
 
         break;
-      } else if (!clickBtn(next.btn)) {
+      } else if (!dryRun && !clickBtn(next.btn)) {
         break;
       }
 
@@ -691,16 +683,32 @@
   }
 
   /** @returns {boolean} */
+  function loopChildren (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ children: KittensBtn[] }[]} */ areas, /** @type {(dryRun: boolean, btn: KittensBtn, isAll: boolean) => boolean} */ buttonFn, /** @type {{ allowedIds?: string[], isAll?: boolean, withMeta?: boolean }} */ opts = {}) {
+    let hasSome = false;
+
+    for (const area of areas) {
+      for (const btn of area.children) {
+        if ((!opts.withMeta || btn.model.metadata) && (!opts.allowedIds || (btn.id && opts.allowedIds.includes(btn.id))) && buttonFn(dryRun, btn, !!opts.isAll)) {
+          if (dryRun) {
+            return true;
+          }
+
+          pushBtnName(completed, btn, /** @type {{ race?: { title: string } }} */ (btn).race?.title);
+          hasSome = true;
+        }
+      }
+    }
+
+    return hasSome;
+  }
+
+  /** @returns {boolean} */
   function buildTheologyBtn (/** @type {boolean} */ dryRun, /** @type {ReturnType<calcTheology>[0]} */ best) {
-    return (!!best.percent && best.percent.frac >= 1 && checkBuilding(best.btn).isBuildable) && (dryRun || clickBtn(best.btn));
+    return !!best.percent && best.percent.frac >= 1 && checkBuilding(best.btn).isBuildable && (dryRun || clickBtn(best.btn));
   }
 
   /** @returns {boolean}  */
   function buildTheology (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed) {
-    if (dryRun || !renderBgTab(game.religionTab)) {
-      return false;
-    }
-
     const avail = calcTheology();
     let hasSome = false;
 
@@ -723,34 +731,18 @@
 
   /** @returns {boolean} */
   function unlockTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab) {
-    if (!renderBgTab(tab)) {
-      return false;
-    }
-
-    const buttons =
+    const children =
       /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels?.map((r) => r.embassyButton) ||
       /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons ||
       /** @type {KittensGame['spaceTab']} */ (tab).GCPanel?.children ||
       /** @type {KittensGame['timeTab']} */ (tab).vsPanel?.children[0].children ||
       /** @type {KittensGame['workshopTab']} */ (tab).buttons;
-    let hasSome = false;
-
-    // multi for religion & embassy upgrades
     const isAll = !!((
-       /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels ||
+      /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels ||
       /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons
     )?.length);
 
-    for (const btn of buttons) {
-      if (unlockTabBtn(dryRun, btn, isAll)) {
-        if (dryRun) {
-          return true;
-        }
-
-        pushBtnName(completed, btn, /** @type {{ race?: { title: string } }} */ (btn).race?.title);
-        hasSome = true;
-      }
-    }
+    let hasSome = loopChildren(dryRun, completed, [{ children }], unlockTabBtn, { isAll });
 
     const d = /** @type {KittensGame['diplomacyTab']} */ (tab);
 
@@ -768,28 +760,12 @@
   }
 
   /** @returns {boolean} */
-  function unlockNamedTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab, /** @type {string[]} */ allowed) {
-    if (dryRun || !renderBgTab(tab)) {
-      return false;
-    }
-
-    const buttons =
+  function unlockNamedTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab, /** @type {string[]} */ allowedIds) {
+    const children =
       /** @type {KittensGame['libraryTab']} */ (tab).policyPanel?.children ||
       /** @type {KittensGame['timeTab']} */ (tab).cfPanel?.children[0].children;
-    let hasSome = false;
 
-    for (const btn of buttons) {
-      if (btn.id && allowed.includes(btn.id) && unlockTabBtn(dryRun, btn, false)) {
-        if (dryRun) {
-          return true;
-        }
-
-        pushBtnName(completed, btn);
-        hasSome = true;
-      }
-    }
-
-    return hasSome;
+    return loopChildren(dryRun, completed, [{ children }], unlockTabBtn, { allowedIds, isAll: false });
   }
 
   /** @returns {boolean} */
@@ -816,29 +792,11 @@
   /** @returns {(dryRun: boolean, completed: string[], tab: KittensTab) => boolean} */
   function buildTab (/** @type {(dryRun: boolean, btn: KittensBtn) => boolean} */ buttonFn) {
     return (/** @type {boolean} */ dryRun, /** @type {string[]} */  completed, /** @type {KittensTab} */ tab) => {
-      if (!renderBgTab(tab)) {
-        return false;
-      }
-
       const areas =
         /** @type {KittensGame['spaceTab']} */ (tab).planetPanels ||
         [/** @type {KittensGame['bldTab']} */ (tab)];
-      let hasSome = false;
 
-      for (const area of areas) {
-        for (const btn of area.children) {
-          if (btn.model.metadata && buttonFn(dryRun, btn)) {
-            if (dryRun) {
-              return true;
-            }
-
-            pushBtnName(completed, btn);
-            hasSome = true;
-          }
-        }
-      }
-
-      return hasSome;
+      return loopChildren(dryRun, completed, areas, buttonFn, { withMeta: true });
     }
   };
 
@@ -848,21 +806,21 @@
     const /** @type {CheatStats} */ stats = {};
     const /** @type {KittensNamedTab[]} */ allowedTabs = [];
 
-    const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabs, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowed = [], /** @type {() => boolean} */ checkFn = () => true) => {
+    const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabIds, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowedIds = [], /** @type {() => boolean} */ checkFn = () => true) => {
       if (!checkFn()) {
         return;
       }
 
-      for (const tab of tabs) {
-        if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tab))) {
+      for (const tabId of tabIds) {
+        if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tabId))) {
           try {
             !dryRun && fillResources();
 
-            if (execFn(dryRun, completed, game[tab], allowed)) {
-              stats[type] = (stats[type] || []).concat(game[tab].tabId);
+            if (renderBgTab(game[tabId]) && execFn(dryRun, completed, game[tabId], allowedIds)) {
+              stats[type] = (stats[type] || []).concat(game[tabId].tabId);
             }
           } catch (e) {
-            console.error('loopTabs', type, tab, e);
+            console.error('loopTabs', type, tabId, e);
           }
         }
       }
