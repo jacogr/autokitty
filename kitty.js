@@ -6,7 +6,7 @@
 
 // Kittens Game
 /** @typedef {'blackCore' | 'blackLibrary' | 'blackNexus' | 'blackObelisk' | 'blackRadiance' | 'blazar' | 'darkNova' | 'holyGenocide' | 'mausoleum' | 'singularity'} KittensNamedBldgCrypto */
-/** @typedef {'blackPyramid' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamedBldgZU */
+/** @typedef {'blackPyramid' | 'unicornGraveyard' | 'unicornNecropolis' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamedBldgZU */
 /** @typedef {'blastFurnace' | 'temporalAccelerator' | 'temporalImpedance' | 'timeBoiler' | 'ressourceRetrieval'} KittensNamedBldgTimeCF */
 /** @typedef {KittensNamedBldgCrypto | KittensNamedBldgZU | KittensNamedBldgTimeCF} KittensNamedBldg */
 /** @typedef {'tenErasLink' | 'previousCycleLink' | 'nextCycleLink'} KittensNamedCombustLink */
@@ -639,12 +639,16 @@
 
   /** @returns {boolean} */
   function buildZig (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed) {
-    const blck = getZigInfo('blackPyramid');
+    const /** @type {KittensNamedBldgZU[]} */ extras = ['blackPyramid', 'unicornGraveyard', 'unicornNecropolis'];
     let hasSome = false;
 
-    if (blck.isBuildable && (dryRun || clickBtn(blck.btn, true))) {
-      pushBtnName(completed, blck.btn);
-      hasSome = true;
+    for (const name of extras) {
+      const bldg = getZigInfo(name);
+
+      if (bldg.isBuildable && (dryRun || clickBtn(bldg.btn, true))) {
+        pushBtnName(completed, bldg.btn);
+        hasSome = true;
+      }
     }
 
     let zig = calcZiggurats();
