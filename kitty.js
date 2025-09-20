@@ -232,23 +232,45 @@
 
   let lastExploreTime = 0;
 
-  /** @returns {void} */
+  /**
+   * @description There probably should not be much description on this: it is simply
+   * a function that does nothing.
+   *
+   * @returns {void}
+   **/
   function noop () {}
 
-  /** @returns {jQuery} */
+  /**
+   * @description Appends a child element to a parent, an unlike the normal jQuery
+   * .append(...) function, this returns the child, not the parent. This allows us to
+   * streamline usage, where we can append and then immediately assign the result.
+   *
+   * @returns {jQuery}
+   **/
   function jqAppend (/** @type {jQuery} */ parent, /** @type {jQuery} */ child) {
      parent.append(child);
 
      return child;
   }
 
-  /** @returns {void} */
+  /**
+   * @description Makes a button active or inactive, based on the input. We toggle both
+   * the actual button option and then reflect this state into the UI, by adding or
+   * removing the "active" css class.
+   *
+   * @returns {void}
+   **/
   function activateBtn (/** @type {CheatOpt} */ opts, /** @type {boolean=} */ active = false) {
     opts.active = active;
     opts.btn[active ? 'addClass' : 'removeClass']('active');
   }
 
-  /** @returns {void} */
+  /**
+   * @description Make a div/group either active or inactive, based on the input. We toggle
+   * the actual group option as well as adding or removing the "disabled" css class.
+   *
+   * @returns {void}
+   **/
   function activateGroup (/** @type {keyof CheatMap} */ group, /** @type {boolean=} */ active = false) {
     const opt = cheatMap[group];
 
@@ -256,7 +278,16 @@
     opt.div?.[active ? 'removeClass' : 'addClass']('disabled');
   }
 
-  /** @returns {{ frac: number, raw: number, text: string } | null} */
+  /**
+   * @description Calculates the percentage value from a supplied fraction. It returns
+   * the original fraction, the raw percentage value as well as the text representation
+   * of the percentage (this is capped at 100%).
+   *
+   * In some cases where we have a very high value or something below 0, we return an
+   * invalid (null) value. In our usage we only expect values within this range.
+   *
+   * @returns {{ frac: number, raw: number, text: string } | null}
+   **/
   function toPercent (/** @type {number} */ frac) {
     if (frac < 0 || frac > Number.MAX_SAFE_INTEGER) {
       return null;
@@ -271,7 +302,13 @@
     };
   }
 
-  /** @returns {string?=} */
+  /**
+   * @description Exctract the name of the button for the supplied button. In this case it first
+   * deals with those with metadata (stuff that can be built) and additionally, if not available,
+   * tries to extract from the options.
+   *
+   * @returns {string?=}
+   **/
   function getBtnName (/** @type {KittensBtn?=} */ btn, /** @type {string?=} */ extra = null) {
     const name = btn?.model.metadata?.label || btn?.opts?.name;
 
@@ -635,6 +672,44 @@
     return !!(n && arr.push(n));
   }
 
+  /** @returns {boolean} */
+  function loopChildren (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ children: KittensBtn[] }[]} */ areas, /** @type {(dryRun: boolean, btn: KittensBtn, isAll: boolean) => boolean} */ buttonFn, /** @type {{ allowedIds?: string[], isAll?: boolean, withMeta?: boolean }} */ opts = {}) {
+    let hasSome = false;
+
+    for (const area of areas) {
+      for (const btn of area.children) {
+        if ((!opts.withMeta || btn.model.metadata) && (!opts.allowedIds || (btn.id && opts.allowedIds.includes(btn.id))) && buttonFn(dryRun, btn, !!opts.isAll)) {
+          if (dryRun) {
+            return true;
+          }
+
+          hasSome ||= pushBtnName(completed, btn, /** @type {{ race?: { title: string } }} */ (btn).race?.title);
+        }
+      }
+    }
+
+    return hasSome;
+  }
+
+  /** @returns {void} */
+  function loopTabs (/** @type {{ allowedTabs: string[], completed: string[], dryRun: boolean, stats: CheatStats }} */ { allowedTabs, completed, dryRun, stats }, /** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabIds, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowedIds = [], /** @type {() => boolean} */ checkFn = () => true) {
+    if (checkFn()) {
+      for (const tabId of tabIds) {
+        if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tabId))) {
+          try {
+            !dryRun && fillResources();
+
+            if (renderBgTab(game[tabId]) && execFn(dryRun, completed, game[tabId], allowedIds)) {
+              stats[type] = (stats[type] || []).concat(game[tabId].tabId);
+            }
+          } catch (e) {
+            console.error('loopTabs', type, tabId, e);
+          }
+        }
+      }
+    }
+  }
+
   /** @returns {{ btn?: KittensBtn, isBuildable: boolean, tears?: KittensPrice }} */
   function getZigInfo (/** @type {string} */ id, /** @type {KittensBtn?} */ inBtn = null) {
     const btn = inBtn || game.religionTab.zgUpgradeButtons.find((b) => b.id === id);
@@ -695,25 +770,6 @@
 
       hasSome ||= pushBtnName(completed, next.btn);
       zig = calcZiggurats();
-    }
-
-    return hasSome;
-  }
-
-  /** @returns {boolean} */
-  function loopChildren (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ children: KittensBtn[] }[]} */ areas, /** @type {(dryRun: boolean, btn: KittensBtn, isAll: boolean) => boolean} */ buttonFn, /** @type {{ allowedIds?: string[], isAll?: boolean, withMeta?: boolean }} */ opts = {}) {
-    let hasSome = false;
-
-    for (const area of areas) {
-      for (const btn of area.children) {
-        if ((!opts.withMeta || btn.model.metadata) && (!opts.allowedIds || (btn.id && opts.allowedIds.includes(btn.id))) && buttonFn(dryRun, btn, !!opts.isAll)) {
-          if (dryRun) {
-            return true;
-          }
-
-          hasSome ||= pushBtnName(completed, btn, /** @type {{ race?: { title: string } }} */ (btn).race?.title);
-        }
-      }
     }
 
     return hasSome;
@@ -819,12 +875,10 @@
 
   /** @returns {CheatStats} */
   function execBuildAll (/** @type {number} */ delay, /** @type {boolean=} */ dryRun = false) {
-    const /** @type {string[]} */ completed = [];
-    const /** @type {CheatStats} */ stats = {};
-    const /** @type {KittensNamedTab[]} */ allowedTabs = [];
+    const /** @type {{ allowedTabs: string[], completed: string[], dryRun: Boolean, stats: CheatStats }} */ info = { allowedTabs: [], completed: [], dryRun, stats: {} };
 
     for (const t in cheatMap.tabs.all) {
-      cheatMap.tabs.all[t]?.active && allowedTabs.push(cheatMap.tabs.all[t].tab);
+      cheatMap.tabs.all[t]?.active && info.allowedTabs.push(cheatMap.tabs.all[t].tab);
     }
 
     if (!dryRun && cheatMap.control.all.craft.active) {
@@ -839,49 +893,30 @@
       }
     }
 
-    const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabIds, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowedIds = [], /** @type {() => boolean} */ checkFn = () => true) => {
-      if (checkFn()) {
-        for (const tabId of tabIds) {
-          if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tabId))) {
-            try {
-              !dryRun && fillResources();
-
-              if (renderBgTab(game[tabId]) && execFn(dryRun, completed, game[tabId], allowedIds)) {
-                stats[type] = (stats[type] || []).concat(game[tabId].tabId);
-              }
-            } catch (e) {
-              console.error('loopTabs', type, tabId, e);
-            }
-          }
-        }
-      }
-    };
-
-    loopTabs('build', ['bldTab', 'spaceTab'], buildTab(buyTabBtn));
-    loopTabs('upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
+    loopTabs(info, 'build', ['bldTab', 'spaceTab'], buildTab(buyTabBtn));
+    loopTabs(info, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
 
     if (!dryRun) {
-      loopTabs('sell', ['bldTab', 'spaceTab'], buildTab(sellTabBtn));
-      loopTabs('zig', ['religionTab'], buildZig);
-      loopTabs('crypto', ['religionTab'], buildTheology);
-
       const /** @type {KittensNamedPolicy[]} */ policies = ['authocracy', 'diplomacy', 'dragonRelationsAstrologers', 'epicurianism', 'extravagance', 'fascism', 'fullIndustrialization', 'griffinRelationsScouts', 'knowledgeSharing', 'lizardRelationsPriests', 'militarizeSpace', 'mysticism', 'nagaRelationsCultists', 'sharkRelationsScribes', 'siphoning', 'socialism', 'spiderRelationsPaleontologists', 'stripMining', 'technocracy', 'tradition', 'transkittenism', 'zebraRelationsBellicosity'];
       const /** @type {KittensNamedPact[]} */ pacts = ['pactOfCleansing', 'pactOfPurity', 'payDebt'];
       const /** @type {KittensNamedBldgTimeCF[]} */ cfbldgs = ['blastFurnace', 'ressourceRetrieval', 'temporalAccelerator', 'temporalImpedance', 'timeBoiler'];
 
-      loopTabs('upgrade', ['libraryTab'], unlockNamedTab, policies);
-      loopTabs('pact', ['religionTab'], unlockNamedTab, pacts);
-      loopTabs('time', ['timeTab'], unlockNamedTab, cfbldgs, () =>
+      loopTabs(info, 'sell', ['bldTab', 'spaceTab'], buildTab(sellTabBtn));
+      loopTabs(info, 'zig', ['religionTab'], buildZig);
+      loopTabs(info, 'crypto', ['religionTab'], buildTheology);
+      loopTabs(info, 'upgrade', ['libraryTab'], unlockNamedTab, policies);
+      loopTabs(info, 'pact', ['religionTab'], unlockNamedTab, pacts);
+      loopTabs(info, 'time', ['timeTab'], unlockNamedTab, cfbldgs, () =>
         game.getEffect('heatMax') < (40000 * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (1 - (1 - (1 / (1 + game.getEffect('heatCompression'))))))
       );
 
       if (delay > 0) {
-        completed.length && $(game.msg(completed.join(', ')).span).addClass('kittycheat-log');
+        info.completed.length && $(game.msg(info.completed.join(', ')).span).addClass('kittycheat-log');
         setTimeout(() => execBuildAll(delay), delay);
       }
     }
 
-    return stats;
+    return info.stats;
   }
 
   /** @returns {void} */
@@ -937,59 +972,71 @@
     }
   }
 
-  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; margin-bottom: 2px; margin-right: 2px; padding: 1px 4px; } .kittycheat-btn.active { background: red; color: white; } .kittycheat-btn.danger { background: lightblue; border-style: dashed; } .kittycheat-btn.danger.active { background: darkblue; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { font-family: monospace; opacity: 0.33; } .kittycheat-btn-grp { display: inline-block; } #game .kittycheat-btn-grp.nobr { white-space: nowrap; }</style>');
+  /**
+   * @description Do the setup for the cheat controls and apply some game configuration. (Mostly around logging
+   * and the actual options available)
+   *
+   * @returns {void}
+   **/
+  function setup () {
+    $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; margin-bottom: 2px; margin-right: 2px; padding: 1px 4px; } .kittycheat-btn.active { background: red; color: white; } .kittycheat-btn.danger { background: lightblue; border-style: dashed; } .kittycheat-btn.danger.active { background: darkblue; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { font-family: monospace; opacity: 0.33; } .kittycheat-btn-grp { display: inline-block; } #game .kittycheat-btn-grp.nobr { white-space: nowrap; }</style>');
 
-  const divAll = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
-  const divAct = jqAppend(divAll, $('<div id="kittycheat-act" class="kittycheat-div"></div>'));
-  const divTxt = jqAppend(divAll, $('<div id="kittycheat-txt" class="kittycheat-div"></div>'));
+    const divAll = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
+    const divAct = jqAppend(divAll, $('<div id="kittycheat-act" class="kittycheat-div"></div>'));
+    const divTxt = jqAppend(divAll, $('<div id="kittycheat-txt" class="kittycheat-div"></div>'));
 
-  for (const _group in cheatMap) {
-    const group = /** @type {keyof CheatMap} */ (_group);
-    const divGrp = cheatMap[group].div = jqAppend(divAct, $(`<div id="kittycheat-act-${group}" class="kittycheat-div"></div>`));
-    const hasEnd = Object.values(cheatMap[group].all).find((o) => /** @type {CheatOpt} */ (o).end);
-    let /** @type {jQuery | null} */ divBtnGrp = null;
+    for (const _group in cheatMap) {
+      const group = /** @type {keyof CheatMap} */ (_group);
+      const divGrp = cheatMap[group].div = jqAppend(divAct, $(`<div id="kittycheat-act-${group}" class="kittycheat-div"></div>`));
+      const hasEnd = Object.values(cheatMap[group].all).find((o) => /** @type {CheatOpt} */ (o).end);
+      let /** @type {jQuery | null} */ divBtnGrp = null;
 
-    if (group !== 'control') {
-      jqAppend(divGrp, $(`<div class="kittycheat-div small">${group}:</div>`));
-    }
+      if (group !== 'control') {
+        jqAppend(divGrp, $(`<div class="kittycheat-div small">${group}:</div>`));
+      }
 
-    activateGroup(group, cheatMap[group].active || cheatMap[group].noExec);
+      activateGroup(group, cheatMap[group].active || cheatMap[group].noExec);
 
-    for (const name in cheatMap[group].all) {
-      const opts = /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (name)]);
+      for (const name in cheatMap[group].all) {
+        const opts = /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (name)]);
 
-      divBtnGrp = divBtnGrp || jqAppend(divGrp, $(`<div class="kittycheat-btn-grp ${hasEnd ? 'nobr' : ''}"></div>`));
+        divBtnGrp = divBtnGrp || jqAppend(divGrp, $(`<div class="kittycheat-btn-grp ${hasEnd ? 'nobr' : ''}"></div>`));
 
-      if (!opts.noShow) {
-        opts.btn = jqAppend(divBtnGrp, $(`<button class="kittycheat-btn ${opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : ''} ${opts.danger ? 'danger' : ''}">${name}</button>`).click(() => {
-          clickOptBtn(group, name, opts);
-        }));
+        if (!opts.noShow) {
+          opts.btn = jqAppend(divBtnGrp, $(`<button class="kittycheat-btn ${opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : ''} ${opts.danger ? 'danger' : ''}">${name}</button>`).click(() => {
+            clickOptBtn(group, name, opts);
+          }));
 
-        activateBtn(opts, opts.active);
+          activateBtn(opts, opts.active);
 
-        if (opts.delay) {
-          execOptTimer(group, name, opts);
-        }
+          if (opts.delay) {
+            execOptTimer(group, name, opts);
+          }
 
-        if (opts.end) {
-          divBtnGrp = null;
+          if (opts.end) {
+            divBtnGrp = null;
+          }
         }
       }
     }
+
+    for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
+      jqAppend(divTxt, $(`<div id="kittycheat-txt-${id}" class="kittycheat-div small"></div>`));
+    }
+
+    game.console.maxMessages = 100;
+    game.opts.hideSell = true;
+    game.opts.noConfirm = true;
+
+    for (const f of ['craft', 'faith', 'hunt', 'trade']) {
+      game.console.filters[/** @type {keyof KittensGame['console']['filters']} */ (f)].enabled = false;
+    }
   }
 
-  for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
-    jqAppend(divTxt, $(`<div id="kittycheat-txt-${id}" class="kittycheat-div small"></div>`));
-  }
-
-  game.console.maxMessages = 100;
-  game.opts.hideSell = true;
-  game.opts.noConfirm = true;
-
-  for (const f of ['craft', 'faith', 'hunt', 'trade']) {
-    game.console.filters[/** @type {keyof KittensGame['console']['filters']} */ (f)].enabled = false;
-  }
-
+  /**
+   * @description Start! Do the setup and then start the execution loops. Done. Profit.
+   */
+  setup();
   execOpts(INTERVAL.ALL.OPTION);
   execTextInfo(INTERVAL.ALL.TEXT);
   execBuildAll(INTERVAL.ALL.BUILD);
