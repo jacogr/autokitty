@@ -25,7 +25,7 @@
 /** @typedef {{ name: KittensNamedRes, val: number }} KittensPrice */
 /** @typedef {{ isHidden: boolean, maxValue: number, name: KittensNamedRes, perTickCached: number, type: 'common' | 'exotic' | 'rare', unlocked: boolean, value: number }} KittensRes */
 /** @template {{}} [E={}] @typedef {{ render: () => void, tabId: string, tabName: string, visible: boolean } & E} KittensTab */
-/** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => { meta: KittensMetadata} }, bldTab: KittensTab<KittensBtnPanel>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: '1000Years') => { researched: boolean } }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: 'heatCompression' | 'heatEfficiency' | 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: KittensBtnPanel }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensMetadata, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: [KittensBtnPanel] }, ptPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: { model: { allLink: { handler: (...args: unknown[]) => void } } }, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: [KittensBtnPanel] } }>, space: { getProgram: (name: 'orbitalLaunch') => { val: number } }, spaceTab: KittensTab<{ GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }>, ui: { activeTabId: string }, village: { holdFestival: (amt: number) => void, huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], festivalBtn: KittensBtn<{ x100: { link: HTMLElement } }>, promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
+/** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => { meta: KittensMetadata} }, bldTab: KittensTab<KittensBtnPanel>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: '1000Years') => { researched: boolean } }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: 'heatCompression' | 'heatEfficiency' | 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: KittensBtnPanel }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensMetadata, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: [KittensBtnPanel] }, ptPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: KittensBtn, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number, shatter: (amt: number) => void }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: [KittensBtnPanel] } }>, space: { getProgram: (name: 'orbitalLaunch') => { val: number } }, spaceTab: KittensTab<{ GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }>, ui: { activeTabId: string }, village: { holdFestival: (amt: number) => void, huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], festivalBtn: KittensBtn<{ x100: { link: HTMLElement } }>, promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
 
 // Kitty Cheat
 /** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
@@ -303,7 +303,7 @@
   }
 
   /**
-   * @description Exctract the name of the button for the supplied button. In this case it first
+   * @description Extract the name of the button for the supplied button. In this case it first
    * deals with those with metadata (stuff that can be built) and additionally, if not available,
    * tries to extract from the options.
    *
@@ -315,23 +315,24 @@
     return name && extra ? `${name} ${extra}` : name;
   }
 
-  /** @returns {boolean} */
+  /**
+   * @description Performs a click on a button. This could take the form of doing a shift-click
+   * (which executes to the maxiumum possible) if the isAll parameter is specified.
+   *
+   * @returns {boolean}
+   **/
   function clickBtn (/** @type {KittensBtn?=} */ btn, /** @type {boolean=} */ isAll = false) {
     return !!btn && btn.domNode.dispatchEvent(new MouseEvent('click', isAll ? { shiftKey: true } : {}));
   }
 
-  /** @returns {boolean} */
-  function callHandler (/** @type {{ handler?: (...args: unknown[]) => void }?=} */ link) {
-    if (!link?.handler) {
-      return false;
-    }
-
-    link.handler.call(noop, noop, noop);
-
-    return true;
-  }
-
-  /** @template {KittensTab} T @returns {T | null | undefined} */
+  /**
+   * @description Renders a tab that is in the background, if it does exist. For foregound tabs, don't
+   * re-render (this is not needed and worse causes some UI glitches). If the tab is existing and visible,
+   * return the actual tab, otherwise null since any further operations are not valid.
+   *
+   * @template {KittensTab} T
+   * @returns {T | null | undefined}
+   **/
   function renderBgTab (/** @type {T?=} */ tab) {
     if (!tab?.visible) {
       return null;
@@ -342,7 +343,13 @@
     return tab;
   }
 
-  /** @returns {{ isUncapped: boolean, isInvalid: boolean }} */
+  /**
+   * @description Checks the prices as associated with a model. Determines if the prices are uncapped and
+   * whether the current resources are enough to actually spend on the item. Internally it uses the definitions
+   * for the resource values (uncapped, least, by-name, by-type) to do the calculations.
+   *
+   * @returns {{ isUncapped: boolean, isInvalid: boolean }}
+   **/
   function checkPrices (/** @type {KittensPrice[]} */ prices, /** @type {KittensNamedRes?} */ skip = null) {
     let isUncapped = true;
 
@@ -352,7 +359,7 @@
 
         // If we have a maxValue or there is a per-tick effect (see for instance starcharts), we
         // assume that we have a building that is capped. Additionally we also bypass resource checks
-        // for those where we want to spend all - necrocorns is the typical example.
+        // for those where we want to spend (almost) all - necrocorns is the typical example.
         if (r.maxValue || r.perTickCached || RESOURCES.LEAST[r.name]) {
           isUncapped = false;
           break;
@@ -403,9 +410,15 @@
     }
   }
 
-  /** @returns {KittensDiplomacyRacePanelLeviathans=} */
+  /** @returns {KittensDiplomacyRacePanelLeviathans?} */
   function findLeviathans () {
-    return /** @type {KittensDiplomacyRacePanelLeviathans} */ (game.diplomacyTab.racePanels.find((p) => p.race.name === 'leviathans'));
+    for (const p of game.diplomacyTab.racePanels) {
+      if (p.race.name === 'leviathans') {
+        return /** @type {KittensDiplomacyRacePanelLeviathans} */ (p);
+      }
+    }
+
+    return null;
   }
 
   /** @returns {number} */
@@ -570,12 +583,11 @@
   function fnCombust () {
     const avail = (game.getEffect('heatMax') - game.time.heat) / 10;
 
-    for (const _c in combustCycles) {
-      const c = /** @type {KittensNamedCombustLink} */ (_c);
+    for (const cycle in combustCycles) {
+      const years = combustCycles[/** @type {KittensNamedCombustLink} */ (cycle)];
 
-      if ((avail / combustCycles[c]) > 1) {
-        callHandler(renderBgTab(game.timeTab)?.cfPanel.children[0].children[0]?.model[c]);
-        return;
+      if ((avail / years) > 1) {
+        return game.time.shatter(years);
       }
     }
   }
@@ -757,8 +769,8 @@
         const nowTears = game.resPool.get('tears').value;
         const finTears = nowTears + (zig.ratio * game.resPool.get('unicorns').value / 2500);
 
-        if (!dryRun && best.tears?.val && (nowTears < best.tears.val) && (finTears > best.tears.val)) {
-          hasSome ||= callHandler(game.religionTab.sacrificeBtn.model.allLink);
+        if (best.tears?.val && (nowTears < best.tears.val) && (finTears > best.tears.val)) {
+          hasSome ||= (dryRun || clickBtn(game.religionTab.sacrificeBtn, true));
         }
 
         break;
@@ -843,7 +855,7 @@
 
   /** @returns {boolean} */
   function buyTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn) {
-    if (!dryRun && btn.model.enabled && btn.model.visible && callHandler(btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler'))) {
+    if (!dryRun && btn.model.enabled && btn.model.visible && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
       return true;
     }
 
