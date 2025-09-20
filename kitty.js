@@ -806,25 +806,9 @@
     const /** @type {CheatStats} */ stats = {};
     const /** @type {KittensNamedTab[]} */ allowedTabs = [];
 
-    const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabIds, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowedIds = [], /** @type {() => boolean} */ checkFn = () => true) => {
-      if (!checkFn()) {
-        return;
-      }
-
-      for (const tabId of tabIds) {
-        if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tabId))) {
-          try {
-            !dryRun && fillResources();
-
-            if (renderBgTab(game[tabId]) && execFn(dryRun, completed, game[tabId], allowedIds)) {
-              stats[type] = (stats[type] || []).concat(game[tabId].tabId);
-            }
-          } catch (e) {
-            console.error('loopTabs', type, tabId, e);
-          }
-        }
-      }
-    };
+    for (const t in cheatMap.tabs.all) {
+      cheatMap.tabs.all[t]?.active && allowedTabs.push(cheatMap.tabs.all[t].tab);
+    }
 
     if (!dryRun && cheatMap.control.all.craft.active) {
       fillResources();
@@ -838,13 +822,26 @@
       }
     }
 
-    for (const t in cheatMap.tabs.all) {
-      cheatMap.tabs.all[t]?.active && allowedTabs.push(cheatMap.tabs.all[t].tab);
-    }
+    const loopTabs = (/** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabIds, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowedIds = [], /** @type {() => boolean} */ checkFn = () => true) => {
+      if (checkFn()) {
+        for (const tabId of tabIds) {
+          if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tabId))) {
+            try {
+              !dryRun && fillResources();
 
-    loopTabs('upgrade', ['libraryTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
+              if (renderBgTab(game[tabId]) && execFn(dryRun, completed, game[tabId], allowedIds)) {
+                stats[type] = (stats[type] || []).concat(game[tabId].tabId);
+              }
+            } catch (e) {
+              console.error('loopTabs', type, tabId, e);
+            }
+          }
+        }
+      }
+    };
+
     loopTabs('build', ['bldTab', 'spaceTab'], buildTab(buyTabBtn));
-    loopTabs('upgrade', ['diplomacyTab', 'religionTab'], unlockTab);
+    loopTabs('upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
 
     if (!dryRun) {
       loopTabs('sell', ['bldTab', 'spaceTab'], buildTab(sellTabBtn));
@@ -855,12 +852,9 @@
       const /** @type {KittensNamedBldgTimeCF[]} */ cfbldgs = ['blastFurnace', 'ressourceRetrieval', 'temporalAccelerator', 'temporalImpedance', 'timeBoiler'];
 
       loopTabs('upgrade', ['libraryTab'], unlockNamedTab, policies);
-      loopTabs('upgrade', ['timeTab'], unlockNamedTab, cfbldgs, () => {
-        const heatAcutoconverted = 1 - 1 / (1 + game.getEffect('heatCompression'));
-        const reqHeat =  40000 * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (heatAcutoconverted ? (1 - heatAcutoconverted) : 1);
-
-        return reqHeat >= game.getEffect('heatMax');
-      });
+      loopTabs('upgrade', ['timeTab'], unlockNamedTab, cfbldgs, () =>
+        game.getEffect('heatMax') < (40000 * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (1 - (1 - (1 / (1 + game.getEffect('heatCompression'))))))
+      );
 
       if (delay > 0) {
         completed.length && $(game.msg(completed.join(', ')).span).addClass('kittycheat-log');
