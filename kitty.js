@@ -25,7 +25,7 @@
 /** @typedef {{ name: KittensNamedRes, val: number }} KittensPrice */
 /** @typedef {{ isHidden: boolean, maxValue: number, name: KittensNamedRes, perTickCached: number, type: 'common' | 'exotic' | 'rare', unlocked: boolean, value: number }} KittensRes */
 /** @template {{}} [E={}] @typedef {{ render: () => void, tabId: string, tabName: string, visible: boolean } & E} KittensTab */
-/** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => { meta: KittensMetadata} }, bldTab: KittensTab<KittensBtnPanel>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: '1000Years') => { researched: boolean } }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: 'heatCompression' | 'heatEfficiency' | 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: KittensBtnPanel }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensMetadata, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: [KittensBtnPanel] }, ptPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: KittensBtn, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number, shatter: (amt: number) => void }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: [KittensBtnPanel] } }>, space: { getProgram: (name: 'orbitalLaunch') => { val: number } }, spaceTab: KittensTab<{ GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }>, ui: { activeTabId: string }, village: { holdFestival: (amt: number) => void, huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], festivalBtn: KittensBtn<{ x100: { link: HTMLElement } }>, promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
+/** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => { meta: KittensMetadata} }, bldTab: KittensTab<KittensBtnPanel>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: '1000Years') => { researched: boolean } }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: 'heatCompression' | 'heatEfficiency' | 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: KittensBtnPanel }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensMetadata, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: [KittensBtnPanel] }, ptPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: KittensBtn, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number, shatter: (amt: number) => void }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ controller: { doShatterAmt: (model: unknown, amt: number) => void }, model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: [KittensBtnPanel] } }>, space: { getProgram: (name: 'orbitalLaunch') => { val: number } }, spaceTab: KittensTab<{ GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }>, ui: { activeTabId: string }, village: { holdFestival: (amt: number) => void, huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], festivalBtn: KittensBtn<{ x100: { link: HTMLElement } }>, promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
 
 // Kitty Cheat
 /** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
@@ -65,7 +65,7 @@
 
   /** @type {Readonly<{ ALL: Readonly<{ [x in 'BUILD' | 'OPTION' | 'TEXT']: number}>, CATNIP: Readonly<{ [x in 'GATHER' | 'REFINE']: number }> } & { [x in 'ADORE' | 'BCOIN' | 'COMBUST' | 'EXPLORE' | 'FEED' | 'PRAISE' | 'PROMOTE' | 'SACRIFICE']: number }> }} */
   const INTERVAL = {
-    ALL: { BUILD: 750, OPTION: 95, TEXT: 1000 },
+    ALL: { BUILD: 950, OPTION: 95, TEXT: 950 },
     ADORE: 120000,
     BCOIN: 60000,
     CATNIP: { GATHER: 5, REFINE: 1000 },
@@ -233,17 +233,18 @@
   let lastExploreTime = 0;
 
   /**
-   * @description There probably should not be much description on this: it is simply
-   * a function that does nothing.
+   * @description There probably should not be much description on this: it is
+   * simply a function that does nothing.
    *
    * @returns {void}
    **/
   function noop () {}
 
   /**
-   * @description Appends a child element to a parent, an unlike the normal jQuery
-   * .append(...) function, this returns the child, not the parent. This allows us to
-   * streamline usage, where we can append and then immediately assign the result.
+   * @description Appends a child element to a parent, an unlike the normal
+   * jQuery.append(...) function, this returns the child, not the parent. This
+   * allows us to streamline usage, where we can append and then immediately
+   * assign the result.
    *
    * @returns {jQuery}
    **/
@@ -254,9 +255,9 @@
   }
 
   /**
-   * @description Makes a button active or inactive, based on the input. We toggle both
-   * the actual button option and then reflect this state into the UI, by adding or
-   * removing the "active" css class.
+   * @description Makes a button active or inactive, based on the input. We
+   * toggle both the actual button option and then reflect this state into the
+   * UI, by adding or removing the "active" css class.
    *
    * @returns {void}
    **/
@@ -266,8 +267,9 @@
   }
 
   /**
-   * @description Make a div/group either active or inactive, based on the input. We toggle
-   * the actual group option as well as adding or removing the "disabled" css class.
+   * @description Make a div/group either active or inactive, based on the
+   * input. We toggle the actual group option as well as adding or removing the
+   * "disabled" css class.
    *
    * @returns {void}
    **/
@@ -279,12 +281,13 @@
   }
 
   /**
-   * @description Calculates the percentage value from a supplied fraction. It returns
-   * the original fraction, the raw percentage value as well as the text representation
-   * of the percentage (this is capped at 100%).
+   * @description Calculates the percentage value from a supplied fraction. It
+   * returns the original fraction, the raw percentage value as well as the
+   * text representation of the percentage (this is capped at 100%).
    *
-   * In some cases where we have a very high value or something below 0, we return an
-   * invalid (null) value. In our usage we only expect values within this range.
+   * In some cases where we have a very high value or something below 0, we
+   * return an invalid (null) value. In our usage we only expect values within
+   * this range.
    *
    * @returns {{ frac: number, raw: number, text: string } | null}
    **/
@@ -303,9 +306,10 @@
   }
 
   /**
-   * @description Extract the name of the button for the supplied button. In this case it first
-   * deals with those with metadata (stuff that can be built) and additionally, if not available,
-   * tries to extract from the options.
+   * @description Extract the name of the button for the supplied button. In
+   * this case it first deals with those with metadata (stuff that can be
+   * built) and additionally, if not available, tries to extract from the
+   * options.
    *
    * @returns {string?=}
    **/
@@ -316,8 +320,9 @@
   }
 
   /**
-   * @description Performs a click on a button. This could take the form of doing a shift-click
-   * (which executes to the maxiumum possible) if the isAll parameter is specified.
+   * @description Performs a click on a button. This could take the form of
+   * doing a shift-click (which executes to the maxiumum possible) if the isAll
+   * parameter is specified.
    *
    * @returns {boolean}
    **/
@@ -326,9 +331,10 @@
   }
 
   /**
-   * @description Renders a tab that is in the background, if it does exist. For foregound tabs, don't
-   * re-render (this is not needed and worse causes some UI glitches). If the tab is existing and visible,
-   * return the actual tab, otherwise null since any further operations are not valid.
+   * @description Renders a tab that is in the background, if it does exist.
+   * For foregound tabs, don't re-render (this is not needed and worse causes
+   * some UI glitches). If the tab is existing and visible, return the actual
+   * tab, otherwise null since any further operations are not valid.
    *
    * @template {KittensTab} T
    * @returns {T | null | undefined}
@@ -344,22 +350,26 @@
   }
 
   /**
-   * @description Checks the prices as associated with a model. Determines if the prices are uncapped and
-   * whether the current resources are enough to actually spend on the item. Internally it uses the definitions
-   * for the resource values (uncapped, least, by-name, by-type) to do the calculations.
+   * @description Checks the prices as associated with a model. Determines if
+   * the prices are uncapped and whether the current resources are enough to
+   * actually spend on the item. Internally it uses the definitions for the
+   * resource values (uncapped, least, by-name, by-type) to do the
+   * calculations.
    *
-   * @returns {{ isUncapped: boolean, isInvalid: boolean }}
+   * @returns {{ isUncapped: boolean, isInvalid: boolean, firstInvalid?: KittensNamedRes }}
    **/
-  function checkPrices (/** @type {KittensPrice[]} */ prices, /** @type {KittensNamedRes?} */ skip = null) {
+  function checkPrices (/** @type {KittensPrice[]} */ prices, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {KittensNamedRes?} */ skip = null) {
     let isUncapped = true;
+    let isInvalid = false;
 
     for (const p of prices) {
       if (p.name !== skip) {
         const r = game.resPool.get(p.name);
 
-        // If we have a maxValue or there is a per-tick effect (see for instance starcharts), we
-        // assume that we have a building that is capped. Additionally we also bypass resource checks
-        // for those where we want to spend (almost) all - necrocorns is the typical example.
+        // If we have a maxValue or there is a per-tick effect (see for
+        // instance starcharts), we assume that we have a building that is
+        // capped. Additionally we also bypass resource checks for those where
+        // we want to spend (almost) all - necrocorns is the typical example.
         if (r.maxValue || r.perTickCached || RESOURCES.LEAST[r.name]) {
           isUncapped = false;
           break;
@@ -374,23 +384,23 @@
         const m = RESOURCES.LEAST[r.name] || 0;
 
         if (((r.value - p.val) < m) || ((p.val / r.value) > f)) {
-          return { isUncapped, isInvalid: true };
+          invalids[r.name] = isInvalid = true;
         }
       }
     }
 
-    return { isUncapped, isInvalid: false };
+    return { isUncapped, isInvalid };
   }
 
   /** @returns {{ isBuildable: boolean, isUncapped?: boolean }} */
-  function checkBuilding (/** @type {KittensBtn?=} */ btn, /** @type {boolean=} */ withFill = false, /** @type {boolean=} */ withCap = false) {
+  function checkBuilding (/** @type {KittensBtn?=} */ btn, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {boolean=} */ withFill = false, /** @type {boolean=} */ withCap = false) {
     if (!btn?.model?.visible || !btn.model.enabled || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) || (btn.model.metadata?.val && btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata?.effects?.cathPollutionPerTickProd) || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
       return { isBuildable: false };
     }
 
     withFill && fillResources();
 
-    const check = checkPrices(btn.model.prices);
+    const check = checkPrices(btn.model.prices, invalids);
 
     return { isBuildable: !(check.isInvalid || (withCap && check.isUncapped && !cheatMap.control.all.uncap.active)), isUncapped: check.isUncapped };
   }
@@ -436,9 +446,17 @@
     return total;
   }
 
-  // Adapted from Kitten Scientists
-  // https://github.com/kitten-science/kitten-scientists/blob/804104d4ddc8b64e74f1ad5b448e0ca334fa6479/source/ReligionManager.ts#L246-L395
-  /** @returns {{ bestBuilding?: KittensNamedBldgZU | null, btn?: KittensBtn | null, ratio: number, text?: string | null }} */
+  /**
+   * @description Adapted from Kitten Scientists to calculate the best Ziggurat
+   * related building to build based on the returns in terms of unicorns. It has
+   * been modified from the original (with the exact calculation logic) to
+   * remove the unicornPasture application and to condense it somewhat. We also
+   * return additional information to make usage logic easier down the chain.
+   *
+   * @see https://github.com/kitten-science/kitten-scientists/blob/804104d4ddc8b64e74f1ad5b448e0ca334fa6479/source/ReligionManager.ts#L246-L395
+   *
+   * @returns {{ bestBuilding?: KittensNamedBldgZU | null, btn?: KittensBtn | null, ratio: number, text?: string | null }}
+   * */
   function calcZiggurats () {
     const /** @type {KittensNamedBldgZU[]} */ validBuildings = ['unicornTomb', 'ivoryTower', 'ivoryCitadel', 'skyPalace', 'unicornUtopia', 'sunspire'];
     const pastureImpl = game.bld.getBuildingExt('unicornPasture');
@@ -525,7 +543,7 @@
           return false;
         }
 
-        return !checkPrices(btn.model.prices, 'relic').isInvalid;
+        return !checkPrices(btn.model.prices, {}, 'relic').isInvalid;
       })
       .sort((a, b) => /** @type {KittensPrice} */ (a.model.prices[0]).val - /** @type {KittensPrice} */ (b.model.prices[0]).val)
       .map((btn) => {
@@ -582,12 +600,14 @@
   /** @returns {void} */
   function fnCombust () {
     const avail = (game.getEffect('heatMax') - game.time.heat) / 10;
+    const btn = renderBgTab(game.timeTab)?.cfPanel.children[0]?.children[0];
 
     for (const cycle in combustCycles) {
       const years = combustCycles[/** @type {KittensNamedCombustLink} */ (cycle)];
 
-      if ((avail / years) > 1) {
-        return game.time.shatter(years);
+      if (btn && (avail / years) > 1) {
+        btn.controller.doShatterAmt(btn.model, years);
+        return;
       }
     }
   }
@@ -685,12 +705,12 @@
   }
 
   /** @returns {boolean} */
-  function loopChildren (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ children: KittensBtn[] }[]} */ areas, /** @type {(dryRun: boolean, btn: KittensBtn, isAll: boolean) => boolean} */ buttonFn, /** @type {{ allowedIds?: string[], isAll?: boolean, withMeta?: boolean }} */ opts = {}) {
+  function loopChildren (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {{ children: KittensBtn[] }[]} */ areas, /** @type {(dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, btn: KittensBtn, isAll: boolean) => boolean} */ buttonFn, /** @type {{ allowedIds?: string[], isAll?: boolean, withMeta?: boolean }} */ opts = {}) {
     let hasSome = false;
 
     for (const area of areas) {
       for (const btn of area.children) {
-        if ((!opts.withMeta || btn.model.metadata) && (!opts.allowedIds || (btn.id && opts.allowedIds.includes(btn.id))) && buttonFn(dryRun, btn, !!opts.isAll)) {
+        if ((!opts.withMeta || btn.model.metadata) && (!opts.allowedIds || (btn.id && opts.allowedIds.includes(btn.id))) && buttonFn(dryRun, invalids, btn, !!opts.isAll)) {
           if (dryRun) {
             return true;
           }
@@ -704,14 +724,14 @@
   }
 
   /** @returns {void} */
-  function loopTabs (/** @type {{ allowedTabs: string[], completed: string[], dryRun: boolean, stats: CheatStats }} */ { allowedTabs, completed, dryRun, stats }, /** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabIds, /** @type {(dryRun: boolean, completed: string[], tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowedIds = [], /** @type {() => boolean} */ checkFn = () => true) {
+  function loopTabs (/** @type {{ allowedTabs: string[], completed: string[], invalids: { [x in KittensNamedRes]?: boolean }, dryRun: boolean, stats: CheatStats }} */ { allowedTabs, completed, invalids, dryRun, stats }, /** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabIds, /** @type {(dryRun: boolean, completed: string[], invalids: { [x in KittensNamedRes]?: boolean }, tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowedIds = [], /** @type {() => boolean} */ checkFn = () => true) {
     if (checkFn()) {
       for (const tabId of tabIds) {
         if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tabId))) {
           try {
             !dryRun && fillResources();
 
-            if (renderBgTab(game[tabId]) && execFn(dryRun, completed, game[tabId], allowedIds)) {
+            if (renderBgTab(game[tabId]) && execFn(dryRun, completed, invalids, game[tabId], allowedIds)) {
               stats[type] = (stats[type] || []).concat(game[tabId].tabId);
             }
           } catch (e) {
@@ -723,23 +743,23 @@
   }
 
   /** @returns {{ btn?: KittensBtn, isBuildable: boolean, tears?: KittensPrice }} */
-  function getZigInfo (/** @type {string} */ id, /** @type {KittensBtn?} */ inBtn = null) {
+  function getZigInfo (/** @type {string} */ id, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {KittensBtn?} */ inBtn = null) {
     const btn = inBtn || game.religionTab.zgUpgradeButtons.find((b) => b.id === id);
 
     return {
       btn,
-      isBuildable: checkBuilding(btn).isBuildable,
+      isBuildable: checkBuilding(btn, invalids).isBuildable,
       tears: btn?.model.prices.find((p) => p.name === 'tears')
     };
   }
 
   /** @returns {boolean} */
-  function buildZig (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed) {
+  function buildZig (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids) {
     const /** @type {KittensNamedBldgZU[]} */ extras = ['blackPyramid', 'unicornGraveyard', 'unicornNecropolis'];
     let hasSome = false;
 
     for (const name of extras) {
-      const bldg = getZigInfo(name);
+      const bldg = getZigInfo(name, invalids);
 
       if (bldg.isBuildable && (dryRun || clickBtn(bldg.btn, true))) {
         if (dryRun) {
@@ -753,8 +773,8 @@
     let zig = calcZiggurats();
 
     while (zig.bestBuilding && completed.length < 7) {
-      const mark = getZigInfo('marker');
-      const best = getZigInfo(zig.bestBuilding, zig.btn);
+      const mark = getZigInfo('marker', invalids);
+      const best = getZigInfo(zig.bestBuilding, invalids, zig.btn);
       const next = (best.isBuildable && mark.tears) && (mark.isBuildable && best.tears)
         ? mark.tears.val <= best.tears.val
           ? mark
@@ -788,17 +808,17 @@
   }
 
   /** @returns {boolean} */
-  function buildTheologyBtn (/** @type {boolean} */ dryRun, /** @type {ReturnType<calcTheology>[0]} */ best) {
-    return !!best.percent && best.percent.frac >= 1 && checkBuilding(best.btn).isBuildable && (dryRun || clickBtn(best.btn));
+  function buildTheologyBtn (/** @type {boolean} */ dryRun, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {ReturnType<calcTheology>[0]} */ best) {
+    return !!best.percent && best.percent.frac >= 1 && checkBuilding(best.btn, invalids).isBuildable && (dryRun || clickBtn(best.btn));
   }
 
   /** @returns {boolean}  */
-  function buildTheology (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed) {
+  function buildTheology (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids) {
     const avail = calcTheology();
     let hasSome = false;
 
     for (const best of avail) {
-      if (!buildTheologyBtn(dryRun, best)) {
+      if (!buildTheologyBtn(dryRun, invalids, best)) {
         break;
       }
 
@@ -809,12 +829,12 @@
   }
 
   /** @returns {boolean} */
-  function unlockTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
-    return checkBuilding(btn, !dryRun).isBuildable && (dryRun || clickBtn(btn, isAll));
+  function unlockTabBtn (/** @type {boolean} */ dryRun, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
+    return checkBuilding(btn, invalids, !dryRun).isBuildable && (dryRun || clickBtn(btn, isAll));
   }
 
   /** @returns {boolean} */
-  function unlockTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab) {
+  function unlockTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {KittensTab} */ tab) {
     const children =
       /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels?.map((r) => r.embassyButton) ||
       /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons ||
@@ -826,7 +846,7 @@
       /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons
     )?.length);
 
-    let hasSome = loopChildren(dryRun, completed, [{ children }], unlockTabBtn, { isAll });
+    let hasSome = loopChildren(dryRun, completed, invalids, [{ children }], unlockTabBtn, { isAll });
 
     const d = /** @type {KittensGame['diplomacyTab']} */ (tab);
 
@@ -844,28 +864,28 @@
   }
 
   /** @returns {boolean} */
-  function unlockNamedTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {KittensTab} */ tab, /** @type {string[]} */ allowedIds) {
+  function unlockNamedTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids,  /** @type {KittensTab} */ tab, /** @type {string[]} */ allowedIds) {
     const children =
       /** @type {KittensGame['libraryTab']} */ (tab).policyPanel?.children ||
       /** @type {KittensGame['religionTab']} */ (tab).ptPanel?.children[0].children ||
       /** @type {KittensGame['timeTab']} */ (tab).cfPanel?.children[0].children;
 
-    return loopChildren(dryRun, completed, [{ children }], unlockTabBtn, { allowedIds, isAll: false });
+    return loopChildren(dryRun, completed, invalids, [{ children }], unlockTabBtn, { allowedIds, isAll: false });
   }
 
   /** @returns {boolean} */
-  function buyTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn) {
+  function buyTabBtn (/** @type {boolean} */ dryRun, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {KittensBtn} */ btn) {
     if (!dryRun && btn.model.enabled && btn.model.visible && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
       return true;
     }
 
-    const check = checkBuilding(btn, !dryRun, true);
+    const check = checkBuilding(btn, invalids, !dryRun, true);
 
     return check.isBuildable && (dryRun || clickBtn(btn, !check.isUncapped && !!btn.model.metadata && btn.model.metadata.on >= 1));
   }
 
   /** @returns {boolean} */
-  function sellTabBtn (/** @type {boolean} */ dryRun, /** @type {KittensBtn} */ btn) {
+  function sellTabBtn (/** @type {boolean} */ dryRun, /** @type {{ [x in KittensNamedRes]?: boolean }} */ _invalids, /** @type {KittensBtn} */ btn) {
     if (!dryRun && btn.model.metadata?.val && btn.model.metadata.name !== 'chronosphere') {
       btn.controller.sellInternal(btn.model, 0, false);
       return true;
@@ -874,20 +894,20 @@
     return false;
   }
 
-  /** @returns {(dryRun: boolean, completed: string[], tab: KittensTab) => boolean} */
-  function buildTab (/** @type {(dryRun: boolean, btn: KittensBtn) => boolean} */ buttonFn) {
-    return (/** @type {boolean} */ dryRun, /** @type {string[]} */  completed, /** @type {KittensTab} */ tab) => {
+  /** @returns {(dryRun: boolean, completed: string[], invalids: { [x in KittensNamedRes]?: boolean }, tab: KittensTab) => boolean} */
+  function buildTab (/** @type {(dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, btn: KittensBtn) => boolean} */ buttonFn) {
+    return (/** @type {boolean} */ dryRun, /** @type {string[]} */  completed, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {KittensTab} */ tab) => {
       const areas =
         /** @type {KittensGame['spaceTab']} */ (tab).planetPanels ||
         [/** @type {KittensGame['bldTab']} */ (tab)];
 
-      return loopChildren(dryRun, completed, areas, buttonFn, { withMeta: true });
+      return loopChildren(dryRun, completed, invalids, areas, buttonFn, { withMeta: true });
     }
   };
 
   /** @returns {CheatStats} */
   function execBuildAll (/** @type {number} */ delay, /** @type {boolean=} */ dryRun = false) {
-    const /** @type {{ allowedTabs: string[], completed: string[], dryRun: Boolean, stats: CheatStats }} */ info = { allowedTabs: [], completed: [], dryRun, stats: {} };
+    const /** @type {{ allowedTabs: string[], completed: string[], invalids: { [x in KittensNamedRes]?: boolean }, dryRun: Boolean, stats: CheatStats }} */ info = { allowedTabs: [], completed: [], invalids: {}, dryRun, stats: {} };
 
     for (const t in cheatMap.tabs.all) {
       cheatMap.tabs.all[t]?.active && info.allowedTabs.push(cheatMap.tabs.all[t].tab);
@@ -921,6 +941,13 @@
       loopTabs(info, 'time', ['timeTab'], unlockNamedTab, cfbldgs, () =>
         game.getEffect('heatMax') < (40000 * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (1 - (1 - (1 / (1 + game.getEffect('heatCompression'))))))
       );
+
+      for (const _name in cheatMap.crafting.all) {
+        const name = /** @type {keyof CheatMap['crafting']['all']} */ (_name);
+        const opts = /** @type {CheatOpt} */ (cheatMap.crafting.all[name]);
+
+        opts.btn?.[info.invalids[name] ? 'addClass' : 'removeClass']('missing');
+      }
 
       if (delay > 0) {
         info.completed.length && $(game.msg(info.completed.join(', ')).span).addClass('kittycheat-log');
@@ -991,7 +1018,7 @@
    * @returns {void}
    **/
   function setup () {
-    $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; margin-bottom: 2px; margin-right: 2px; padding: 1px 4px; } .kittycheat-btn.active { background: red; color: white; } .kittycheat-btn.danger { background: lightblue; border-style: dashed; } .kittycheat-btn.danger.active { background: darkblue; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { font-family: monospace; opacity: 0.33; } .kittycheat-btn-grp { display: inline-block; } #game .kittycheat-btn-grp.nobr { white-space: nowrap; }</style>');
+    $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; margin-bottom: 2px; margin-right: 2px; padding: 1px 4px; } #game .kittycheat-btn.active { background: darkgreen; color: white; } .kittycheat-btn.danger { background: lightblue; border-style: dashed; } #game .kittycheat-btn.danger.active { background: darkblue; } .kittycheat-btn.missing { background: lightpink; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { font-family: monospace; opacity: 0.33; } .kittycheat-btn-grp { display: inline-block; } #game .kittycheat-btn-grp.nobr { white-space: nowrap; }</style>');
 
     const divAll = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
     const divAct = jqAppend(divAll, $('<div id="kittycheat-act" class="kittycheat-div"></div>'));
