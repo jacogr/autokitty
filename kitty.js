@@ -356,7 +356,7 @@
    * resource values (uncapped, least, by-name, by-type) to do the
    * calculations.
    *
-   * @returns {{ isUncapped: boolean, isInvalid: boolean, firstInvalid?: KittensNamedRes }}
+   * @returns {{ isUncapped: boolean, isInvalid: boolean }}
    **/
   function checkPrices (/** @type {KittensPrice[]} */ prices, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {KittensNamedRes?} */ skip = null) {
     let isUncapped = true;
@@ -393,7 +393,13 @@
     return { isUncapped, isInvalid };
   }
 
-  /** @returns {{ isBuildable: boolean, isUncapped?: boolean }} */
+  /**
+   * @description Checks to see if a building is able to be constructed. It
+   * checks the visibility, the build limits, polution control and the actual
+   * prices and availability of resources.
+   *
+   * @returns {{ isBuildable: boolean, isUncapped?: boolean }}
+   **/
   function checkBuilding (/** @type {KittensBtn?=} */ btn, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {boolean=} */ withFill = false, /** @type {boolean=} */ withCap = false) {
     if (!btn?.model?.visible || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) || (btn.model.metadata?.val && btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata?.effects?.cathPollutionPerTickProd) || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
       return { isBuildable: false };
@@ -406,7 +412,14 @@
     return { isBuildable: btn.model.enabled && !(check.isInvalid || (withCap && check.isUncapped && !cheatMap.control.all.uncap.active)), isUncapped: check.isUncapped };
   }
 
-  /** @returns {void} */
+  /**
+   * @description A major cheat. Ignore all production and max resources with
+   * limits, e.g. catnip. This allow usage in construction and well as crafting
+   * majorly shortcutting the actual game-play. Additionally it also allows for
+   * bypassing the caps with the max10 option.
+   *
+   * @returns {void}
+   **/
   function fillResources () {
     if (cheatMap.control.all.max.active || cheatMap.control.all.max10.active) {
       for (const r of game.resPool.resources) {
