@@ -385,6 +385,7 @@
 
         if (((r.value - p.val) < m) || ((p.val / r.value) > f)) {
           isInvalid = invalids[r.name] = true;
+          break;
         }
       }
     }
