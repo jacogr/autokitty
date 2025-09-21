@@ -28,18 +28,18 @@
 /** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => { meta: KittensMetadata} }, bldTab: KittensTab<KittensBtnPanel>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: '1000Years') => { researched: boolean } }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: 'heatCompression' | 'heatEfficiency' | 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: KittensBtnPanel }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensMetadata, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: [KittensBtnPanel] }, ptPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: KittensBtn<{ model: { allLink: { handler: (...args: unknown[]) => void } } }>, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number, shatter: (amt: number) => void }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ controller: { doShatterAmt: (model: unknown, amt: number) => void }, model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: [KittensBtnPanel] } }>, space: { getProgram: (name: 'orbitalLaunch') => { val: number } }, spaceTab: KittensTab<{ GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }>, ui: { activeTabId: string }, village: { holdFestival: (amt: number) => void, huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], festivalBtn: KittensBtn<{ x100: { link: HTMLElement } }>, promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
 
 // Kitty Cheat
-/** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
+/** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
 /** @template {{ [x: string]: CheatOpt }} T @template {{}} [E={}] @typedef {{ active?: boolean, all: T, div?: jQuery, noExec?: boolean } & E} CheatMapEntry */
-/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: string, name: string, opts: CheatOpt) => void }>, 'btn' | 'group'> }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'pollute' | 'uncap' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end'> }> }} CheatMap */
+/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: string, name: string, opts: CheatOpt) => void }>, 'btn' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'pollute' | 'uncap' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
 /** @typedef {{ [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact']?: string[] }} CheatStats */
 
 // Window
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
-  /** @type {Readonly<{ CRAFT: Readonly<{ MAX: number, MIN: number }> }> & Readonly<{ [x in 'UNCAPPED']: number }>} */
+  /** @type {Readonly<{ CRAFT: Readonly<{ MAX: number, MIN: number, MISS: number }> }> & Readonly<{ [x in 'UNCAPPED']: number }>} */
   const SPEND = {
-    CRAFT: { MAX: 0.925, MIN: 0.0005 }, // max of 92.5% for full, 0.05% for trickle
+    CRAFT: { MAX: 0.925, MIN: 0.00075, MISS: 0.075 }, // max of 92.5% for full, 0.075% for trickle, 7.5% for missing
     UNCAPPED: 0.1, // 10% spent on uncapped
   };
 
@@ -383,8 +383,9 @@
         const f = RESOURCES.NAME[r.name] || RESOURCES.TYPE[r.type] || (isUncapped && SPEND.UNCAPPED) || 1;
         const m = RESOURCES.LEAST[r.name] || 0;
 
-        if (((r.value - p.val) < m) || ((p.val / r.value) > f)) {
-          invalids[r.name] = isInvalid = true;
+        if ((r.value < p.val) || ((r.value - p.val) < m) || ((p.val / r.value) > f)) {
+          isInvalid = true;
+          invalids[r.name] = true;
         }
       }
     }
@@ -394,7 +395,7 @@
 
   /** @returns {{ isBuildable: boolean, isUncapped?: boolean }} */
   function checkBuilding (/** @type {KittensBtn?=} */ btn, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {boolean=} */ withFill = false, /** @type {boolean=} */ withCap = false) {
-    if (!btn?.model?.visible || !btn.model.enabled || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) || (btn.model.metadata?.val && btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata?.effects?.cathPollutionPerTickProd) || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
+    if (!btn?.model?.visible || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) || (btn.model.metadata?.val && btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata?.effects?.cathPollutionPerTickProd) || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
       return { isBuildable: false };
     }
 
@@ -402,7 +403,7 @@
 
     const check = checkPrices(btn.model.prices, invalids);
 
-    return { isBuildable: !(check.isInvalid || (withCap && check.isUncapped && !cheatMap.control.all.uncap.active)), isUncapped: check.isUncapped };
+    return { isBuildable: btn.model.enabled && !(check.isInvalid || (withCap && check.isUncapped && !cheatMap.control.all.uncap.active)), isUncapped: check.isUncapped };
   }
 
   /** @returns {void} */
@@ -657,11 +658,11 @@
   }
 
   /** @returns {void} */
-  function execCraft (/** @type {KittensNamedResCraft} */ name, /** @type {boolean} */ isMax) {
+  function execCraft (/** @type {KittensNamedResCraft} */ name, /** @type {number} */ frac) {
     const r = game.resPool.get(name);
 
     if (r.unlocked && r.value && !r.isHidden) {
-      const val = Math.ceil(game.workshop.getCraftAllCount(name) * (isMax ? SPEND.CRAFT.MAX : SPEND.CRAFT.MIN));
+      const val = Math.ceil(game.workshop.getCraftAllCount(name) * frac);
 
       if (val > 1 && val < Number.MAX_VALUE) {
         game.workshop.craft(name, val);
@@ -678,7 +679,7 @@
         if (group === 'actions') {
           /** @type {Required<CheatOpt>} */ (opts).fn(group, name, opts);
         } else if (group === 'crafting') {
-          execCraft(/** @type {KittensNamedResCraft} */ (name), true);
+          execCraft(/** @type {KittensNamedResCraft} */ (name), SPEND.CRAFT.MAX);
         } else if (group === 'trading') {
           execTrade(/** @type {KittensDiplomacyRace['name']} */ (name));
         }
@@ -919,9 +920,10 @@
 
       for (const _name in cheatMap.crafting.all) {
         const name = /** @type {KittensNamedResCraft} */ (_name);
+        const opt = cheatMap.crafting.all[name];
 
-        if (!cheatMap.crafting.all[name]?.noMinCraft) {
-          execCraft(name, false);
+        if (opt && !opt.noMinCraft) {
+          execCraft(name, opt.missing ? SPEND.CRAFT.MISS : SPEND.CRAFT.MIN);
         }
       }
     }
@@ -947,6 +949,7 @@
         const name = /** @type {keyof CheatMap['crafting']['all']} */ (_name);
         const opts = /** @type {CheatOpt} */ (cheatMap.crafting.all[name]);
 
+        opts.missing = !!info.invalids[name];
         opts.btn?.[info.invalids[name] ? 'addClass' : 'removeClass']('missing');
       }
 
