@@ -383,9 +383,8 @@
         const f = RESOURCES.NAME[r.name] || RESOURCES.TYPE[r.type] || (isUncapped && SPEND.UNCAPPED) || 1;
         const m = RESOURCES.LEAST[r.name] || 0;
 
-        if ((r.value < p.val) || ((r.value - p.val) < m) || ((p.val / r.value) > f)) {
-          isInvalid = true;
-          invalids[r.name] = true;
+        if (((r.value - p.val) < m) || ((p.val / r.value) > f)) {
+          isInvalid = invalids[r.name] = true;
         }
       }
     }
@@ -961,9 +960,12 @@
       for (const _name in cheatMap.crafting.all) {
         const name = /** @type {keyof CheatMap['crafting']['all']} */ (_name);
         const opts = /** @type {CheatOpt} */ (cheatMap.crafting.all[name]);
+        const missing = !!info.invalids[name];
 
-        opts.missing = !!info.invalids[name];
-        opts.btn?.[info.invalids[name] ? 'addClass' : 'removeClass']('missing');
+        if (missing !== opts.missing) {
+          opts.missing = missing;
+          opts.btn?.[info.invalids[name] ? 'addClass' : 'removeClass']('missing');
+        }
       }
 
       if (delay > 0) {
