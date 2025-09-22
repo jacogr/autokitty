@@ -802,8 +802,8 @@
 
   /**
    * @description Loop through a set of tabs and execute the supplied function
-   * on each of the tabs. On success, adds the tab id to a list of tabs
-   * with actions.
+   * on each of the tabs. On success, adds the tab id to a list of tabs with
+   * actions.
    *
    * @returns {void}
    **/
@@ -841,7 +841,15 @@
     };
   }
 
-  /** @returns {boolean} */
+  /**
+   * @description Builds Ziggurat related buildings. This is made of 2 parts:
+   * Pyramid, Graveyard & Necropolis, which are independent of unicorn
+   * generation. (And not included in calculations) The second part are those
+   * affecting production and these are interleved with corruption (Marker)
+   * builds.
+   *
+   * @returns {boolean}
+   **/
   function buildZig (/** @type {CheatCtrl} */ ctrl) {
     const /** @type {KittensNamedBldgZU[]} */ extras = ['blackPyramid', 'unicornGraveyard', 'unicornNecropolis'];
     let hasSome = false;
@@ -896,30 +904,75 @@
     return hasSome;
   }
 
-  /** @returns {boolean} */
-  function buildTheologyBtn (/** @type {CheatCtrl} */ ctrl, /** @type {ReturnType<calcTheology>[0]} */ best) {
-    return !!best.percent && best.percent.frac >= 1 && checkBuilding(best.btn, ctrl.invalids).isBuildable && (ctrl.dryRun || clickBtn(best.btn));
+  /**
+   * @description Buys buildings, either as singles or as blocks of multiples.
+   * Also allows for upgrades on buildings and checking for the existence of
+   * metadata (real buildings, no metadata indicates non-physical items)
+   *
+   * @returns {boolean}
+   **/
+  function buyTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
+    if (!ctrl.dryRun && btn.model.enabled && btn.model.visible && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
+      return true;
+    }
+
+    const check = checkBuilding(btn, ctrl.invalids, { withCap: true, withFill: !ctrl.dryRun });
+
+    return check.isBuildable && (ctrl.dryRun || clickBtn(btn, !check.isUncapped && !!btn.model.metadata && btn.model.metadata.on >= 1));
   }
 
-  /** @returns {boolean}  */
+  /**
+   * @description The reverse of the buy operation. In this case it gets rid of
+   * all buildings where we have a number >= 0 - apart from Chronospheres which
+   * are used to carry over resources between resets. It is assumed we use this
+   * right before a reset.
+   *
+   * @returns {boolean}
+   **/
+  function sellTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
+    if (!ctrl.dryRun && btn.model.metadata?.val && btn.model.metadata.name !== 'chronosphere') {
+      btn.controller.sellInternal(btn.model, 0, false);
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * @description This is a simplied version of the buyTabBtn that always
+   * does limited checks and operates on a (mostly) single button generally
+   * used for unlocks. It is re-used for workshop unlocks, named buttons as
+   * well as in theology.
+   *
+   * @returns {boolean} */
+  function unlockTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
+    return checkBuilding(btn, ctrl.invalids, { withFill: !ctrl.dryRun }).isBuildable && (ctrl.dryRun || clickBtn(btn, isAll));
+  }
+
+  /**
+   * @description Builds crypto theology structures based on the list generated
+   * by the cryto calculation. For each ensure that we ahve >100% costs covered
+   * breaking out for the first one not applicable (these are sorted)
+   *
+   * @returns {boolean}
+   **/
   function buildTheology (/** @type {CheatCtrl} */ ctrl) {
-    const avail = calcTheology();
+    const all = calcTheology();
     let hasSome = false;
 
-    for (const best of avail) {
-      if (!buildTheologyBtn(ctrl, best)) {
+    for (const best of all) {
+      if (best.percent && best.percent.frac >= 1 && unlockTabBtn(ctrl, best.btn, false)) {
+        if (ctrl.dryRun) {
+          return true;
+        }
+
+        hasSome ||= pushBtnName(ctrl.completed, best.btn);
+      } else {
         break;
       }
-
-      hasSome ||= pushBtnName(ctrl.completed, best.btn);
     }
 
     return hasSome;
-  }
-
-  /** @returns {boolean} */
-  function unlockTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
-    return checkBuilding(btn, ctrl.invalids, { withFill: !ctrl.dryRun }).isBuildable && (ctrl.dryRun || clickBtn(btn, isAll));
   }
 
   /** @returns {boolean} */
@@ -962,27 +1015,6 @@
     return loopChildren(ctrl, [{ children }], unlockTabBtn, { allowedIds, isAll: false });
   }
 
-  /** @returns {boolean} */
-  function buyTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
-    if (!ctrl.dryRun && btn.model.enabled && btn.model.visible && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
-      return true;
-    }
-
-    const check = checkBuilding(btn, ctrl.invalids, { withCap: true, withFill: !ctrl.dryRun });
-
-    return check.isBuildable && (ctrl.dryRun || clickBtn(btn, !check.isUncapped && !!btn.model.metadata && btn.model.metadata.on >= 1));
-  }
-
-  /** @returns {boolean} */
-  function sellTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
-    if (!ctrl.dryRun && btn.model.metadata?.val && btn.model.metadata.name !== 'chronosphere') {
-      btn.controller.sellInternal(btn.model, 0, false);
-      return true;
-    }
-
-    return false;
-  }
-
   /** @returns {(ctrl: CheatCtrl, tab: KittensTab) => boolean} */
   function buildTab (/** @type {(ctrl: CheatCtrl, btn: KittensBtn) => boolean} */ buttonFn) {
     return (/** @type {CheatCtrl} */ ctrl, /** @type {KittensTab} */ tab) => {
@@ -1013,10 +1045,13 @@
           const craftFrac = SPEND.CRAFT[opt.missing ? 'MISSING' : 'TRICKLE'];
 
           if (opt.missing) {
-            for (const p of game.workshop.getCraft(name).prices) {
-              const pname = /** @type {KittensNamedResCraft} */ (p.name);
+            const craft = game.workshop.getCraft(name);
 
-              if (game.resPool.get(pname).craftable) {
+            for (const p of craft.prices) {
+              const pname = /** @type {KittensNamedResCraft} */ (p.name);
+              const r = game.resPool.get(pname);
+
+              if (r.craftable) {
                 const popt = cheatMap.crafting.all[pname];
 
                 if (popt && !popt.noMinCraft && !popt.active && !popt.missing) {
