@@ -37,10 +37,17 @@
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
-  /** @type {Readonly<{ [x in 'CRAFT' | 'UNCAPPED']: number }>} */
+  /**
+   * Resource spends for both crafting an uncapped buildings. These are quite
+   * sensitive, for instance upping missing to around 12.5% has an adverse
+   * effect of exhausting slabs in some case. For trickle the same could happen
+   * with overspend in some areas and under elsewhere
+   *
+   * @type {Readonly<{ UNCAPPED: number, CRAFT: Readonly<{ [x in 'MAXIMUM' | 'MISSING' | 'TRICKLE']: number }> }>}
+   **/
   const SPEND = {
-    CRAFT: 0.925, // max of 92.5% for full, 0.05% for trickle, 9.25% for missing
-    UNCAPPED: 0.1, // 10% spent on uncapped
+    CRAFT: { MAXIMUM: 0.925, MISSING: 0.0925, TRICKLE: 0.00925 },
+    UNCAPPED: 0.1,
   };
 
   /** @type {Readonly<{ LEAST: Readonly<{ [x in KittensNamedRes]?: number }>, NAME: Readonly<{ [x in KittensNamedRes]?: number }>, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>} */
@@ -671,11 +678,11 @@
   }
 
   /** @returns {void} */
-  function execCraft (/** @type {KittensNamedResCraft} */ name, /** @type {number} */ div = 1) {
+  function execCraft (/** @type {KittensNamedResCraft} */ name, /** @type {number} */ frac) {
     const r = game.resPool.get(name);
 
     if (r.unlocked && r.value && !r.isHidden) {
-      const val = Math.ceil(game.workshop.getCraftAllCount(name) / div);
+      const val = Math.ceil(game.workshop.getCraftAllCount(name) * frac);
 
       if (val > 1 && val < Number.MAX_VALUE) {
         game.workshop.craft(name, val);
@@ -692,7 +699,7 @@
         if (group === 'actions') {
           /** @type {Required<CheatOpt>} */ (opts).fn(group, name, opts);
         } else if (group === 'crafting') {
-          execCraft(/** @type {KittensNamedResCraft} */ (name));
+          execCraft(/** @type {KittensNamedResCraft} */ (name), SPEND.CRAFT.MAXIMUM);
         } else if (group === 'trading') {
           execTrade(/** @type {KittensDiplomacyRace['name']} */ (name));
         }
@@ -934,7 +941,7 @@
       for (const _name in cheatMap.crafting.all) {
         const name = /** @type {KittensNamedResCraft} */ (_name);
         const opt = cheatMap.crafting.all[name];
-        const craftDiv = opt?.missing ? 10 : 100;
+        const craftFrac = SPEND.CRAFT[opt?.missing ? 'MISSING' : 'TRICKLE'];
 
         if (opt && !opt.noMinCraft && !opt.active) {
           if (opt.missing) {
@@ -945,13 +952,13 @@
                 const popt = cheatMap.crafting.all[pname];
 
                 if (popt && !popt.noMinCraft && !popt.active && !popt.missing) {
-                  execCraft(pname, craftDiv);
+                  execCraft(pname, craftFrac);
                 }
               }
             }
           }
 
-          execCraft(name, craftDiv);
+          execCraft(name, craftFrac);
         }
       }
     }
