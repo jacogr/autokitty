@@ -392,7 +392,6 @@
 
         if (((r.value - p.val) < m) || ((p.val / r.value) > f)) {
           isInvalid = invalids[r.name] = true;
-          break;
         }
       }
     }
@@ -441,7 +440,11 @@
     }
   }
 
-  /** @returns {KittensDiplomacyRacePanelLeviathans?} */
+  /**
+   * @description Find the specific race panel for Leviathans.
+   *
+   * @returns {KittensDiplomacyRacePanelLeviathans?}
+   **/
   function findLeviathans () {
     for (const p of game.diplomacyTab.racePanels) {
       if (p.race.name === 'leviathans') {
@@ -452,8 +455,13 @@
     return null;
   }
 
-  /** @returns {number} */
-  function calcZigguratsPrices (/** @type {KittensPrice[]} */ prices, /** @type {number} */ zigguratRatio) {
+  /**
+   * @description Calculate the price of a building in terms of unicorns, both
+   * taking "raw" unicorns into account as well as "converted" tears.
+   *
+   * @returns {number}
+   **/
+  function calcUnicornPrice (/** @type {KittensPrice[]} */ prices, /** @type {number} */ zigguratRatio) {
     let total = 0;
 
     for (const p of prices) {
@@ -513,7 +521,7 @@
       const buildingImpl = game.religionTab.zgUpgradeButtons[i];
 
       if (building && buildingImpl?.model.metadata?.unlocked) {
-        const unicornPrice = calcZigguratsPrices(buildingImpl.model.prices, zigguratRatio);
+        const unicornPrice = calcUnicornPrice(buildingImpl.model.prices, zigguratRatio);
         const buildingInfo = game.religion.getZU(building);
         const religionBonus = religionRatio + (buildingInfo.effects?.unicornsRatioReligion || 0);
         const riftChance = game.getEffect('riftChance') + (buildingInfo.effects?.riftChance || 0);
@@ -534,7 +542,13 @@
     return { bestBuilding, btn: bestBtn, ratio: zigguratRatio, text: getBtnName(bestBtn, toPercent((((game.resPool.get('tears').value * 2500) / zigguratRatio) + game.resPool.get('unicorns').value) / bestPrice)?.text) };
   }
 
-  /** @returns {{ action: 'buy' | 'hold' | 'sell', price: number, text: string }} */
+  /**
+   * @description Get the price of blackcoin and calculate the action to take
+   * based on this price. We either want to buy (when the price is low), hold
+   * or sell (when the price is close to 1100, the market top)
+   *
+   * @returns {{ action: 'buy' | 'hold' | 'sell', price: number, text: string }}
+   **/
   function calcBcoin () {
     const price = game.calendar.cryptoPrice;
     const action =
@@ -551,7 +565,12 @@
     };
   }
 
-  /** @returns {ReturnType<toPercent>} */
+  /**
+   * @description Calculate the percentage value of trancending, i.e. how much
+   * we have spent in faith and how much we still need to reach the next tier
+   *
+   * @returns {ReturnType<toPercent>}
+   **/
   function calcTranscend () {
     return toPercent(game.religion.faithRatio / game.religion._getTranscendNextPrice());
   }
@@ -1034,21 +1053,21 @@
     setTimeout(() => execOpts(delay), delay);
   }
 
-  /** @returns {void} */
-  function clickOptBtn (/** @type {keyof CheatMap} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
+  /**
+   * @description Perform a click on a cheat option button. For each it would
+   * do the required activations (make active or inactive) and this state will
+   * be used during our execution timer (in execOpts) to do the actual logic.
+   *
+   * @returns {void}
+   **/
+  function clickOptBtn (/** @type {keyof CheatMap} */ group, /** @type {string} */ _name, /** @type {CheatOpt} */ opts) {
     activateBtn(opts, !opts.active);
 
-    if (cheatMap[group].active) {
-      if (opts.group) {
-        activateGroup(opts.group, opts.active);
-      } else if (opts.active) {
-        if (opts.excl) {
-          for (const e of opts.excl) {
-            activateBtn(/** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (e)]), false);
-          }
-        }
-
-        execOpt(group, name, opts);
+    if (opts.group) {
+      activateGroup(opts.group, opts.active);
+    } else if (opts.active && opts.excl) {
+      for (const e of opts.excl) {
+        activateBtn(/** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (e)]), false);
       }
     }
   }
