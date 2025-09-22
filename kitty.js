@@ -28,7 +28,7 @@
 /** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => { meta: KittensMetadata} }, bldTab: KittensTab<KittensBtnPanel>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: '1000Years') => { researched: boolean } }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: 'heatCompression' | 'heatEfficiency' | 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: KittensBtnPanel }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensMetadata, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: [KittensBtnPanel] }, ptPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: KittensBtn<{ model: { allLink: { handler: (...args: unknown[]) => void } } }>, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number, shatter: (amt: number) => void }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ controller: { doShatterAmt: (model: unknown, amt: number) => void }, model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: [KittensBtnPanel] } }>, space: { getProgram: (name: 'orbitalLaunch') => { val: number } }, spaceTab: KittensTab<{ GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }>, ui: { activeTabId: string }, village: { holdFestival: (amt: number) => void, huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], festivalBtn: KittensBtn<{ x100: { link: HTMLElement } }>, promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
 
 // Kitty Cheat
-/** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: 'actions' | 'crafting' | 'trading', missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
+/** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: string, name: string, opts: CheatOpt) => void, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
 /** @template {{ [x: string]: CheatOpt }} T @template {{}} [E={}] @typedef {{ active?: boolean, all: T, div?: jQuery, noExec?: boolean } & E} CheatMapEntry */
 /** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: string, name: string, opts: CheatOpt) => void }>, 'btn' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'pollute' | 'uncap' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
 /** @typedef {{ [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact']?: string[] }} CheatStats */
@@ -264,13 +264,24 @@
   /**
    * @description Makes a button active or inactive, based on the input. We
    * toggle both the actual button option and then reflect this state into the
-   * UI, by adding or removing the "active" css class.
+   * UI, by adding/removing the "active" css class. Additionally we handle any
+   * exclusions and toggle groups, if specified.
    *
    * @returns {void}
    **/
-  function activateBtn (/** @type {CheatOpt} */ opts, /** @type {boolean=} */ active = false) {
+  function activateBtn (/** @type {keyof CheatMap} */ group, /** @type {string} */ _name, /** @type {CheatOpt} */ opts, /** @type {boolean=} */ active = false) {
     opts.active = active;
     opts.btn[active ? 'addClass' : 'removeClass']('active');
+
+    if (active && opts.excl) {
+      for (const excl of opts.excl) {
+        activateBtn(group, excl, /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (excl)]), false);
+      }
+    }
+
+    if (opts.group) {
+      activateGroup(opts.group, active);
+    }
   }
 
   /**
@@ -575,7 +586,12 @@
     return toPercent(game.religion.faithRatio / game.religion._getTranscendNextPrice());
   }
 
-  /** @returns {{ btn: KittensBtn, percent: ReturnType<toPercent>, text?: string | null }[]} */
+  /**
+   * @description Calculate the list of best buildings for Cryptotheology.
+   * These are sorted by the cheapest price in terms of relics.
+   *
+   * @returns {{ btn: KittensBtn, percent: ReturnType<toPercent>, text?: string | null }[]}
+   **/
   function calcTheology () {
     return game.religionTab.ctPanel.children[0].children
       .filter((btn) => {
@@ -653,11 +669,11 @@
   }
 
   /** @returns {void} */
-  function fnCombust40k (/** @type {string} */ _group, /** @type {string} */ _name, /** @type {CheatOpt} */ opts) {
+  function fnCombust40k (/** @type {string} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
     if (game.calendar.year < 40000) {
       fnCombust();
     } else if (opts.active) {
-      activateBtn(opts, false);
+      activateBtn(/** @type {keyof CheatMap} */ (group), name, opts, false);
 
       // Start a festival with a 100 year duration (aligning with the x100 button). During festivals
       // the kittens are happier and (most importantly) they arrive faster, i.e. we have shorter runs.
@@ -1054,25 +1070,6 @@
   }
 
   /**
-   * @description Perform a click on a cheat option button. For each it would
-   * do the required activations (make active or inactive) and this state will
-   * be used during our execution timer (in execOpts) to do the actual logic.
-   *
-   * @returns {void}
-   **/
-  function clickOptBtn (/** @type {keyof CheatMap} */ group, /** @type {string} */ _name, /** @type {CheatOpt} */ opts) {
-    activateBtn(opts, !opts.active);
-
-    if (opts.group) {
-      activateGroup(opts.group, opts.active);
-    } else if (opts.active && opts.excl) {
-      for (const e of opts.excl) {
-        activateBtn(/** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (e)]), false);
-      }
-    }
-  }
-
-  /**
    * @description Do the setup for the cheat controls and apply some game configuration. (Mostly around logging
    * and the actual options available)
    *
@@ -1104,10 +1101,10 @@
 
         if (!opts.noShow) {
           opts.btn = jqAppend(divBtnGrp, $(`<button class="kittycheat-btn ${opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : ''} ${opts.danger ? 'danger' : ''}">${name}</button>`).click(() => {
-            clickOptBtn(group, name, opts);
+            activateBtn(group, name, opts, !opts.active);
           }));
 
-          activateBtn(opts, opts.active);
+          activateBtn(group, name, opts, opts.active);
 
           if (opts.delay) {
             execOptTimer(group, name, opts);
