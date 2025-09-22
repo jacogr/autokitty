@@ -37,9 +37,9 @@
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
-  /** @type {Readonly<{ CRAFT: Readonly<{ MAX: number, MIN: number, MISS: number }> }> & Readonly<{ [x in 'UNCAPPED']: number }>} */
+  /** @type {Readonly<{ [x in 'CRAFT' | 'UNCAPPED']: number }>} */
   const SPEND = {
-    CRAFT: { MAX: 0.925, MIN: 0.0005, MISS: 0.0925 }, // max of 92.5% for full, 0.05% for trickle, 9.25% for missing
+    CRAFT: 0.925, // max of 92.5% for full, 0.05% for trickle, 9.25% for missing
     UNCAPPED: 0.1, // 10% spent on uncapped
   };
 
@@ -671,11 +671,11 @@
   }
 
   /** @returns {void} */
-  function execCraft (/** @type {KittensNamedResCraft} */ name, /** @type {number} */ frac) {
+  function execCraft (/** @type {KittensNamedResCraft} */ name, /** @type {number} */ div = 1) {
     const r = game.resPool.get(name);
 
     if (r.unlocked && r.value && !r.isHidden) {
-      const val = Math.ceil(game.workshop.getCraftAllCount(name) * frac);
+      const val = Math.ceil(game.workshop.getCraftAllCount(name) / div);
 
       if (val > 1 && val < Number.MAX_VALUE) {
         game.workshop.craft(name, val);
@@ -692,7 +692,7 @@
         if (group === 'actions') {
           /** @type {Required<CheatOpt>} */ (opts).fn(group, name, opts);
         } else if (group === 'crafting') {
-          execCraft(/** @type {KittensNamedResCraft} */ (name), SPEND.CRAFT.MAX);
+          execCraft(/** @type {KittensNamedResCraft} */ (name));
         } else if (group === 'trading') {
           execTrade(/** @type {KittensDiplomacyRace['name']} */ (name));
         }
@@ -934,26 +934,24 @@
       for (const _name in cheatMap.crafting.all) {
         const name = /** @type {KittensNamedResCraft} */ (_name);
         const opt = cheatMap.crafting.all[name];
+        const craftDiv = opt?.missing ? 5 : 100;
 
         if (opt && !opt.noMinCraft && !opt.active) {
           if (opt.missing) {
-            const craft = game.workshop.getCraft(name);
-
-            for (const p of craft.prices) {
+            for (const p of game.workshop.getCraft(name).prices) {
               const pname = /** @type {KittensNamedResCraft} */ (p.name);
-              const r = game.resPool.get(pname);
 
-              if (r.craftable) {
-                const popt = cheatMap.crafting.all[pname] || null;
+              if (game.resPool.get(pname).craftable) {
+                const popt = cheatMap.crafting.all[pname];
 
                 if (popt && !popt.noMinCraft && !popt.active && !popt.missing) {
-                  execCraft(pname, SPEND.CRAFT.MISS);
+                  execCraft(pname, craftDiv);
                 }
               }
             }
           }
 
-          execCraft(name, opt.missing ? SPEND.CRAFT.MISS : SPEND.CRAFT.MIN);
+          execCraft(name, craftDiv);
         }
       }
     }
