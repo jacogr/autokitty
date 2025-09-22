@@ -28,10 +28,10 @@
 /** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => { meta: KittensMetadata} }, bldTab: KittensTab<KittensBtnPanel>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: '1000Years') => { researched: boolean } }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: 'heatCompression' | 'heatEfficiency' | 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: KittensBtnPanel }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensMetadata, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: [KittensBtnPanel] }, ptPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: KittensBtn<{ model: { allLink: { handler: (...args: unknown[]) => void } } }>, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number, shatter: (amt: number) => void }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ controller: { doShatterAmt: (model: unknown, amt: number) => void }, model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: [KittensBtnPanel] } }>, space: { getProgram: (name: 'orbitalLaunch') => { val: number } }, spaceTab: KittensTab<{ GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }>, ui: { activeTabId: string }, village: { holdFestival: (amt: number) => void, huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], festivalBtn: KittensBtn<{ x100: { link: HTMLElement } }>, promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
 
 // Kitty Cheat
-/** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => void, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
+/** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => unknown, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
 /** @template {{ [x: string]: CheatOpt }} T @template {{}} [E={}] @typedef {{ active?: boolean, all: T, div?: jQuery, noExec?: boolean } & E} CheatMapEntry */
 /** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: string, name: string, opts: CheatOpt) => void }>, 'btn' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'pollute' | 'uncap' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
-/** @typedef {{ [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact']?: string[] }} CheatStats */
+/** @typedef {{ allowedTabs: string[], completed: string[], dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, stats: { [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact']?: string[] } }} CheatCtrl */
 
 // Window
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
@@ -145,47 +145,47 @@
     actions: {
       all: {
         catnip: {
-          fn: fnGather,
+          fn: () => clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model.name === 'Gather catnip')),
           active: true,
           delay: INTERVAL.CATNIP.GATHER,
           noFill: true
         },
         refine: {
-          fn: fnRefine,
+          fn: () => clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model.name === 'Refine catnip')),
           active: true,
           delay: INTERVAL.CATNIP.REFINE,
           end: true,
           noFill: true
         },
         observe: {
-          fn: fnObserve,
+          fn: () => $('input#observeBtn').click(),
           active: true,
           noFill: true
         },
         hunt: {
-          fn: fnHunt,
+          fn: () => game.village.huntAll(),
           active: true
         },
         promote: {
-          fn: fnPromote,
+          fn: () => clickBtn(renderBgTab(game.villageTab)?.promoteKittensBtn),
           active: true,
           delay: INTERVAL.PROMOTE,
           noFill: true
         },
         loadout: {
-          fn: fnLoadout,
+          fn: () => clickBtn(renderBgTab(game.villageTab)?.buttons.find((b) => b?.opts?.loadout?.pinned)),
           active: true,
           delay: INTERVAL.PROMOTE,
           end: true,
           noFill: true
         },
         praise: {
-          fn: fnPraise,
+          fn: () => game.religion.praise(),
           active: true,
           delay: INTERVAL.PRAISE
         },
         adore: {
-          fn: fnAdore,
+          fn: () => game.religion.resetFaith(1.01, false),
           active: true,
           delay: INTERVAL.ADORE,
           end: true
@@ -430,16 +430,16 @@
    *
    * @returns {{ isBuildable: boolean, isUncapped?: boolean }}
    **/
-  function checkBuilding (/** @type {KittensBtn?=} */ btn, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {boolean=} */ withFill = false, /** @type {boolean=} */ withCap = false) {
+  function checkBuilding (/** @type {KittensBtn?=} */ btn, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {{ withCap?: boolean, withFill?: boolean }} */ opts = {}) {
     if (!btn?.model?.visible || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) || (btn.model.metadata?.val && btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata?.effects?.cathPollutionPerTickProd) || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
       return { isBuildable: false };
     }
 
-    withFill && fillResources();
+    opts.withFill && fillResources();
 
     const check = checkPrices(btn.model.prices, invalids);
 
-    return { isBuildable: btn.model.enabled && !(check.isInvalid || (withCap && check.isUncapped && !cheatMap.control.all.uncap.active)), isUncapped: check.isUncapped };
+    return { isBuildable: btn.model.enabled && !(check.isInvalid || (opts.withCap && check.isUncapped && !cheatMap.control.all.uncap.active)), isUncapped: check.isUncapped };
   }
 
   /**
@@ -626,47 +626,13 @@
       });
   }
 
-  /** @returns {void} */
-  function fnAdore () {
-    game.religion.resetFaith(1.01, false);
-  }
-
-  /** @returns {void} */
-  function fnPraise () {
-    game.religion.praise();
-  }
-
-  /** @returns {void} */
-  function fnPromote () {
-    clickBtn(renderBgTab(game.villageTab)?.promoteKittensBtn);
-  }
-
-  /** @returns {void} */
-  function fnLoadout () {
-    clickBtn(renderBgTab(game.villageTab)?.buttons.find((b) => b?.opts?.loadout?.pinned));
-  }
-
-  /** @returns {void} */
-  function fnGather () {
-    clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model.name === 'Gather catnip'));
-  }
-
-  /** @returns {void} */
-  function fnRefine () {
-    clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model.name === 'Refine catnip'));
-  }
-
-  /** @returns {void} */
-  function fnObserve () {
-    $('input#observeBtn').click();
-  }
-
-  /** @returns {void} */
-  function fnHunt () {
-    game.village.huntAll();
-  }
-
-  /** @returns {void} */
+  /**
+   * @description Combust timeCrystals to move ahead in time. We find the max
+   * amount (based on the available cycles) of TCs we can combust at a single
+   * time without exhauting the heat limits.
+   *
+   * @returns {void}
+   **/
   function fnCombust () {
     const avail = (game.getEffect('heatMax') - game.time.heat) / 10;
     const btn = renderBgTab(game.timeTab)?.cfPanel.children[0]?.children[0];
@@ -681,7 +647,13 @@
     }
   }
 
-  /** @returns {void} */
+  /**
+   * @description Combust time crystals until we have have 40,000 years into
+   * the future. At this point start a festival to ensure that kittens arrive
+   * as fast as possible.
+   *
+   * @returns {void}
+   **/
   function fnCombust40k (/** @type {string} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
     if (game.calendar.year < 40000) {
       fnCombust();
@@ -696,14 +668,23 @@
     }
   }
 
-  /** @returns {void} */
+  /**
+   * @description Feed necrocorns to the elders. This means that they stay
+   * longer and trades yield better results.
+   *
+   * @returns {void}
+   **/
   function fnFeed () {
     if ((game.resPool.get('necrocorn').value > (RESOURCES.LEAST.necrocorn || 0)) && renderBgTab(game.diplomacyTab)) {
       clickBtn(findLeviathans()?.feedBtn);
     }
   }
 
-  /** @returns {void} */
+  /**
+   * @description Trade blackcoin. Buy at the bottom, hold, sell at the top.
+   *
+   * @returns {void}
+   **/
   function fnTradeBcoin () {
     const info = calcBcoin();
 
@@ -794,18 +775,24 @@
     setTimeout(() => execOptTimer(group, name, opts), opts.delay);
   }
 
-  /** @returns {boolean} */
-  function loopChildren (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {{ children: KittensBtn[] }[]} */ areas, /** @type {(dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, btn: KittensBtn, isAll: boolean) => boolean} */ buttonFn, /** @type {{ allowedIds?: string[], isAll?: boolean, withMeta?: boolean }} */ opts = {}) {
+  /**
+   * @description Loops through groups of children and applies the supplied
+   * function on each on them. For success, adds the button name to the list
+   * of executions.
+   *
+   * @returns {boolean}
+   **/
+  function loopChildren (/** @type {CheatCtrl} */ ctrl, /** @type {{ children: KittensBtn[] }[]} */ areas, /** @type {(ctrl: CheatCtrl, btn: KittensBtn, isAll: boolean) => boolean} */ buttonFn, /** @type {{ allowedIds?: string[], isAll?: boolean, withMeta?: boolean }} */ opts = {}) {
     let hasSome = false;
 
     for (const area of areas) {
       for (const btn of area.children) {
-        if ((!opts.withMeta || btn.model.metadata) && (!opts.allowedIds || (btn.id && opts.allowedIds.includes(btn.id))) && buttonFn(dryRun, invalids, btn, !!opts.isAll)) {
-          if (dryRun) {
+        if ((!opts.withMeta || btn.model.metadata) && (!opts.allowedIds || (btn.id && opts.allowedIds.includes(btn.id))) && buttonFn(ctrl, btn, !!opts.isAll)) {
+          if (ctrl.dryRun) {
             return true;
           }
 
-          hasSome ||= pushBtnName(completed, btn, /** @type {{ race?: { title: string } }} */ (btn).race?.title);
+          hasSome ||= pushBtnName(ctrl.completed, btn, /** @type {{ race?: { title: string } }} */ (btn).race?.title);
         }
       }
     }
@@ -813,16 +800,22 @@
     return hasSome;
   }
 
-  /** @returns {void} */
-  function loopTabs (/** @type {{ allowedTabs: string[], completed: string[], invalids: { [x in KittensNamedRes]?: boolean }, dryRun: boolean, stats: CheatStats }} */ { allowedTabs, completed, invalids, dryRun, stats }, /** @type {keyof CheatStats} */ type, /** @type {KittensNamedTab[]} */ tabIds, /** @type {(dryRun: boolean, completed: string[], invalids: { [x in KittensNamedRes]?: boolean }, tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowedIds = [], /** @type {() => boolean} */ checkFn = () => true) {
+  /**
+   * @description Loop through a set of tabs and execute the supplied function
+   * on each of the tabs. On success, adds the tab id to a list of tabs
+   * with actions.
+   *
+   * @returns {void}
+   **/
+  function loopTabs (/** @type {CheatCtrl} */ ctrl, /** @type {keyof CheatCtrl['stats']} */ type, /** @type {KittensNamedTab[]} */ tabIds, /** @type {(ctrl: CheatCtrl, tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowedIds = [], /** @type {() => boolean} */ checkFn = () => true) {
     if (checkFn()) {
       for (const tabId of tabIds) {
-        if (dryRun || (cheatMap.control.all[type].active && allowedTabs.includes(tabId))) {
+        if (ctrl.dryRun || (cheatMap.control.all[type].active && ctrl.allowedTabs.includes(tabId))) {
           try {
-            !dryRun && fillResources();
+            !ctrl.dryRun && fillResources();
 
-            if (renderBgTab(game[tabId]) && execFn(dryRun, completed, invalids, game[tabId], allowedIds)) {
-              stats[type] = (stats[type] || []).concat(game[tabId].tabId);
+            if (renderBgTab(game[tabId]) && execFn(ctrl, game[tabId], allowedIds)) {
+              ctrl.stats[type] = (ctrl.stats[type] || []).concat(game[tabId].tabId);
             }
           } catch (e) {
             console.error('loopTabs', type, tabId, e);
@@ -832,7 +825,12 @@
     }
   }
 
-  /** @returns {{ btn?: KittensBtn, isBuildable: boolean, tears?: KittensPrice }} */
+  /**
+   * @description From a Ziggurat related building, check if the building can
+   * be constructed outright.
+   *
+   * @returns {{ btn?: KittensBtn, isBuildable: boolean, tears?: KittensPrice }}
+   **/
   function getZigInfo (/** @type {string} */ id, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {KittensBtn?} */ inBtn = null) {
     const btn = inBtn || game.religionTab.zgUpgradeButtons.find((b) => b.id === id);
 
@@ -844,27 +842,27 @@
   }
 
   /** @returns {boolean} */
-  function buildZig (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids) {
+  function buildZig (/** @type {CheatCtrl} */ ctrl) {
     const /** @type {KittensNamedBldgZU[]} */ extras = ['blackPyramid', 'unicornGraveyard', 'unicornNecropolis'];
     let hasSome = false;
 
     for (const name of extras) {
-      const bldg = getZigInfo(name, invalids);
+      const bldg = getZigInfo(name, ctrl.invalids);
 
-      if (bldg.isBuildable && (dryRun || clickBtn(bldg.btn, true))) {
-        if (dryRun) {
+      if (bldg.isBuildable && (ctrl.dryRun || clickBtn(bldg.btn, true))) {
+        if (ctrl.dryRun) {
           return true;
         }
 
-        hasSome ||= pushBtnName(completed, bldg.btn);
+        hasSome ||= pushBtnName(ctrl.completed, bldg.btn);
       }
     }
 
     let zig = calcZiggurats();
 
-    while (zig.bestBuilding && completed.length < 7) {
-      const mark = getZigInfo('marker', invalids);
-      const best = getZigInfo(zig.bestBuilding, invalids, zig.btn);
+    while (zig.bestBuilding && ctrl.completed.length < 7) {
+      const mark = getZigInfo('marker', ctrl.invalids);
+      const best = getZigInfo(zig.bestBuilding, ctrl.invalids, zig.btn);
       const next = (best.isBuildable && mark.tears) && (mark.isBuildable && best.tears)
         ? mark.tears.val <= best.tears.val
           ? mark
@@ -879,19 +877,19 @@
         const nowTears = game.resPool.get('tears').value;
         const finTears = nowTears + (zig.ratio * game.resPool.get('unicorns').value / 2500);
 
-        if (!dryRun && best.tears?.val && (nowTears < best.tears.val) && (finTears > best.tears.val)) {
+        if (!ctrl.dryRun && best.tears?.val && (nowTears < best.tears.val) && (finTears > best.tears.val)) {
           game.religionTab.sacrificeBtn.model.allLink.handler.call(noop, noop, noop);
           return true;
         }
 
         break;
-      } else if (dryRun) {
+      } else if (ctrl.dryRun) {
         return true;
       } else if (!clickBtn(next.btn)) {
         break;
       }
 
-      hasSome ||= pushBtnName(completed, next.btn);
+      hasSome ||= pushBtnName(ctrl.completed, next.btn);
       zig = calcZiggurats();
     }
 
@@ -899,33 +897,33 @@
   }
 
   /** @returns {boolean} */
-  function buildTheologyBtn (/** @type {boolean} */ dryRun, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {ReturnType<calcTheology>[0]} */ best) {
-    return !!best.percent && best.percent.frac >= 1 && checkBuilding(best.btn, invalids).isBuildable && (dryRun || clickBtn(best.btn));
+  function buildTheologyBtn (/** @type {CheatCtrl} */ ctrl, /** @type {ReturnType<calcTheology>[0]} */ best) {
+    return !!best.percent && best.percent.frac >= 1 && checkBuilding(best.btn, ctrl.invalids).isBuildable && (ctrl.dryRun || clickBtn(best.btn));
   }
 
   /** @returns {boolean}  */
-  function buildTheology (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids) {
+  function buildTheology (/** @type {CheatCtrl} */ ctrl) {
     const avail = calcTheology();
     let hasSome = false;
 
     for (const best of avail) {
-      if (!buildTheologyBtn(dryRun, invalids, best)) {
+      if (!buildTheologyBtn(ctrl, best)) {
         break;
       }
 
-      hasSome ||= pushBtnName(completed, best.btn);
+      hasSome ||= pushBtnName(ctrl.completed, best.btn);
     }
 
     return hasSome;
   }
 
   /** @returns {boolean} */
-  function unlockTabBtn (/** @type {boolean} */ dryRun, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
-    return checkBuilding(btn, invalids, !dryRun).isBuildable && (dryRun || clickBtn(btn, isAll));
+  function unlockTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
+    return checkBuilding(btn, ctrl.invalids, { withFill: !ctrl.dryRun }).isBuildable && (ctrl.dryRun || clickBtn(btn, isAll));
   }
 
   /** @returns {boolean} */
-  function unlockTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {KittensTab} */ tab) {
+  function unlockTab (/** @type {CheatCtrl} */ ctrl, /** @type {KittensTab} */ tab) {
     const children =
       /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels?.map((r) => r.embassyButton) ||
       /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons ||
@@ -937,11 +935,11 @@
       /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons
     )?.length);
 
-    let hasSome = loopChildren(dryRun, completed, invalids, [{ children }], unlockTabBtn, { isAll });
+    let hasSome = loopChildren(ctrl, [{ children }], unlockTabBtn, { isAll });
 
     const d = /** @type {KittensGame['diplomacyTab']} */ (tab);
 
-    if (!dryRun && d.exploreBtn && d.racePanels.length !== 8 && d.racePanels.length !== (8 - (findLeviathans()?.race.unlocked ? 0 : 1))) {
+    if (!ctrl.dryRun && d.exploreBtn && d.racePanels.length !== 8 && d.racePanels.length !== (8 - (findLeviathans()?.race.unlocked ? 0 : 1))) {
       const nowTime = Date.now();
       const nowDelta = nowTime - lastExploreTime;
 
@@ -955,29 +953,29 @@
   }
 
   /** @returns {boolean} */
-  function unlockNamedTab (/** @type {boolean} */ dryRun, /** @type {string[]} */ completed, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids,  /** @type {KittensTab} */ tab, /** @type {string[]} */ allowedIds) {
+  function unlockNamedTab (/** @type {CheatCtrl} */ ctrl,  /** @type {KittensTab} */ tab, /** @type {string[]} */ allowedIds) {
     const children =
       /** @type {KittensGame['libraryTab']} */ (tab).policyPanel?.children ||
       /** @type {KittensGame['religionTab']} */ (tab).ptPanel?.children[0].children ||
       /** @type {KittensGame['timeTab']} */ (tab).cfPanel?.children[0].children;
 
-    return loopChildren(dryRun, completed, invalids, [{ children }], unlockTabBtn, { allowedIds, isAll: false });
+    return loopChildren(ctrl, [{ children }], unlockTabBtn, { allowedIds, isAll: false });
   }
 
   /** @returns {boolean} */
-  function buyTabBtn (/** @type {boolean} */ dryRun, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {KittensBtn} */ btn) {
-    if (!dryRun && btn.model.enabled && btn.model.visible && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
+  function buyTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
+    if (!ctrl.dryRun && btn.model.enabled && btn.model.visible && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
       return true;
     }
 
-    const check = checkBuilding(btn, invalids, !dryRun, true);
+    const check = checkBuilding(btn, ctrl.invalids, { withCap: true, withFill: !ctrl.dryRun });
 
-    return check.isBuildable && (dryRun || clickBtn(btn, !check.isUncapped && !!btn.model.metadata && btn.model.metadata.on >= 1));
+    return check.isBuildable && (ctrl.dryRun || clickBtn(btn, !check.isUncapped && !!btn.model.metadata && btn.model.metadata.on >= 1));
   }
 
   /** @returns {boolean} */
-  function sellTabBtn (/** @type {boolean} */ dryRun, /** @type {{ [x in KittensNamedRes]?: boolean }} */ _invalids, /** @type {KittensBtn} */ btn) {
-    if (!dryRun && btn.model.metadata?.val && btn.model.metadata.name !== 'chronosphere') {
+  function sellTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
+    if (!ctrl.dryRun && btn.model.metadata?.val && btn.model.metadata.name !== 'chronosphere') {
       btn.controller.sellInternal(btn.model, 0, false);
       return true;
     }
@@ -985,23 +983,23 @@
     return false;
   }
 
-  /** @returns {(dryRun: boolean, completed: string[], invalids: { [x in KittensNamedRes]?: boolean }, tab: KittensTab) => boolean} */
-  function buildTab (/** @type {(dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, btn: KittensBtn) => boolean} */ buttonFn) {
-    return (/** @type {boolean} */ dryRun, /** @type {string[]} */  completed, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {KittensTab} */ tab) => {
+  /** @returns {(ctrl: CheatCtrl, tab: KittensTab) => boolean} */
+  function buildTab (/** @type {(ctrl: CheatCtrl, btn: KittensBtn) => boolean} */ buttonFn) {
+    return (/** @type {CheatCtrl} */ ctrl, /** @type {KittensTab} */ tab) => {
       const areas =
         /** @type {KittensGame['spaceTab']} */ (tab).planetPanels ||
         [/** @type {KittensGame['bldTab']} */ (tab)];
 
-      return loopChildren(dryRun, completed, invalids, areas, buttonFn, { withMeta: true });
+      return loopChildren(ctrl, areas, buttonFn, { withMeta: true });
     }
   };
 
-  /** @returns {CheatStats} */
+  /** @returns {CheatCtrl['stats']} */
   function execBuildAll (/** @type {number} */ delay, /** @type {boolean=} */ dryRun = false) {
-    const /** @type {{ allowedTabs: string[], completed: string[], invalids: { [x in KittensNamedRes]?: boolean }, dryRun: Boolean, stats: CheatStats }} */ info = { allowedTabs: [], completed: [], invalids: {}, dryRun, stats: {} };
+    const /** @type {CheatCtrl} */ ctrl = { allowedTabs: [], completed: [], invalids: {}, dryRun, stats: {} };
 
     for (const t in cheatMap.tabs.all) {
-      cheatMap.tabs.all[t]?.active && info.allowedTabs.push(cheatMap.tabs.all[t].tab);
+      cheatMap.tabs.all[t]?.active && ctrl.allowedTabs.push(cheatMap.tabs.all[t].tab);
     }
 
     if (!dryRun && cheatMap.control.all.craft.active) {
@@ -1033,44 +1031,49 @@
       }
     }
 
-    loopTabs(info, 'build', ['bldTab', 'spaceTab'], buildTab(buyTabBtn));
-    loopTabs(info, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
+    loopTabs(ctrl, 'build', ['bldTab', 'spaceTab'], buildTab(buyTabBtn));
+    loopTabs(ctrl, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
 
     if (!dryRun) {
       const /** @type {KittensNamedPolicy[]} */ policies = ['authocracy', 'diplomacy', 'dragonRelationsAstrologers', 'epicurianism', 'extravagance', 'fascism', 'fullIndustrialization', 'griffinRelationsScouts', 'knowledgeSharing', 'lizardRelationsPriests', 'militarizeSpace', 'mysticism', 'nagaRelationsCultists', 'sharkRelationsScribes', 'siphoning', 'socialism', 'spiderRelationsPaleontologists', 'stripMining', 'technocracy', 'tradition', 'transkittenism', 'zebraRelationsBellicosity'];
       const /** @type {KittensNamedPact[]} */ pacts = ['pactOfCleansing', 'pactOfPurity', 'payDebt'];
       const /** @type {KittensNamedBldgTimeCF[]} */ cfbldgs = ['blastFurnace', 'ressourceRetrieval', 'temporalAccelerator', 'temporalImpedance', 'timeBoiler'];
 
-      loopTabs(info, 'sell', ['bldTab', 'spaceTab'], buildTab(sellTabBtn));
-      loopTabs(info, 'zig', ['religionTab'], buildZig);
-      loopTabs(info, 'crypto', ['religionTab'], buildTheology);
-      loopTabs(info, 'upgrade', ['libraryTab'], unlockNamedTab, policies);
-      loopTabs(info, 'pact', ['religionTab'], unlockNamedTab, pacts);
-      loopTabs(info, 'time', ['timeTab'], unlockNamedTab, cfbldgs, () =>
+      loopTabs(ctrl, 'sell', ['bldTab', 'spaceTab'], buildTab(sellTabBtn));
+      loopTabs(ctrl, 'zig', ['religionTab'], buildZig);
+      loopTabs(ctrl, 'crypto', ['religionTab'], buildTheology);
+      loopTabs(ctrl, 'upgrade', ['libraryTab'], unlockNamedTab, policies);
+      loopTabs(ctrl, 'pact', ['religionTab'], unlockNamedTab, pacts);
+      loopTabs(ctrl, 'time', ['timeTab'], unlockNamedTab, cfbldgs, () =>
         game.getEffect('heatMax') < (40000 * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (1 - (1 - (1 / (1 + game.getEffect('heatCompression'))))))
       );
 
       for (const _name in cheatMap.crafting.all) {
         const name = /** @type {keyof CheatMap['crafting']['all']} */ (_name);
         const opts = /** @type {CheatOpt} */ (cheatMap.crafting.all[name]);
-        const missing = !!info.invalids[name];
+        const missing = !!ctrl.invalids[name];
 
         if (missing !== opts.missing) {
           opts.missing = missing;
-          opts.btn?.[info.invalids[name] ? 'addClass' : 'removeClass']('missing');
+          opts.btn?.[ctrl.invalids[name] ? 'addClass' : 'removeClass']('missing');
         }
       }
 
       if (delay > 0) {
-        info.completed.length && $(game.msg(info.completed.join(', ')).span).addClass('kittycheat-log');
+        ctrl.completed.length && $(game.msg(ctrl.completed.join(', ')).span).addClass('kittycheat-log');
         setTimeout(() => execBuildAll(delay), delay);
       }
     }
 
-    return info.stats;
+    return ctrl.stats;
   }
 
-  /** @returns {void} */
+  /**
+   * @description Doing a dry run, do a full calculation of the game state,
+   * and then display a summary of this information.
+   *
+   * @returns {void}
+   **/
   function execTextInfo (/** @type {number} */ delay) {
     const bld = execBuildAll(0, true);
 
