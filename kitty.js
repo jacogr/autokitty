@@ -934,7 +934,7 @@
       for (const _name in cheatMap.crafting.all) {
         const name = /** @type {KittensNamedResCraft} */ (_name);
         const opt = cheatMap.crafting.all[name];
-        const craftDiv = opt?.missing ? 7.5 : 100;
+        const craftDiv = opt?.missing ? 10 : 100;
 
         if (opt && !opt.noMinCraft && !opt.active) {
           if (opt.missing) {
