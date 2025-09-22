@@ -338,6 +338,19 @@
   }
 
   /**
+   * @description Extracts the name of a button and if exisiting, places this
+   * onto the result array that has been passed in. Returns a true/false to
+   * indicate success.
+   *
+   * @returns {boolean}
+   **/
+  function pushBtnName (/** @type {string[]} */ arr, /** @type {KittensBtn=} */ btn, /** @type {string?=} */ extra = null) {
+    const n = getBtnName(btn, extra);
+
+    return !!(n && arr.push(n));
+  }
+
+  /**
    * @description Performs a click on a button. This could take the form of
    * doing a shift-click (which executes to the maxiumum possible) if the isAll
    * parameter is specified.
@@ -703,7 +716,14 @@
     }
   }
 
-  /** @returns {void} */
+  /**
+   * @description Excecutes a trade with a race, sending all available. For
+   * Leviathans, we do an additional check to see if they are unlocked and if
+   * they are unlockable (we have Ziggurats) - if this is the case, we try and
+   * unlock before we execute the trade.
+   *
+   * @returns {void}
+   **/
   function execTrade (/** @type {KittensDiplomacyRace['name']} */ name) {
     if ((name === 'leviathans') && !game.diplomacy.get('leviathans').unlocked && game.religion.getZU('blackPyramid').val) {
       game.diplomacy.unlockElders();
@@ -712,20 +732,34 @@
     renderBgTab(game.diplomacyTab)?.racePanels.find((p) => p.race.name === name)?.tradeBtn.tradeAllHref.link.click();
   }
 
-  /** @returns {void} */
+  /**
+   * @description Executes a craft for a specific craftable resource. We try
+   * and craft a fraction (as passed in) of the maxiumum that we are able to
+   * do. The fractional nature allows us to tweak where and when we call the
+   * function. If we do so via an option, we do the maximum, if we doa. trickle
+   * feed we do a minimum.
+   *
+   * @returns {void}
+   **/
   function execCraft (/** @type {KittensNamedResCraft} */ name, /** @type {number} */ frac) {
     const r = game.resPool.get(name);
 
-    if (r.unlocked && r.value && !r.isHidden) {
+    if (r.craftable && r.unlocked && !r.isHidden) {
       const val = Math.ceil(game.workshop.getCraftAllCount(name) * frac);
 
-      if (val > 1 && val < Number.MAX_VALUE) {
+      if (val > 0) {
         game.workshop.craft(name, val);
       }
     }
   }
 
-  /** @returns {void} */
+  /**
+   * @description Executes a specific option, either via function, crafting or
+   * trading. We specifically check if the option is currently active and is in
+   * an active group before execution and respect resource filling flags.
+   *
+   * @returns {void}
+   **/
   function execOpt (/** @type {keyof CheatMap} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
     try {
       if (opts.active && cheatMap[group].active && !cheatMap[group].noExec) {
@@ -746,18 +780,18 @@
     }
   }
 
-  /** @returns {void} */
+  /**
+   * @description Executes an option that is assigned to a specific timer. Once
+   * execution has been completed, re-schedule the exceution into the furture.
+   * All logic with respect to option and group activity flags are handled by
+   * the specific execOpt function.
+   *
+   * @returns {void}
+   **/
   function execOptTimer (/** @type {keyof CheatMap} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
     execOpt(group, name, opts);
 
     setTimeout(() => execOptTimer(group, name, opts), opts.delay);
-  }
-
-  /** @returns {boolean} */
-  function pushBtnName (/** @type {string[]} */ arr, /** @type {KittensBtn=} */ btn, /** @type {string?=} */ extra = null) {
-    const n = getBtnName(btn, extra);
-
-    return !!(n && arr.push(n));
   }
 
   /** @returns {boolean} */
@@ -976,9 +1010,10 @@
       for (const _name in cheatMap.crafting.all) {
         const name = /** @type {KittensNamedResCraft} */ (_name);
         const opt = cheatMap.crafting.all[name];
-        const craftFrac = SPEND.CRAFT[opt?.missing ? 'MISSING' : 'TRICKLE'];
 
         if (opt && !opt.noMinCraft && !opt.active) {
+          const craftFrac = SPEND.CRAFT[opt.missing ? 'MISSING' : 'TRICKLE'];
+
           if (opt.missing) {
             for (const p of game.workshop.getCraft(name).prices) {
               const pname = /** @type {KittensNamedResCraft} */ (p.name);
