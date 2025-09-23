@@ -975,7 +975,13 @@
     return hasSome;
   }
 
-  /** @returns {boolean} */
+  /**
+   * @description Perform tab unlocks. This is for instance for workshop or
+   * diplomacy where we want to build, but it doesn't have the additional
+   * features of production or storage, rather adding features to the game.
+   *
+   * @returns {boolean}
+   **/
   function unlockTab (/** @type {CheatCtrl} */ ctrl, /** @type {KittensTab} */ tab) {
     const children =
       /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels?.map((r) => r.embassyButton) ||
@@ -992,6 +998,7 @@
 
     const d = /** @type {KittensGame['diplomacyTab']} */ (tab);
 
+    // unlock additional reces by exploring
     if (!ctrl.dryRun && d.exploreBtn && d.racePanels.length !== 8 && d.racePanels.length !== (8 - (findLeviathans()?.race.unlocked ? 0 : 1))) {
       const nowTime = Date.now();
       const nowDelta = nowTime - lastExploreTime;
@@ -1005,7 +1012,13 @@
     return hasSome;
   }
 
-  /** @returns {boolean} */
+  /**
+   * @description Unlock features, but in this case we only operate on known
+   * buttons, e.g. for policies we don't just unlock all, same with pacts,
+   * rather we pick specific hard-coded features and unlock those.
+   *
+   * @returns {boolean}
+   **/
   function unlockNamedTab (/** @type {CheatCtrl} */ ctrl,  /** @type {KittensTab} */ tab, /** @type {string[]} */ allowedIds) {
     const children =
       /** @type {KittensGame['libraryTab']} */ (tab).policyPanel?.children ||
@@ -1015,7 +1028,13 @@
     return loopChildren(ctrl, [{ children }], unlockTabBtn, { allowedIds, isAll: false });
   }
 
-  /** @returns {(ctrl: CheatCtrl, tab: KittensTab) => boolean} */
+  /**
+   * @description Operating either on space or the building tab, this is a
+   * factory function that allows either buying or selling. We pass in a
+   * function (buy or sell) that operates on the specific bussons found.
+   *
+   * @returns {(ctrl: CheatCtrl, tab: KittensTab) => boolean}
+   **/
   function buildTab (/** @type {(ctrl: CheatCtrl, btn: KittensBtn) => boolean} */ buttonFn) {
     return (/** @type {CheatCtrl} */ ctrl, /** @type {KittensTab} */ tab) => {
       const areas =
@@ -1026,7 +1045,14 @@
     }
   };
 
-  /** @returns {CheatCtrl['stats']} */
+  /**
+   * @description Go through all tabs and click buttons. This means we either
+   * buy (sell in the case pre-reset), or upgrade through all panels. Here we
+   * also introduce trickle feeds for craftable resources. Either slightly
+   * ticking them up or crafting slightly more where we have some missing.
+   *
+   * @returns {CheatCtrl['stats']}
+   **/
   function execBuildAll (/** @type {number} */ delay, /** @type {boolean=} */ dryRun = false) {
     const /** @type {CheatCtrl} */ ctrl = { allowedTabs: [], completed: [], invalids: {}, dryRun, stats: {} };
 
