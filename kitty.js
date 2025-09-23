@@ -1087,7 +1087,51 @@
         ),
         withMeta: true
       });
-  };
+  }
+
+  /**
+   * @description Mark all resources, as identified via the building phase, as
+   * "missing" if we don't have enough. If previously "missing" and we now have
+   * enough, remove the flag. Additionally trickle crafting for all non-active
+   * resources, either via the minimum trickle amount, or slightly more for
+   * those identified as "missing".
+   *
+   * @returns {void}
+   */
+  function trickleCraft (/** @type {CheatCtrl} */ ctrl) {
+    for (const _name in cheatMap.crafting.all) {
+      const name = /** @type {keyof CheatMap['crafting']['all']} */ (_name);
+      const opts = /** @type {CheatOpt} */ (cheatMap.crafting.all[name]);
+      const missing = !!ctrl.invalids[name];
+
+      if (missing !== opts.missing) {
+        opts.missing = missing;
+        opts.btn?.[missing ? 'addClass' : 'removeClass']('missing');
+      }
+
+      if (cheatMap.control.all.craft.active && !opts.noMinCraft && !opts.active) {
+        const craftFrac = SPEND.CRAFT[missing ? 'MISSING' : 'TRICKLE'];
+
+        if (missing) {
+          const craft = game.workshop.getCraft(name);
+
+          for (const p of craft.prices) {
+            const pname = /** @type {KittensNamedResCraft} */ (p.name);
+            const popts = cheatMap.crafting.all[pname];
+            const r = game.resPool.get(pname);
+
+            if (r.craftable && popts && !popts.noMinCraft && !popts.active && !popts.missing) {
+              fillResources();
+              execCraft(pname, craftFrac);
+            }
+          }
+        }
+
+        fillResources();
+        execCraft(name, craftFrac);
+      }
+    }
+  }
 
   /**
    * @description Go through all tabs and click buttons. This means we either
@@ -1121,39 +1165,7 @@
         game.getEffect('heatMax') < (40000 * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (1 - (1 - (1 / (1 + game.getEffect('heatCompression'))))))
       );
 
-      for (const _name in cheatMap.crafting.all) {
-        const name = /** @type {keyof CheatMap['crafting']['all']} */ (_name);
-        const opts = /** @type {CheatOpt} */ (cheatMap.crafting.all[name]);
-        const missing = !!ctrl.invalids[name];
-
-        if (missing !== opts.missing) {
-          opts.missing = missing;
-          opts.btn?.[missing ? 'addClass' : 'removeClass']('missing');
-        }
-
-        if (cheatMap.control.all.craft.active && !opts.noMinCraft && !opts.active) {
-          const craftFrac = SPEND.CRAFT[missing ? 'MISSING' : 'TRICKLE'];
-
-          if (missing) {
-            const craft = game.workshop.getCraft(name);
-
-            for (const p of craft.prices) {
-              const pname = /** @type {KittensNamedResCraft} */ (p.name);
-              const popts = cheatMap.crafting.all[pname];
-              const r = game.resPool.get(pname);
-
-              if (r.craftable && popts && !popts.noMinCraft && !popts.active && !popts.missing) {
-                fillResources();
-                execCraft(pname, craftFrac);
-              }
-            }
-          }
-
-          fillResources();
-          execCraft(name, craftFrac);
-        }
-      }
-
+      trickleCraft(ctrl);
       fillResources();
 
       if (delay > 0) {
