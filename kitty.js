@@ -28,7 +28,7 @@
 /** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: 'chronosphere' | 'unicornPasture' | 'ziggurat') => { meta: KittensMetadata} }, bldTab: KittensTab<KittensBtnPanel>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: '1000Years') => { researched: boolean } }, diplomacy: { get: (name: KittensDiplomacyRace['name']) => KittensDiplomacyRace, unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: 'heatCompression' | 'heatEfficiency' | 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion') => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: KittensBtnPanel }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: 'numeromancy' | 'unicornmancy') => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensMetadata, praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: [KittensBtnPanel] }, ptPanel: { children: [KittensBtnPanel] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: KittensBtn<{ model: { allLink: { handler: (...args: unknown[]) => void } } }>, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number, shatter: (amt: number) => void }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ controller: { doShatterAmt: (model: unknown, amt: number) => void }, model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: [KittensBtnPanel] } }>, space: { getProgram: (name: 'orbitalLaunch') => { val: number } }, spaceTab: KittensTab<{ GCPanel: KittensBtnPanel, planetPanels: KittensBtnPanel[] }>, ui: { activeTabId: string }, village: { holdFestival: (amt: number) => void, huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], festivalBtn: KittensBtn<{ x100: { link: HTMLElement } }>, promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
 
 // Kitty Cheat
-/** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => unknown, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
+/** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => void, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
 /** @template {{ [x: string]: CheatOpt }} T @template {{}} [E={}] @typedef {{ active?: boolean, all: T, div?: jQuery, noExec?: boolean } & E} CheatMapEntry */
 /** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: string, name: string, opts: CheatOpt) => void }>, 'btn' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'pollute' | 'uncap' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensDiplomacyRace['name']]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
 /** @typedef {{ allowedTabs: string[], completed: string[], dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, stats: { [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact']?: string[] } }} CheatCtrl */
@@ -145,47 +145,63 @@
     actions: {
       all: {
         catnip: {
-          fn: () => clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model.name === 'Gather catnip')),
+          fn: function fnCatnip () {
+            clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model.name === 'Gather catnip'));
+          },
           active: true,
           delay: INTERVAL.CATNIP.GATHER,
           noFill: true
         },
         refine: {
-          fn: () => clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model.name === 'Refine catnip')),
+          fn: function fnRefine () {
+            clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model.name === 'Refine catnip'));
+          },
           active: true,
           delay: INTERVAL.CATNIP.REFINE,
           end: true,
           noFill: true
         },
         observe: {
-          fn: () => $('input#observeBtn').click(),
+          fn: function fnObserve () {
+            $('input#observeBtn').click();
+          },
           active: true,
           noFill: true
         },
         hunt: {
-          fn: () => game.village.huntAll(),
+          fn: function fnHunt () {
+            game.village.huntAll();
+          },
           active: true
         },
         promote: {
-          fn: () => clickBtn(renderBgTab(game.villageTab)?.promoteKittensBtn),
+          fn: function fnPromote () {
+            clickBtn(renderBgTab(game.villageTab)?.promoteKittensBtn);
+          },
           active: true,
           delay: INTERVAL.PROMOTE,
           noFill: true
         },
         loadout: {
-          fn: () => clickBtn(renderBgTab(game.villageTab)?.buttons.find((b) => b?.opts?.loadout?.pinned)),
+          fn: function fnLoadout () {
+            clickBtn(renderBgTab(game.villageTab)?.buttons.find((b) => b?.opts?.loadout?.pinned));
+          },
           active: true,
           delay: INTERVAL.PROMOTE,
           end: true,
           noFill: true
         },
         praise: {
-          fn: () => game.religion.praise(),
+          fn: function fnPraise () {
+            game.religion.praise();
+          },
           active: true,
           delay: INTERVAL.PRAISE
         },
         adore: {
-          fn: () => game.religion.resetFaith(1.01, false),
+          fn: function fnAdore () {
+            game.religion.resetFaith(1.01, false);
+          },
           active: true,
           delay: INTERVAL.ADORE,
           end: true
@@ -1174,71 +1190,66 @@
     setTimeout(() => execOpts(delay), delay);
   }
 
-  /**
-   * @description Do the setup for the cheat controls and apply some game configuration. (Mostly around logging
-   * and the actual options available)
-   *
-   * @returns {void}
-   **/
-  function setup () {
-    $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; margin-bottom: 2px; margin-right: 2px; padding: 1px 4px; } #game .kittycheat-btn.active { background: darkgreen; color: white; } .kittycheat-btn.danger { background: lightblue; border-style: dashed; } #game .kittycheat-btn.danger.active { background: darkblue; } .kittycheat-btn.missing { background: lightpink; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { font-family: monospace; opacity: 0.33; } .kittycheat-btn-grp { display: inline-block; } #game .kittycheat-btn-grp.nobr { white-space: nowrap; }</style>');
+  // Overall HTML structure and styling for the cheat controls
+  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; margin-bottom: 2px; margin-right: 2px; padding: 1px 4px; } #game .kittycheat-btn.active { background: darkgreen; color: white; } .kittycheat-btn.danger { background: lightblue; border-style: dashed; } #game .kittycheat-btn.danger.active { background: darkblue; } .kittycheat-btn.missing { background: lightpink; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { font-family: monospace; opacity: 0.33; } .kittycheat-btn-grp { display: inline-block; } #game .kittycheat-btn-grp.nobr { white-space: nowrap; }</style>');
 
-    const divAll = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
-    const divAct = jqAppend(divAll, $('<div id="kittycheat-act" class="kittycheat-div"></div>'));
-    const divTxt = jqAppend(divAll, $('<div id="kittycheat-txt" class="kittycheat-div"></div>'));
+  const divAll = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
+  const divAct = jqAppend(divAll, $('<div id="kittycheat-act" class="kittycheat-div"></div>'));
+  const divTxt = jqAppend(divAll, $('<div id="kittycheat-txt" class="kittycheat-div"></div>'));
 
-    for (const _group in cheatMap) {
-      const group = /** @type {keyof CheatMap} */ (_group);
-      const divGrp = cheatMap[group].div = jqAppend(divAct, $(`<div id="kittycheat-act-${group}" class="kittycheat-div"></div>`));
-      const hasEnd = Object.values(cheatMap[group].all).find((o) => /** @type {CheatOpt} */ (o).end);
-      let /** @type {jQuery | null} */ divBtnGrp = null;
+  // Loop through all options and create buttons in groups
+  for (const _group in cheatMap) {
+    const group = /** @type {keyof CheatMap} */ (_group);
+    const divGrp = cheatMap[group].div = jqAppend(divAct, $(`<div id="kittycheat-act-${group}" class="kittycheat-div"></div>`));
+    const hasEnd = Object.values(cheatMap[group].all).find((o) => /** @type {CheatOpt} */ (o).end);
+    let /** @type {jQuery | null} */ divBtnGrp = null;
 
-      if (group !== 'control') {
-        jqAppend(divGrp, $(`<div class="kittycheat-div small">${group}:</div>`));
-      }
-
-      activateGroup(group, cheatMap[group].active || cheatMap[group].noExec);
-
-      for (const name in cheatMap[group].all) {
-        const opts = /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (name)]);
-
-        divBtnGrp = divBtnGrp || jqAppend(divGrp, $(`<div class="kittycheat-btn-grp ${hasEnd ? 'nobr' : ''}"></div>`));
-
-        if (!opts.noShow) {
-          opts.btn = jqAppend(divBtnGrp, $(`<button class="kittycheat-btn ${opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : ''} ${opts.danger ? 'danger' : ''}">${name}</button>`).click(() => {
-            activateBtn(group, name, opts, !opts.active);
-          }));
-
-          activateBtn(group, name, opts, opts.active);
-
-          if (opts.delay) {
-            execOptTimer(group, name, opts);
-          }
-
-          if (opts.end) {
-            divBtnGrp = null;
-          }
-        }
-      }
+    if (group !== 'control') {
+      jqAppend(divGrp, $(`<div class="kittycheat-div small">${group}:</div>`));
     }
 
-    for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
-      jqAppend(divTxt, $(`<div id="kittycheat-txt-${id}" class="kittycheat-div small"></div>`));
-    }
+    activateGroup(group, cheatMap[group].active || cheatMap[group].noExec);
 
-    game.console.maxMessages = 100;
-    game.opts.hideSell = true;
-    game.opts.noConfirm = true;
+    for (const name in cheatMap[group].all) {
+      const opts = /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (name)]);
 
-    for (const f of ['craft', 'faith', 'hunt', 'trade']) {
-      game.console.filters[/** @type {keyof KittensGame['console']['filters']} */ (f)].enabled = false;
+      if (opts.noShow) {
+        continue;
+      }
+
+      divBtnGrp = divBtnGrp || jqAppend(divGrp, $(`<div class="kittycheat-btn-grp ${hasEnd ? 'nobr' : ''}"></div>`));
+      opts.btn = jqAppend(divBtnGrp, $(`<button class="kittycheat-btn ${opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : ''} ${opts.danger ? 'danger' : ''}">${name}</button>`).click(() => {
+        activateBtn(group, name, opts, !opts.active);
+      }));
+
+      activateBtn(group, name, opts, opts.active);
+
+      if (opts.delay) {
+        execOptTimer(group, name, opts);
+      }
+
+      if (opts.end) {
+        divBtnGrp = null;
+      }
     }
   }
 
-  /**
-   * @description Start! Do the setup and then start the execution loops. Done. Profit.
-   */
-  setup();
+  // Do the setup for out information panel, all game information
+  for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
+    jqAppend(divTxt, $(`<div id="kittycheat-txt-${id}" class="kittycheat-div small"></div>`));
+  }
+
+  // Do the setup for the game options, slightly tweaking the messages, logging
+  // as well as confirmation and unneeded button displays
+  game.console.maxMessages = 100;
+  game.opts.hideSell = true;
+  game.opts.noConfirm = true;
+
+  for (const f of ['craft', 'faith', 'hunt', 'trade']) {
+    game.console.filters[/** @type {keyof KittensGame['console']['filters']} */ (f)].enabled = false;
+  }
+
+  // Start! Do the setup and then start the execution loops. Done. Profit.
   execOpts(INTERVAL.ALL.OPTION);
   execTextInfo(INTERVAL.ALL.TEXT);
   execBuildAll(INTERVAL.ALL.BUILD);
