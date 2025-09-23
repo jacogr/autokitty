@@ -37,7 +37,13 @@
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
-  /** @type {Readonly<{ CRAFT: number; LEAST: Readonly<{ [x in KittensNamedRes]?: number }>, NAME: Readonly<{ [x in KittensNamedRes]?: number }>, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>} */
+  /**
+   * @description Contains a map of resource mappings for spend. It allows us
+   * to control the spend on a per-type and per-name basis and also allows
+   * exclusion of certain type for resource maxing.
+   *
+   * @type {Readonly<{ CRAFT: number; LEAST: Readonly<{ [x in KittensNamedRes]?: number }>, NAME: Readonly<{ [x in KittensNamedRes]?: number }>, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>}
+   **/
   const RESOURCES = {
     CRAFT: 0.925, // use this via SPEND.CRAFT.MAXIMUM
     LEAST: { necrocorn: 1 }, // have at least this left
@@ -53,10 +59,10 @@
   }
 
   /**
-   * Resource spends for both crafting an uncapped buildings. These are quite
-   * sensitive, for instance upping missing to could have an adverse effect of
-   * exhausting slabs in some case. For trickle the same could happen with
-   * overspend in some areas and under elsewhere
+   * @description Resource spends for both crafting an uncapped buildings.
+   * These are quite sensitive, for instance upping missing to could have an
+   * adverse effect of exhausting slabs in some case. For trickle the same
+   * could happen with overspend in some areas and under elsewhere
    *
    * @type {Readonly<{ UNCAPPED: number, CRAFT: Readonly<{ [x in 'MAXIMUM' | 'MISSING' | 'TRICKLE']: number }> }>}
    **/
@@ -247,18 +253,30 @@
     }
   };
 
-  /** @type {Readonly<{ [x in KittensNamedCombustLink]: number }>} */
+  /**
+   * @description Combust cycles as defined in the UI. The various available
+   * links each jump a pre-defined number of years into the future. We use this
+   * map alongside the UI-defined values to find the optimal number of years
+   * to move forward.
+   *
+   * @type {Readonly<{ [x in KittensNamedCombustLink]: number }>}
+   **/
   const combustCycles = {
     tenErasLink: 500,
     previousCycleLink: 45,
     nextCycleLink: 5
   };
 
+  /**
+   * @description Store the last timestamp on when we have explored. This
+   * ensures we don't have spam in the logs with "cannot find civ", rather
+   * we have some cooloff time between attempts.
+   */
   let lastExploreTime = 0;
 
   /**
    * @description There probably should not be much description on this: it is
-   * simply a function that does nothing.
+   * simply a function that does nothing and returns nothing.
    *
    * @returns {void}
    **/
@@ -799,12 +817,12 @@
    *
    * @returns {boolean}
    **/
-  function loopChildren (/** @type {CheatCtrl} */ ctrl, /** @type {{ children: KittensBtn[] }[]} */ areas, /** @type {(ctrl: CheatCtrl, btn: KittensBtn, isAll: boolean) => boolean} */ buttonFn, /** @type {{ allowedIds?: string[], isAll?: boolean, withMeta?: boolean }} */ opts = {}) {
+  function loopChildren (/** @type {CheatCtrl} */ ctrl, /** @type {(ctrl: CheatCtrl, btn: KittensBtn, isAll: boolean) => boolean} */ buttonFn, /** @type {{ areas: KittensBtnPanel[], withAll?: boolean, withIds?: string[], withMeta?: boolean }} */ { areas, withAll, withIds, withMeta  }) {
     let hasSome = false;
 
     for (const area of areas) {
       for (const btn of area.children) {
-        if ((!opts.withMeta || btn.model.metadata) && (!opts.allowedIds || (btn.id && opts.allowedIds.includes(btn.id))) && buttonFn(ctrl, btn, !!opts.isAll)) {
+        if ((!withMeta || btn.model.metadata) && (!withIds || (btn.id && withIds.includes(btn.id))) && buttonFn(ctrl, btn, !!withAll)) {
           if (ctrl.dryRun) {
             return true;
           }
@@ -1000,18 +1018,21 @@
    * @returns {boolean}
    **/
   function unlockTab (/** @type {CheatCtrl} */ ctrl, /** @type {KittensTab} */ tab) {
-    const children =
-      /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels?.map((r) => r.embassyButton) ||
-      /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons ||
-      /** @type {KittensGame['spaceTab']} */ (tab).GCPanel?.children ||
-      /** @type {KittensGame['timeTab']} */ (tab).vsPanel?.children[0].children ||
-      /** @type {KittensGame['workshopTab']} */ (tab).buttons;
-    const isAll = !!((
-      /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels ||
-      /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons
-    )?.length);
-
-    let hasSome = loopChildren(ctrl, [{ children }], unlockTabBtn, { isAll });
+    let hasSome = loopChildren(ctrl, unlockTabBtn, {
+      areas: [{
+        children: (
+          /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels?.map((r) => r.embassyButton) ||
+          /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons ||
+          /** @type {KittensGame['spaceTab']} */ (tab).GCPanel?.children ||
+          /** @type {KittensGame['timeTab']} */ (tab).vsPanel?.children[0].children ||
+          /** @type {KittensGame['workshopTab']} */ (tab).buttons
+        )
+      }],
+      withAll: !!((
+        /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels ||
+        /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons
+      )?.length)
+    });
 
     const d = /** @type {KittensGame['diplomacyTab']} */ (tab);
 
@@ -1036,13 +1057,18 @@
    *
    * @returns {boolean}
    **/
-  function unlockNamedTab (/** @type {CheatCtrl} */ ctrl,  /** @type {KittensTab} */ tab, /** @type {string[]} */ allowedIds) {
-    const children =
-      /** @type {KittensGame['libraryTab']} */ (tab).policyPanel?.children ||
-      /** @type {KittensGame['religionTab']} */ (tab).ptPanel?.children[0].children ||
-      /** @type {KittensGame['timeTab']} */ (tab).cfPanel?.children[0].children;
-
-    return loopChildren(ctrl, [{ children }], unlockTabBtn, { allowedIds, isAll: false });
+  function unlockNamedTab (/** @type {CheatCtrl} */ ctrl,  /** @type {KittensTab} */ tab, /** @type {string[]} */ withIds) {
+    return loopChildren(ctrl, unlockTabBtn, {
+      areas: [{
+        children: (
+          /** @type {KittensGame['libraryTab']} */ (tab).policyPanel?.children ||
+          /** @type {KittensGame['religionTab']} */ (tab).ptPanel?.children[0].children ||
+          /** @type {KittensGame['timeTab']} */ (tab).cfPanel?.children[0].children
+        )
+      }],
+      withAll: false,
+      withIds
+    });
   }
 
   /**
@@ -1053,13 +1079,14 @@
    * @returns {(ctrl: CheatCtrl, tab: KittensTab) => boolean}
    **/
   function buildTab (/** @type {(ctrl: CheatCtrl, btn: KittensBtn) => boolean} */ buttonFn) {
-    return (/** @type {CheatCtrl} */ ctrl, /** @type {KittensTab} */ tab) => {
-      const areas =
-        /** @type {KittensGame['spaceTab']} */ (tab).planetPanels ||
-        [/** @type {KittensGame['bldTab']} */ (tab)];
-
-      return loopChildren(ctrl, areas, buttonFn, { withMeta: true });
-    }
+    return (/** @type {CheatCtrl} */ ctrl, /** @type {KittensTab} */ tab) =>
+      loopChildren(ctrl, buttonFn, {
+        areas: (
+          /** @type {KittensGame['spaceTab']} */ (tab).planetPanels ||
+          [/** @type {KittensGame['bldTab']} */ (tab)]
+        ),
+        withMeta: true
+      });
   };
 
   /**
@@ -1075,38 +1102,6 @@
 
     for (const t in cheatMap.tabs.all) {
       cheatMap.tabs.all[t]?.active && ctrl.allowedTabs.push(cheatMap.tabs.all[t].tab);
-    }
-
-    if (!dryRun && cheatMap.control.all.craft.active) {
-      fillResources();
-
-      for (const _name in cheatMap.crafting.all) {
-        const name = /** @type {KittensNamedResCraft} */ (_name);
-        const opt = cheatMap.crafting.all[name];
-
-        if (opt && !opt.noMinCraft && !opt.active) {
-          const craftFrac = SPEND.CRAFT[opt.missing ? 'MISSING' : 'TRICKLE'];
-
-          if (opt.missing) {
-            const craft = game.workshop.getCraft(name);
-
-            for (const p of craft.prices) {
-              const pname = /** @type {KittensNamedResCraft} */ (p.name);
-              const r = game.resPool.get(pname);
-
-              if (r.craftable) {
-                const popt = cheatMap.crafting.all[pname];
-
-                if (popt && !popt.noMinCraft && !popt.active && !popt.missing) {
-                  execCraft(pname, craftFrac);
-                }
-              }
-            }
-          }
-
-          execCraft(name, craftFrac);
-        }
-      }
     }
 
     loopTabs(ctrl, 'build', ['bldTab', 'spaceTab'], buildTab(buyTabBtn));
@@ -1133,9 +1128,33 @@
 
         if (missing !== opts.missing) {
           opts.missing = missing;
-          opts.btn?.[ctrl.invalids[name] ? 'addClass' : 'removeClass']('missing');
+          opts.btn?.[missing ? 'addClass' : 'removeClass']('missing');
+        }
+
+        if (cheatMap.control.all.craft.active && !opts.noMinCraft && !opts.active) {
+          const craftFrac = SPEND.CRAFT[missing ? 'MISSING' : 'TRICKLE'];
+
+          if (missing) {
+            const craft = game.workshop.getCraft(name);
+
+            for (const p of craft.prices) {
+              const pname = /** @type {KittensNamedResCraft} */ (p.name);
+              const popts = cheatMap.crafting.all[pname];
+              const r = game.resPool.get(pname);
+
+              if (r.craftable && popts && !popts.noMinCraft && !popts.active && !popts.missing) {
+                fillResources();
+                execCraft(pname, craftFrac);
+              }
+            }
+          }
+
+          fillResources();
+          execCraft(name, craftFrac);
         }
       }
+
+      fillResources();
 
       if (delay > 0) {
         ctrl.completed.length && $(game.msg(ctrl.completed.join(', ')).span).addClass('kittycheat-log');
