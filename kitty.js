@@ -54,14 +54,14 @@
 
   /**
    * Resource spends for both crafting an uncapped buildings. These are quite
-   * sensitive, for instance upping missing to around 12.5% has an adverse
-   * effect of exhausting slabs in some case. For trickle the same could happen
-   * with overspend in some areas and under elsewhere
+   * sensitive, for instance upping missing to could have an adverse effect of
+   * exhausting slabs in some case. For trickle the same could happen with
+   * overspend in some areas and under elsewhere
    *
    * @type {Readonly<{ UNCAPPED: number, CRAFT: Readonly<{ [x in 'MAXIMUM' | 'MISSING' | 'TRICKLE']: number }> }>}
    **/
   const SPEND = {
-    CRAFT: { MAXIMUM: RESOURCES.CRAFT, MISSING: RESOURCES.CRAFT / 5, TRICKLE: RESOURCES.CRAFT / 100 },
+    CRAFT: { MAXIMUM: RESOURCES.CRAFT, MISSING: RESOURCES.CRAFT / 7.5, TRICKLE: RESOURCES.CRAFT / 100 },
     UNCAPPED: 0.1,
   };
 
