@@ -37,21 +37,9 @@
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
 
 ((/** @type {JQuery} */ $, /** @type {KittensGame} */ game) => {
-  /**
-   * Resource spends for both crafting an uncapped buildings. These are quite
-   * sensitive, for instance upping missing to around 12.5% has an adverse
-   * effect of exhausting slabs in some case. For trickle the same could happen
-   * with overspend in some areas and under elsewhere
-   *
-   * @type {Readonly<{ UNCAPPED: number, CRAFT: Readonly<{ [x in 'MAXIMUM' | 'MISSING' | 'TRICKLE']: number }> }>}
-   **/
-  const SPEND = {
-    CRAFT: { MAXIMUM: 0.925, MISSING: 0.0925, TRICKLE: 0.00925 },
-    UNCAPPED: 0.1,
-  };
-
-  /** @type {Readonly<{ LEAST: Readonly<{ [x in KittensNamedRes]?: number }>, NAME: Readonly<{ [x in KittensNamedRes]?: number }>, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>} */
+  /** @type {Readonly<{ CRAFT: number; LEAST: Readonly<{ [x in KittensNamedRes]?: number }>, NAME: Readonly<{ [x in KittensNamedRes]?: number }>, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>} */
   const RESOURCES = {
+    CRAFT: 0.925, // use this via SPEND.CRAFT.MAXIMUM
     LEAST: { necrocorn: 1 }, // have at least this left
     NAME: { karma: 0.5, tears: 1 }, // fractions for name spend
     SKIP: { kittens: true, zebras: true }, // skip these when maxing
@@ -63,6 +51,19 @@
       rare: 0
     } // exhaustive fractions for type spend
   }
+
+  /**
+   * Resource spends for both crafting an uncapped buildings. These are quite
+   * sensitive, for instance upping missing to around 12.5% has an adverse
+   * effect of exhausting slabs in some case. For trickle the same could happen
+   * with overspend in some areas and under elsewhere
+   *
+   * @type {Readonly<{ UNCAPPED: number, CRAFT: Readonly<{ [x in 'MAXIMUM' | 'MISSING' | 'TRICKLE']: number }> }>}
+   **/
+  const SPEND = {
+    CRAFT: { MAXIMUM: RESOURCES.CRAFT, MISSING: RESOURCES.CRAFT / 5, TRICKLE: RESOURCES.CRAFT / 100 },
+    UNCAPPED: 0.1,
+  };
 
   /** @type {Readonly<{ BCOIN: Readonly<{ [x in 'BUY' | 'SELL']: number }>, BUILD: Readonly<{ [x in KittensNamedBldg]?: number }> }>} */
   const MAXVAL = {
