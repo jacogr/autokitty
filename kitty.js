@@ -67,7 +67,7 @@
    * @type {Readonly<{ UNCAPPED: number, CRAFT: Readonly<{ [x in 'MAXIMUM' | 'MISSING' | 'TRICKLE']: number }> }>}
    **/
   const SPEND = {
-    CRAFT: { MAXIMUM: RESOURCES.CRAFT, MISSING: RESOURCES.CRAFT / 7.5, TRICKLE: RESOURCES.CRAFT / 100 },
+    CRAFT: { MAXIMUM: RESOURCES.CRAFT, MISSING: RESOURCES.CRAFT / 5, TRICKLE: RESOURCES.CRAFT / 100 },
     UNCAPPED: 0.1,
   };
 
@@ -1099,6 +1099,8 @@
    * @returns {void}
    */
   function trickleCraft (/** @type {CheatCtrl} */ ctrl) {
+    const /** @type {{ [x in KittensNamedRes]?: boolean }} */ done = {};
+
     for (const _name in cheatMap.crafting.all) {
       const name = /** @type {keyof CheatMap['crafting']['all']} */ (_name);
       const opts = /** @type {CheatOpt} */ (cheatMap.crafting.all[name]);
@@ -1118,17 +1120,26 @@
           for (const p of craft.prices) {
             const pname = /** @type {KittensNamedResCraft} */ (p.name);
             const popts = cheatMap.crafting.all[pname];
-            const r = game.resPool.get(pname);
 
-            if (r.craftable && popts && !popts.noMinCraft && !popts.active && !popts.missing) {
-              fillResources();
-              execCraft(pname, craftFrac);
+            if (!done[pname] && popts && !popts.noMinCraft && !popts.active && !popts.missing) {
+              const r = game.resPool.get(pname);
+
+              if (r.craftable) {
+                done[pname] = true;
+
+                fillResources();
+                execCraft(pname, craftFrac);
+              }
             }
           }
         }
 
-        fillResources();
-        execCraft(name, craftFrac);
+        if (!done[name]) {
+          done[name] = true;
+
+          fillResources();
+          execCraft(name, craftFrac);
+        }
       }
     }
   }
