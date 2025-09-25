@@ -30,9 +30,9 @@
 /** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: KittensNamedBldgBld) => { meta: KittensBtn['model']['metadata'] } }, bldTab: KittensTab<{ children: KittensBtn[] }>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: KittensNamedChallenge) => { researched: boolean } }, diplomacy: { get: (name: KittensNamedRace) => KittensDiplomacyRacePanel['race'], unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: KittensNamedEffect) => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: { children: KittensBtn[] } }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: KittensNamedPerk) => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBtn['model']['metadata'], praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: { children: KittensBtn[] }[] }, ptPanel: { children: { children: KittensBtn[] }[] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: KittensBtn<{ model: { allLink: { handler: (...args: unknown[]) => void } } }>, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number, shatter: (amt: number) => void }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ controller: { doShatterAmt: (model: KittensBtn['model'], amt: number) => void }, model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: { children: KittensBtn[] }[] } }>, space: { getProgram: (name: KittensNamedBldgSpace) => { val: number } }, spaceTab: KittensTab<{ GCPanel: { children: KittensBtn[] }, planetPanels: { children: KittensBtn[] }[] }>, ui: { activeTabId: string }, village: { holdFestival: (amt: number) => void, huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], festivalBtn: KittensBtn<{ x100: { link: HTMLElement } }>, promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
 
 // Kitty Cheat
-/** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => void, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
+/** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, do?: string[], end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => void, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
 /** @template {{ [x: string]: CheatOpt }} T @template {{}} [E={}] @typedef {{ active?: boolean, all: T, div?: jQuery, noExec?: boolean } & E} CheatMapEntry */
-/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: string, name: string, opts: CheatOpt) => void }>, 'btn' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'pollute' | 'uncap' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
+/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: string, name: string, opts: CheatOpt) => void }>, 'btn' | 'do' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'auto' | 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'pollute' | 'uncap' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
 /** @typedef {{ allowedTabs: string[], completed: string[], dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, stats: { [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact']?: string[] } }} CheatCtrl */
 
 // Window
@@ -111,20 +111,21 @@
   const cheatMap = {
     control: {
       all: {
+        auto: { danger: true, do: ['build', 'upgrade', 'craft', 'trade', 'exec', 'max10', 'zig', 'crypto', 'pact', 'time', 'uncap'], excl: ['sell'] },
+        sell: { danger: true, excl: ['auto', 'build'], end: true },
         build: { excl: ['sell'] },
         upgrade: { end: true },
         craft: { group: 'crafting' },
         trade: { group: 'trading' },
         exec: { group: 'actions', end: true },
+        pollute: {},
+        uncap: { active: true, end: true },
         max: { excl: ['max10'] },
         max10: { excl: ['max'], end: true },
         zig: {},
         crypto: {},
         pact: {},
-        time: { end: true },
-        pollute: {},
-        uncap: { active: true, end: true },
-        sell: { danger: true, excl: ['build'] }
+        time: { end: true }
       },
       noExec: true
     },
@@ -324,9 +325,17 @@
     opts.active = active;
     opts.btn[active ? 'addClass' : 'removeClass']('active');
 
-    if (active && opts.excl) {
-      for (const excl of opts.excl) {
-        activateBtn(group, excl, cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (excl)], false);
+    if (active) {
+      if (opts.excl) {
+        for (const e of opts.excl) {
+          activateBtn(group, e, cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (e)], false);
+        }
+      }
+
+      if (opts.do) {
+        for (const d of opts.do) {
+          activateBtn(group, d, cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (d)], true);
+        }
       }
     }
 
