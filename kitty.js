@@ -1101,6 +1101,27 @@
   function trickleCraft (/** @type {CheatCtrl} */ ctrl) {
     const /** @type {{ [x in KittensNamedRes]?: boolean }} */ done = {};
 
+    const loopCraft = (/** @type {keyof CheatMap['crafting']['all']} */ name) => {
+      const craft = game.workshop.getCraft(name);
+
+      for (const p of craft.prices) {
+        const pname = /** @type {KittensNamedResCraft} */ (p.name);
+        const popts = cheatMap.crafting.all[pname];
+
+        if (!done[pname] && popts && !popts.noMinCraft && !popts.active && !popts.missing) {
+          const r = game.resPool.get(pname);
+
+          if (r.craftable) {
+            done[pname] = true;
+
+            loopCraft(pname);
+            fillResources();
+            execCraft(pname, SPEND.CRAFT.MISSING);
+          }
+        }
+      }
+    };
+
     for (const _name in cheatMap.crafting.all) {
       const name = /** @type {keyof CheatMap['crafting']['all']} */ (_name);
       const opts = /** @type {CheatOpt} */ (cheatMap.crafting.all[name]);
@@ -1112,33 +1133,15 @@
       }
 
       if (cheatMap.control.all.craft.active && !opts.noMinCraft && !opts.active) {
-        const craftFrac = SPEND.CRAFT[missing ? 'MISSING' : 'TRICKLE'];
-
-        if (missing) {
-          const craft = game.workshop.getCraft(name);
-
-          for (const p of craft.prices) {
-            const pname = /** @type {KittensNamedResCraft} */ (p.name);
-            const popts = cheatMap.crafting.all[pname];
-
-            if (!done[pname] && popts && !popts.noMinCraft && !popts.active && !popts.missing) {
-              const r = game.resPool.get(pname);
-
-              if (r.craftable) {
-                done[pname] = true;
-
-                fillResources();
-                execCraft(pname, craftFrac);
-              }
-            }
-          }
-        }
-
         if (!done[name]) {
           done[name] = true;
 
+          if (missing) {
+            loopCraft(name);
+          }
+
           fillResources();
-          execCraft(name, craftFrac);
+          execCraft(name, SPEND.CRAFT[missing ? 'MISSING' : 'TRICKLE']);
         }
       }
     }
