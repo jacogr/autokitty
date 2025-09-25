@@ -1101,14 +1101,14 @@
   function trickleCraft (/** @type {CheatCtrl} */ ctrl) {
     const /** @type {{ [x in KittensNamedRes]?: boolean }} */ done = {};
 
-    const loopCraft = (/** @type {keyof CheatMap['crafting']['all']} */ name) => {
+    const loopCraft = (/** @type {KittensNamedResCraft} */ name) => {
       const craft = game.workshop.getCraft(name);
 
       for (const p of craft.prices) {
         const pname = /** @type {KittensNamedResCraft} */ (p.name);
         const popts = cheatMap.crafting.all[pname];
 
-        if (!done[pname] && popts && !popts.noMinCraft && !popts.active && !popts.missing) {
+        if (!done[pname] && popts && !popts.noMinCraft && !popts.active) {
           const r = game.resPool.get(pname);
 
           if (r.craftable) {
@@ -1123,7 +1123,7 @@
     };
 
     for (const _name in cheatMap.crafting.all) {
-      const name = /** @type {keyof CheatMap['crafting']['all']} */ (_name);
+      const name = /** @type {KittensNamedResCraft} */ (_name);
       const opts = /** @type {CheatOpt} */ (cheatMap.crafting.all[name]);
       const missing = !!ctrl.invalids[name];
 
