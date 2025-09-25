@@ -111,21 +111,21 @@
   const cheatMap = {
     control: {
       all: {
-        auto: { danger: true, do: ['build', 'upgrade', 'craft', 'trade', 'exec', 'max10', 'zig', 'crypto', 'pact', 'time', 'uncap'], excl: ['sell'] },
-        sell: { danger: true, excl: ['auto', 'build'], end: true },
         build: { excl: ['sell'] },
         upgrade: { end: true },
         craft: { group: 'crafting' },
         trade: { group: 'trading' },
         exec: { group: 'actions', end: true },
-        pollute: {},
-        uncap: { active: true, end: true },
         max: { excl: ['max10'] },
         max10: { excl: ['max'], end: true },
         zig: {},
         crypto: {},
         pact: {},
-        time: { end: true }
+        time: { end: true },
+        pollute: {},
+        uncap: { active: true, end: true },
+        auto: { danger: true, do: ['build', 'upgrade', 'craft', 'trade', 'exec', 'max10', 'zig', 'crypto', 'pact', 'time', 'uncap'], excl: ['sell'] },
+        sell: { danger: true, excl: ['auto', 'build'], end: true }
       },
       noExec: true
     },
