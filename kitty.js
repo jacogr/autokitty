@@ -507,9 +507,9 @@
           // pollute
           (!cheatMap.control.all.co2.active && btn.model.metadata.effects.cathPollutionPerTickProd) ||
           // storage
-          (!cheatMap.control.all.store.active && Object.keys(btn.model.metadata.effects).find((k) => k !== 'manpowerMax' && k.endsWith('Max'))) ||
+          (!cheatMap.control.all.store.active && Object.keys(btn.model.metadata.effects).find((k) => ['coalMax', 'ironMax', 'titaniumMax', 'goldMax'].includes(k))) ||
           // iron will
-          (cheatMap.control.all.iw.active && Object.keys(btn.model.metadata.effects).find((k) => k === 'maxKittens'))
+          (cheatMap.control.all.iw.active && Object.keys(btn.model.metadata.effects).find((k) => ['maxKittens'].includes(k)))
         ))
        )) ||
       // max builds
