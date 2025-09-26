@@ -13,7 +13,7 @@
 /** @typedef {KittensNamedBldgBld | KittensNamedBldgCrypto | KittensNamedBldgSpace | KittensNamedBldgTimeCF | KittensNamedBldgZU} KittensNamedBldg */
 /** @typedef {'1000Years'} KittensNamedChallenge */
 /** @typedef {'tenErasLink' | 'previousCycleLink' | 'nextCycleLink'} KittensNamedCombustLink */
-/** @typedef {'heatCompression' | 'heatEfficiency' | 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion'} KittensNamedEffect */
+/** @typedef {'cathPollutionPerTickProd' | 'heatCompression' | 'heatEfficiency' | 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion' | 'catnipMax' | 'coalMax' | 'goldMax' | 'ironMax' | 'mineralsMax' | 'titaniumMax' | 'woodMax' | 'manpowerMax' | 'maxKittens'} KittensNamedEffect */
 /** @typedef {'fractured' | 'pactOfCleansing' | 'pactOfDestruction' | 'pactOfExtermination' | 'pactOfPurity' | 'payDebt'} KittensNamedPact */
 /** @typedef {'numeromancy' | 'unicornmancy'} KittensNamedPerk */
 /** @typedef {'authocracy' | 'bigStickPolicy' | 'carnivale' | 'cityOnAHill' | 'clearCutting' | 'communism' | 'conservation' | 'cryochamberExtraction' | 'culturalExchange' | 'diplomacy' | 'dragonRelationsAstrologers' | 'dragonRelationsDynamicists' | 'dragonRelationsPhysicists' | 'environmentalism' | 'epicurianism' | 'expansionism' | 'extravagance' | 'fascism' | 'frugality' | 'fullIndustrialization' | 'griffinRelationsMachinists' | 'griffinRelationsMetallurgists' | 'griffinRelationsScouts' | 'isolationism' | 'knowledgeSharing' | 'liberalism' | 'liberty' | 'lizardRelationsDiplomats' | 'lizardRelationsEcologists' | 'lizardRelationsPriests' | 'militarizeSpace' | 'monarchy' | 'mysticism' | 'nagaRelationsArchitects' | 'nagaRelationsCultists' | 'nagaRelationsMasons' | 'necrocracy' | 'openWoodlands' | 'outerSpaceTreaty' | 'radicalXenophobia' | 'rationality' | 'rationing' | 'republic' | 'scientificCommunism' | 'sharkRelationsBotanists' | 'sharkRelationsMerchants' | 'sharkRelationsScribes' | 'siphoning' | 'socialism' | 'spiderRelationsChemists' | 'spiderRelationsGeologists' | 'spiderRelationsPaleontologists' | 'stoicism' | 'stripMining' | 'sustainability' | 'technocracy' | 'terraformingInsight' | 'theocracy' | 'tradition' | 'transkittenism' | 'zebraRelationsAppeasement' | 'zebraRelationsBellicosity'} KittensNamedPolicy */
@@ -21,7 +21,7 @@
 /** @typedef {'alloy' | 'beam' | 'bloodstone' | 'blueprint' | 'compedium' | 'concrate' | 'eludium' | 'gear' | 'kerosene' | 'manuscript' | 'megalith' |'parchment' | 'plate' | 'scaffold' |  'ship' | 'slab' | 'steel' | 'tMythril' | 'tanker' | 'thorium' | 'wood'} KittensNamedResCraft */
 /** @typedef {'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
-/** @template {{}} [E={}] @typedef {{ controller: { sellInternal: (model: KittensBtn<E>['model'], remain: number, check: boolean) => void }, domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: { effects: { cathPollutionPerTickProd?: number, riftChance?: number, unicornsPerTickBase?: number, unicornsRatioReligion?: number }, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }, name?: string, on: number, prices: KittensPrice[], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
+/** @template {{}} [E={}] @typedef {{ controller: { sellInternal: (model: KittensBtn<E>['model'], remain: number, check: boolean) => void }, domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: { effects: { [x in KittensNamedEffect]?: number }, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }, name?: string, on: number, prices: KittensPrice[], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
 /** @template {{}} [E={}] @typedef {{ embassyButton: KittensBtn, race: { name: KittensNamedRace, unlocked: boolean }, tradeBtn: { tradeAllHref: { link: HTMLElement } } } & E} KittensDiplomacyRacePanel */
 /** @typedef {KittensDiplomacyRacePanel<{ buyBcoin: KittensBtn, sellBcoin: KittensBtn, feedBtn: KittensBtn }>} KittensDiplomacyRacePanelLeviathans */
 /** @typedef {{ name: KittensNamedRes, val: number }} KittensPrice */
@@ -32,7 +32,7 @@
 // Kitty Cheat
 /** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, do?: string[], end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => void, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
 /** @template {{ [x: string]: CheatOpt }} T @template {{}} [E={}] @typedef {{ active?: boolean, all: T, div?: jQuery, noExec?: boolean } & E} CheatMapEntry */
-/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: string, name: string, opts: CheatOpt) => void }>, 'btn' | 'do' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'auto' | 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'pollute' | 'uncap' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
+/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: string, name: string, opts: CheatOpt) => void }>, 'btn' | 'do' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'auto' | 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'co2' | 'store' | 'uncap' | 'iw' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
 /** @typedef {{ allowedTabs: string[], completed: string[], dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, stats: { [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact']?: string[] } }} CheatCtrl */
 
 // Window
@@ -122,8 +122,10 @@
         crypto: {},
         pact: {},
         time: { end: true },
-        pollute: {},
-        uncap: { active: true, end: true },
+        store: { active: true },
+        uncap: { active: true },
+        co2: {},
+        iw: { end: true },
         auto: { danger: true, do: ['build', 'upgrade', 'craft', 'trade', 'exec', 'max10', 'zig', 'crypto', 'pact', 'time', 'uncap'], excl: ['sell'] },
         sell: { danger: true, excl: ['auto', 'build'], end: true }
       },
@@ -491,7 +493,28 @@
    * @returns {{ isBuildable: boolean, isUncapped?: boolean }}
    **/
   function checkBuilding (/** @type {KittensBtn?=} */ btn, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {{ withCap?: boolean, withFill?: boolean }} */ opts = {}) {
-    if (!btn?.model?.visible || (btn.model.metadata?.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) || (btn.model.metadata?.val && btn.model.metadata.on !== btn.model.metadata.val) || (!cheatMap.control.all.pollute.active && btn.model.metadata?.effects?.cathPollutionPerTickProd) || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
+    if (
+      // visibility
+      !btn?.model?.visible ||
+      // anything metadata related
+      (btn.model.metadata && (
+        // limit builds
+        (btn.model.metadata.limitBuild && btn.model.metadata.val >= btn.model.metadata.limitBuild) ||
+        // buildings off
+        (btn.model.metadata.val && btn.model.metadata.on !== btn.model.metadata.val) ||
+        // anything effect related
+        (btn.model.metadata.effects && (
+          // pollute
+          (!cheatMap.control.all.co2.active && btn.model.metadata.effects.cathPollutionPerTickProd) ||
+          // storage
+          (!cheatMap.control.all.store.active && Object.keys(btn.model.metadata.effects).find((k) => k !== 'manpowerMax' && k.endsWith('Max'))) ||
+          // iron will
+          (cheatMap.control.all.iw.active && Object.keys(btn.model.metadata.effects).find((k) => k === 'maxKittens'))
+        ))
+       )) ||
+      // max builds
+      (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))
+    ) {
       return { isBuildable: false };
     }
 
