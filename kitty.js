@@ -852,7 +852,7 @@
             return true;
           }
 
-          hasSome ||= pushBtnName(ctrl.completed, btn, /** @type {{ race?: { title: string } }} */ (btn).race?.title);
+          hasSome = pushBtnName(ctrl.completed, btn, /** @type {{ race?: { title: string } }} */ (btn).race?.title) || hasSome;
         }
       }
     }
@@ -922,7 +922,7 @@
           return true;
         }
 
-        hasSome ||= pushBtnName(ctrl.completed, bldg.btn);
+        hasSome = pushBtnName(ctrl.completed, bldg.btn) || hasSome;
       }
     }
 
@@ -957,7 +957,7 @@
         break;
       }
 
-      hasSome ||= pushBtnName(ctrl.completed, next.btn);
+      hasSome = pushBtnName(ctrl.completed, next.btn) || hasSome;
       zig = calcZiggurats();
     }
 
@@ -1026,7 +1026,7 @@
           return true;
         }
 
-        hasSome ||= pushBtnName(ctrl.completed, best.btn);
+        hasSome = pushBtnName(ctrl.completed, best.btn) || hasSome;
       } else {
         break;
       }
@@ -1068,7 +1068,7 @@
 
       if (nowDelta > INTERVAL.EXPLORE) {
         lastExploreTime = nowTime;
-        hasSome ||= clickBtn(d.exploreBtn);
+        hasSome = clickBtn(d.exploreBtn) || hasSome;
       }
     }
 
