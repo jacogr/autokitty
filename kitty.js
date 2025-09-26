@@ -126,7 +126,7 @@
         uncap: { active: true },
         co2: {},
         iw: { end: true },
-        auto: { danger: true, do: ['build', 'upgrade', 'craft', 'trade', 'exec', 'max10', 'zig', 'crypto', 'pact', 'time', 'uncap'], excl: ['sell'] },
+        auto: { danger: true, do: ['build', 'upgrade', 'craft', 'trade', 'exec', 'max10', 'zig', 'crypto', 'pact', 'time'], excl: ['sell'] },
         sell: { danger: true, excl: ['auto', 'build'], end: true }
       },
       noExec: true
