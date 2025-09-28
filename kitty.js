@@ -21,7 +21,7 @@
 /** @typedef {'alloy' | 'beam' | 'bloodstone' | 'blueprint' | 'compedium' | 'concrate' | 'eludium' | 'gear' | 'kerosene' | 'manuscript' | 'megalith' |'parchment' | 'plate' | 'scaffold' |  'ship' | 'slab' | 'steel' | 'tMythril' | 'tanker' | 'thorium' | 'wood'} KittensNamedResCraft */
 /** @typedef {'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
-/** @template {{}} [E={}] @typedef {{ controller: { sellInternal: (model: KittensBtn<E>['model'], remain: number, check: boolean) => void }, domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: { effects: { [x in KittensNamedEffect]?: number }, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }, name?: string, on: number, prices: KittensPrice[], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
+/** @template {{}} [E={}] @typedef {{ controller: { sellInternal: (model: KittensBtn<E>['model'], remain: number, check: boolean) => void }, domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: { effects: { [x in KittensNamedEffect]?: number }, isAutomationEnabled?: boolean, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }, name?: string, on: number, prices: KittensPrice[], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], toggleAutomationLink?: { enabled: boolean,  handler: ((...args: unknown[]) => void), title: 'A' | '*' }, visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
 /** @template {{}} [E={}] @typedef {{ embassyButton: KittensBtn, race: { name: KittensNamedRace, unlocked: boolean }, tradeBtn: { tradeAllHref: { link: HTMLElement } } } & E} KittensDiplomacyRacePanel */
 /** @typedef {KittensDiplomacyRacePanel<{ buyBcoin: KittensBtn, sellBcoin: KittensBtn, feedBtn: KittensBtn }>} KittensDiplomacyRacePanelLeviathans */
 /** @typedef {{ name: KittensNamedRes, val: number }} KittensPrice */
@@ -78,10 +78,16 @@
    * ranges for vlackcoin as well as the maximum number of buildings (with a
    * specific name/id) that can be constructed.
    *
+   * For blackcoin, resets are at 1100, dropping to between 780 and 880, set
+   * the buy/sell limits around these with some room to spare.
+   *
+   * For builds, 25 HGs are optimal for maximum paragon. Impedance it set to
+   * a low value (even 1 should be enough with a large number of challenges)
+   *
    * @type {Readonly<{ BCOIN: Readonly<{ [x in 'BUY' | 'SELL']: number }>, BUILD: Readonly<{ [x in KittensNamedBldg]?: number }> }>} */
   const MAXVAL = {
-    BCOIN: { BUY: 899, SELL: 1089 }, // sell bcoin when it hits this amount (1100 is a crash)
-    BUILD: { holyGenocide: 25, temporalImpedance: 1 } // build at most 25 HGs - this is optimal for paragon
+    BCOIN: { BUY: 899, SELL: 1089 },
+    BUILD: { holyGenocide: 25, temporalImpedance: 2 }
   };
 
   /**
@@ -122,7 +128,7 @@
         crypto: {},
         pact: {},
         time: { end: true },
-        store: { active: true },
+        store: { noShow: true, active: true },
         uncap: { active: true },
         co2: {},
         iw: { end: true },
@@ -233,7 +239,9 @@
           end: true
         },
         feed: {
-          fn: fnFeed,
+          fn: function fnFeed () {
+            (game.resPool.get('necrocorn').value > (RESOURCES.LEAST.necrocorn || 0)) && renderBgTab(game.diplomacyTab) && clickBtn(findLeviathans()?.feedBtn);
+          },
           delay: INTERVAL.FEED,
           noFill: true
         },
@@ -752,18 +760,6 @@
   }
 
   /**
-   * @description Feed necrocorns to the elders. This means that they stay
-   * longer and trades yield better results.
-   *
-   * @returns {void}
-   **/
-  function fnFeed () {
-    if ((game.resPool.get('necrocorn').value > (RESOURCES.LEAST.necrocorn || 0)) && renderBgTab(game.diplomacyTab)) {
-      clickBtn(findLeviathans()?.feedBtn);
-    }
-  }
-
-  /**
    * @description Trade blackcoin. Buy at the bottom, hold, sell at the top.
    *
    * @returns {void}
@@ -996,7 +992,7 @@
    **/
   function buyTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
     if (!ctrl.dryRun && btn.model.enabled && btn.model.visible && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
-      return true;
+      // return true;
     }
 
     const check = checkBuilding(btn, ctrl.invalids, { withCap: true, withFill: !ctrl.dryRun });
@@ -1029,6 +1025,10 @@
    *
    * @returns {boolean} */
   function unlockTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
+    if (!ctrl.dryRun && btn.model.on && btn.model.toggleAutomationLink?.enabled && btn.model.toggleAutomationLink.title === '*' && !btn.model.metadata?.isAutomationEnabled && btn.model.toggleAutomationLink.handler.call(noop, noop, noop)) {
+      // return true;
+    }
+
     return checkBuilding(btn, ctrl.invalids, { withFill: !ctrl.dryRun }).isBuildable && (ctrl.dryRun || clickBtn(btn, isAll));
   }
 
@@ -1224,7 +1224,7 @@
       loopTabs(ctrl, 'upgrade', ['libraryTab'], unlockNamedTab, policies);
       loopTabs(ctrl, 'pact', ['religionTab'], unlockNamedTab, pacts);
       loopTabs(ctrl, 'time', ['timeTab'], unlockNamedTab, cfbldgs, () =>
-        game.getEffect('heatMax') < (40000 * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (1 - (1 - (1 / (1 + game.getEffect('heatCompression'))))))
+        game.getEffect('heatMax') < ((40000 - game.calendar.year) * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (1 - (1 - (1 / (1 + game.getEffect('heatCompression'))))))
       );
 
       trickleCraft(ctrl);
