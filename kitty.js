@@ -990,14 +990,14 @@
    *
    * @returns {boolean}
    **/
-  function buyTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
-    if (!ctrl.dryRun && btn.model.enabled && btn.model.visible && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
+  function buyTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn=} */ btn) {
+    if (!ctrl.dryRun && btn?.model.enabled && btn.model.visible && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
       // return true;
     }
 
     const check = checkBuilding(btn, ctrl.invalids, { withCap: true, withFill: !ctrl.dryRun });
 
-    return check.isBuildable && (ctrl.dryRun || clickBtn(btn, !check.isUncapped && !!btn.model.metadata && btn.model.metadata.on >= 1));
+    return check.isBuildable && (ctrl.dryRun || clickBtn(btn, !check.isUncapped && !!btn?.model.metadata && btn.model.metadata.on >= 1));
   }
 
   /**
@@ -1008,8 +1008,8 @@
    *
    * @returns {boolean}
    **/
-  function sellTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
-    if (!ctrl.dryRun && btn.model.metadata?.val && btn.model.metadata.name !== 'chronosphere') {
+  function sellTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn=} */ btn) {
+    if (!ctrl.dryRun && btn?.model.metadata?.val && btn.model.metadata.name !== 'chronosphere') {
       btn.controller.sellInternal(btn.model, 0, false);
       return true;
     }
@@ -1024,8 +1024,8 @@
    * well as in theology.
    *
    * @returns {boolean} */
-  function unlockTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
-    if (!ctrl.dryRun && btn.model.enabled && btn.model.visible && btn.model.toggleAutomationLink?.enabled && !btn.model.metadata?.isAutomationEnabled && btn.model.toggleAutomationLink.title === '*' && btn.model.toggleAutomationLink.handler.call(noop, noop, noop)) {
+  function unlockTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn=} */ btn, /** @type {boolean} */ isAll) {
+    if (!ctrl.dryRun && btn?.model.enabled && btn.model.visible && btn.model.toggleAutomationLink?.enabled && !btn.model.metadata?.isAutomationEnabled && btn.model.toggleAutomationLink.title === '*' && btn.model.toggleAutomationLink.handler.call(noop, noop, noop)) {
       // return true;
     }
 
