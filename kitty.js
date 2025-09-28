@@ -503,7 +503,7 @@
   function checkBuilding (/** @type {KittensBtn} */ btn, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {{ withCap?: boolean, withFill?: boolean }} */ opts = {}) {
     if (
       // visibility
-      !btn?.model?.visible ||
+      !btn.model.visible ||
       // anything metadata related
       (btn.model.metadata && (
         // limit builds
@@ -991,7 +991,7 @@
    * @returns {boolean}
    **/
   function buyTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
-    if (!ctrl.dryRun && btn.model.enabled && btn.model.visible && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
+    if (!ctrl.dryRun && btn.model.enabled && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
       // return true;
     }
 
@@ -1025,9 +1025,7 @@
    *
    * @returns {boolean} */
   function unlockTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
-    btn.id && console.log(btn.id);
-
-    if (!ctrl.dryRun && btn.model.enabled && btn.model.visible && btn.model.toggleAutomationLink?.enabled && !btn.model.metadata?.isAutomationEnabled && btn.model.toggleAutomationLink.title === '*' && btn.model.toggleAutomationLink.handler.call(noop, noop, noop)) {
+    if (!ctrl.dryRun && btn.model.enabled && btn.model.toggleAutomationLink?.enabled && !btn.model.metadata?.isAutomationEnabled && btn.model.toggleAutomationLink.title === '*' && btn.model.toggleAutomationLink.handler.call(noop, noop, noop)) {
       // return true;
     }
 
