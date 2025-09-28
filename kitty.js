@@ -500,7 +500,7 @@
    *
    * @returns {{ isBuildable: boolean, isUncapped?: boolean }}
    **/
-  function checkBuilding (/** @type {KittensBtn?=} */ btn, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {{ withCap?: boolean, withFill?: boolean }} */ opts = {}) {
+  function checkBuilding (/** @type {KittensBtn} */ btn, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {{ withCap?: boolean, withFill?: boolean }} */ opts = {}) {
     if (
       // visibility
       !btn?.model?.visible ||
@@ -866,7 +866,7 @@
 
     for (const area of areas) {
       for (const btn of area.children) {
-        if (btn && (!withMeta || btn.model.metadata) && (!withIds || (btn.id && withIds.includes(btn.id))) && buttonFn(ctrl, btn, !!withAll)) {
+        if (btn?.model?.visible && (!withMeta || btn.model.metadata) && (!withIds || (btn.id && withIds.includes(btn.id))) && buttonFn(ctrl, btn, !!withAll)) {
           if (ctrl.dryRun) {
             return true;
           }
@@ -915,7 +915,7 @@
 
     return {
       btn,
-      isBuildable: checkBuilding(btn, invalids).isBuildable,
+      isBuildable: !!btn && checkBuilding(btn, invalids).isBuildable,
       tears: btn?.model.prices.find((p) => p.name === 'tears')
     };
   }
@@ -1025,6 +1025,8 @@
    *
    * @returns {boolean} */
   function unlockTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
+    btn.id && console.log(btn.id);
+
     if (!ctrl.dryRun && btn.model.enabled && btn.model.visible && btn.model.toggleAutomationLink?.enabled && !btn.model.metadata?.isAutomationEnabled && btn.model.toggleAutomationLink.title === '*' && btn.model.toggleAutomationLink.handler.call(noop, noop, noop)) {
       // return true;
     }
