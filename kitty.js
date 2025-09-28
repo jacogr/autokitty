@@ -414,7 +414,7 @@
    *
    * @returns {boolean}
    **/
-  function pushBtnName (/** @type {string[]} */ arr, /** @type {KittensBtn=} */ btn, /** @type {string?=} */ extra = null) {
+  function pushBtnName (/** @type {string[]} */ arr, /** @type {KittensBtn} */ btn, /** @type {string?=} */ extra = null) {
     const n = getBtnName(btn, extra);
 
     return !!(n && arr.push(n));
@@ -866,7 +866,7 @@
 
     for (const area of areas) {
       for (const btn of area.children) {
-        if ((!withMeta || btn.model.metadata) && (!withIds || (btn.id && withIds.includes(btn.id))) && buttonFn(ctrl, btn, !!withAll)) {
+        if (btn && (!withMeta || btn.model.metadata) && (!withIds || (btn.id && withIds.includes(btn.id))) && buttonFn(ctrl, btn, !!withAll)) {
           if (ctrl.dryRun) {
             return true;
           }
@@ -936,7 +936,7 @@
     for (const name of extras) {
       const bldg = getZigInfo(name, ctrl.invalids);
 
-      if (bldg.isBuildable && (ctrl.dryRun || clickBtn(bldg.btn, true))) {
+      if (bldg.btn && bldg.isBuildable && (ctrl.dryRun || clickBtn(bldg.btn, true))) {
         if (ctrl.dryRun) {
           return true;
         }
@@ -990,8 +990,8 @@
    *
    * @returns {boolean}
    **/
-  function buyTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn=} */ btn) {
-    if (!ctrl.dryRun && btn?.model.enabled && btn.model.visible && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
+  function buyTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
+    if (!ctrl.dryRun && btn.model.enabled && btn.model.visible && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
       // return true;
     }
 
@@ -1008,8 +1008,8 @@
    *
    * @returns {boolean}
    **/
-  function sellTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn=} */ btn) {
-    if (!ctrl.dryRun && btn?.model.metadata?.val && btn.model.metadata.name !== 'chronosphere') {
+  function sellTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
+    if (!ctrl.dryRun && btn.model.metadata?.val && btn.model.metadata.name !== 'chronosphere') {
       btn.controller.sellInternal(btn.model, 0, false);
       return true;
     }
@@ -1024,8 +1024,8 @@
    * well as in theology.
    *
    * @returns {boolean} */
-  function unlockTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn=} */ btn, /** @type {boolean} */ isAll) {
-    if (!ctrl.dryRun && btn?.model.enabled && btn.model.visible && btn.model.toggleAutomationLink?.enabled && !btn.model.metadata?.isAutomationEnabled && btn.model.toggleAutomationLink.title === '*' && btn.model.toggleAutomationLink.handler.call(noop, noop, noop)) {
+  function unlockTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
+    if (!ctrl.dryRun && btn.model.enabled && btn.model.visible && btn.model.toggleAutomationLink?.enabled && !btn.model.metadata?.isAutomationEnabled && btn.model.toggleAutomationLink.title === '*' && btn.model.toggleAutomationLink.handler.call(noop, noop, noop)) {
       // return true;
     }
 
@@ -1044,7 +1044,7 @@
     let hasSome = false;
 
     for (const best of (all || [])) {
-      if (best.percent && best.percent.frac >= 1 && unlockTabBtn(ctrl, best.btn, false)) {
+      if (best.btn && best.percent && best.percent.frac >= 1 && unlockTabBtn(ctrl, best.btn, false)) {
         if (ctrl.dryRun) {
           return true;
         }
