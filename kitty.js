@@ -1025,7 +1025,7 @@
    *
    * @returns {boolean} */
   function unlockTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
-    if (!ctrl.dryRun && btn.model.on && btn.model.toggleAutomationLink?.enabled && btn.model.toggleAutomationLink.title === '*' && !btn.model.metadata?.isAutomationEnabled && btn.model.toggleAutomationLink.handler.call(noop, noop, noop)) {
+    if (!ctrl.dryRun && btn.model.enabled && btn.model.visible && btn.model.toggleAutomationLink?.enabled && !btn.model.metadata?.isAutomationEnabled && btn.model.toggleAutomationLink.title === '*' && btn.model.toggleAutomationLink.handler.call(noop, noop, noop)) {
       // return true;
     }
 
