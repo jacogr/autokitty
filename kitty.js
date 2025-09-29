@@ -19,7 +19,7 @@
 /** @typedef {'authocracy' | 'bigStickPolicy' | 'carnivale' | 'cityOnAHill' | 'clearCutting' | 'communism' | 'conservation' | 'cryochamberExtraction' | 'culturalExchange' | 'diplomacy' | 'dragonRelationsAstrologers' | 'dragonRelationsDynamicists' | 'dragonRelationsPhysicists' | 'environmentalism' | 'epicurianism' | 'expansionism' | 'extravagance' | 'fascism' | 'frugality' | 'fullIndustrialization' | 'griffinRelationsMachinists' | 'griffinRelationsMetallurgists' | 'griffinRelationsScouts' | 'isolationism' | 'knowledgeSharing' | 'liberalism' | 'liberty' | 'lizardRelationsDiplomats' | 'lizardRelationsEcologists' | 'lizardRelationsPriests' | 'militarizeSpace' | 'monarchy' | 'mysticism' | 'nagaRelationsArchitects' | 'nagaRelationsCultists' | 'nagaRelationsMasons' | 'necrocracy' | 'openWoodlands' | 'outerSpaceTreaty' | 'radicalXenophobia' | 'rationality' | 'rationing' | 'republic' | 'scientificCommunism' | 'sharkRelationsBotanists' | 'sharkRelationsMerchants' | 'sharkRelationsScribes' | 'siphoning' | 'socialism' | 'spiderRelationsChemists' | 'spiderRelationsGeologists' | 'spiderRelationsPaleontologists' | 'stoicism' | 'stripMining' | 'sustainability' | 'technocracy' | 'terraformingInsight' | 'theocracy' | 'tradition' | 'transkittenism' | 'zebraRelationsAppeasement' | 'zebraRelationsBellicosity'} KittensNamedPolicy */
 /** @typedef {'dragons' | 'griffins' | 'leviathans' | 'lizards' |'nagas' | 'sharks' | 'spiders' | 'zebras'} KittensNamedRace */
 /** @typedef {'alloy' | 'beam' | 'bloodstone' | 'blueprint' | 'compedium' | 'concrate' | 'eludium' | 'gear' | 'kerosene' | 'manuscript' | 'megalith' |'parchment' | 'plate' | 'scaffold' |  'ship' | 'slab' | 'steel' | 'tMythril' | 'tanker' | 'thorium' | 'wood'} KittensNamedResCraft */
-/** @typedef {'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
+/** @typedef {'alicorn' | 'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
 /** @template {{}} [E={}] @typedef {{ controller: { sellInternal: (model: KittensBtn<E>['model'], remain: number, check: boolean) => void }, domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: { effects: { [x in KittensNamedEffect]?: number }, isAutomationEnabled?: boolean, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }, name?: string, on: number, prices: KittensPrice[], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], toggleAutomationLink?: { enabled: boolean,  handler: ((...args: unknown[]) => void), title: 'A' | '*' }, visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
 /** @template {{}} [E={}] @typedef {{ embassyButton: KittensBtn, race: { name: KittensNamedRace, unlocked: boolean }, tradeBtn: { tradeAllHref: { link: HTMLElement } } } & E} KittensDiplomacyRacePanel */
@@ -48,7 +48,7 @@
    **/
   const RESOURCES = {
     CRAFT: 0.925, // use this via SPEND.CRAFT.MAXIMUM
-    LEAST: { necrocorn: 1 }, // have at least this left
+    LEAST: { alicorn: 1, necrocorn: 1 }, // have at least this left
     NAME: { karma: 0.5, tears: 1 }, // fractions for name spend
     SKIP: { kittens: true, zebras: true }, // skip these when maxing
     TYPE: {
@@ -471,21 +471,23 @@
         // instance starcharts), we assume that we have a building that is
         // capped. Additionally we also bypass resource checks for those where
         // we want to spend (almost) all - necrocorns is the typical example.
-        if (r.maxValue || r.perTickCached || RESOURCES.LEAST[r.name]) {
+        //
+        // NOTE: This assumes capped resources always appear before uncapped
+        if (isUncapped && (r.maxValue || r.perTickCached || RESOURCES.LEAST[r.name])) {
           isUncapped = false;
-          break;
         }
-      }
-    }
 
-    for (const p of prices) {
-      if (p.name !== skip) {
-        const r = game.resPool.get(p.name);
-        const f = RESOURCES.NAME[r.name] || RESOURCES.TYPE[r.type] || (isUncapped && SPEND.UNCAPPED) || 1;
-        const m = RESOURCES.LEAST[r.name] || 0;
+        // We (currently) only mark the first invalid - this ensure that when
+        // we are already capped, we don't display the other resources that
+        // may come into play in the future. (We have gone both ways, hence the
+        // usage of "currently" above...)
+        if (!isInvalid) {
+          const f = RESOURCES.NAME[r.name] || RESOURCES.TYPE[r.type] || (isUncapped && SPEND.UNCAPPED) || 1;
+          const m = RESOURCES.LEAST[r.name] || 0;
 
-        if (((r.value - p.val) < m) || ((p.val / r.value) > f)) {
-          isInvalid = invalids[r.name] = true;
+          if (((r.value - p.val) < m) || ((p.val / r.value) > f)) {
+            isInvalid = invalids[r.name] = true;
+          }
         }
       }
     }
