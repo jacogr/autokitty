@@ -247,6 +247,7 @@
         },
         bcoin: {
           fn: fnTradeBcoin,
+          active: true,
           delay: INTERVAL.BCOIN,
           end: true
         },
@@ -258,6 +259,7 @@
         },
         '40k': {
           fn: fnCombust40k,
+          active: true,
           delay: INTERVAL.COMBUST,
           excl: ['combust'],
           end: true,
