@@ -1,5 +1,12 @@
 // @ts-check
 
+/**
+ * Just a somewhat fun, throw away serious chat for the kittens game. Since it
+ * actually has a "cheat" achievement, why not do something fun. Probably not
+ * fit for purpose, and probably over-engineered (and/or documented), but it
+ * is what it is.
+ */
+
 // jQuery
 /** @typedef {{ addClass: (classes: string) => jQuery, append: (elem: jQuery | string) => jQuery, click: (fn?: () => unknown) => jQuery, css: (style: { [x: string]: string | number } | string, val?: string | number) => jQuery, filter: (fn: (index: number, elem: HTMLElement) => boolean) => jQuery, html: (html: string) => jQuery, length: number, removeClass: (classes: string) => jQuery, text: () => string }} jQuery */
 /** @typedef {(elem: HTMLElement | string) => jQuery} JQuery */
@@ -379,13 +386,9 @@
    * return an invalid (null) value. In our usage we only expect values within
    * this range.
    *
-   * @returns {{ frac: number, raw: number, text: string } | null}
+   * @returns {{ frac: number, raw: number, text: string }}
    **/
   function toPercent (/** @type {number} */ frac) {
-    if (frac < 0 || frac > Number.MAX_SAFE_INTEGER) {
-      return null;
-    }
-
     const raw = 100 * frac;
 
     return {
@@ -658,7 +661,7 @@
       }
     }
 
-    return { bestBuilding, btn: bestBtn, ratio: zigguratRatio, text: getBtnName(bestBtn, toPercent((((game.resPool.get('tears').value * 2500) / zigguratRatio) + game.resPool.get('unicorns').value) / bestPrice)?.text) };
+    return { bestBuilding, btn: bestBtn, ratio: zigguratRatio, text: getBtnName(bestBtn, toPercent((((game.resPool.get('tears').value * 2500) / zigguratRatio) + game.resPool.get('unicorns').value) / bestPrice).text) };
   }
 
   /**
@@ -670,12 +673,11 @@
    **/
   function calcBcoin () {
     const price = game.calendar.cryptoPrice;
-    const action =
-      price >= MAXVAL.BCOIN.SELL
-        ? 'sell'
-        : price <= MAXVAL.BCOIN.BUY
-          ? 'buy'
-          : 'hold';
+    const action = price >= MAXVAL.BCOIN.SELL
+      ? 'sell'
+      : price <= MAXVAL.BCOIN.BUY
+        ? 'buy'
+        : 'hold';
 
     return {
       action,
@@ -716,7 +718,7 @@
         return {
           btn,
           percent,
-          text: getBtnName(btn, percent?.text)
+          text: getBtnName(btn, percent.text)
         };
       });
   }
@@ -755,8 +757,9 @@
     } else if (opts.active) {
       activateBtn(/** @type {keyof CheatMap} */ (group), name, opts, false);
 
-      // Start a festival with a 100 year duration (aligning with the x100 button). During festivals
-      // the kittens are happier and (most importantly) they arrive faster, i.e. we have shorter runs.
+      // Start a festival with a 100 year duration (aligning with the x100
+      // button). During festivals the kittens are happier and (most
+      // importantly) they arrive faster, i.e. we have shorter runs.
       if (!game.calendar.festivalDays) {
         game.village.holdFestival(100);
       }
@@ -1256,8 +1259,8 @@
     $('div#kittycheat-txt-dryupg').html(`Upgrades : ${bld.upgrade?.join(', ') || '-'}`);
     $('div#kittycheat-txt-relzig').html(`Ziggurat : ${calcZiggurats().text || '-'}`);
     $('div#kittycheat-txt-relcry').html(`Theology : ${calcTheology()?.[0]?.text || '-'}`);
-    $('div#kittycheat-txt-rellvl').html(`Transcend: ${calcTranscend()?.text || '-'}`);
-    $('div#kittycheat-txt-bcoins').html(`Blackcoin: ${calcBcoin()?.text || '-'}`);
+    $('div#kittycheat-txt-rellvl').html(`Transcend: ${calcTranscend().text || '-'}`);
+    $('div#kittycheat-txt-bcoins').html(`Blackcoin: ${calcBcoin().text || '-'}`);
 
     setTimeout(() => execTextInfo(delay), delay);
   }
