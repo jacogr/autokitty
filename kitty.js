@@ -1231,7 +1231,7 @@
       loopTabs(ctrl, 'upgrade', ['libraryTab'], unlockNamedTab, policies);
       loopTabs(ctrl, 'pact', ['religionTab'], unlockNamedTab, pacts);
       loopTabs(ctrl, 'time', ['timeTab'], unlockNamedTab, cfbldgs, () =>
-        game.getEffect('heatMax') < ((40000 - game.calendar.year) * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (1 - (1 - (1 / (1 + game.getEffect('heatCompression'))))))
+        game.getEffect('heatMax') < (40000 * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (1 - (1 - (1 / (1 + game.getEffect('heatCompression'))))))
       );
 
       trickleCraft(ctrl);
