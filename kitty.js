@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * Just a somewhat fun, throw away serious chat for the kittens game. Since it
+ * Just a somewhat fun, throw away serious cheat for the kittens game. Since it
  * actually has a "cheat" achievement, why not do something fun. Probably not
  * fit for purpose, and probably over-engineered (and/or documented), but it
  * is what it is.
@@ -28,13 +28,14 @@
 /** @typedef {'alloy' | 'beam' | 'bloodstone' | 'blueprint' | 'compedium' | 'concrate' | 'eludium' | 'gear' | 'kerosene' | 'manuscript' | 'megalith' |'parchment' | 'plate' | 'scaffold' |  'ship' | 'slab' | 'steel' | 'tMythril' | 'tanker' | 'thorium' | 'wood'} KittensNamedResCraft */
 /** @typedef {'alicorn' | 'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
-/** @template {{}} [E={}] @typedef {{ controller: { sellInternal: (model: KittensBtn<E>['model'], remain: number, check: boolean) => void }, domNode: HTMLElement, id: string, model: { enabled: boolean, metadata?: { effects: { [x in KittensNamedEffect]?: number }, isAutomationEnabled?: boolean, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }, name?: string, on: number, prices: KittensPrice[], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], toggleAutomationLink?: { enabled: boolean,  handler: ((...args: unknown[]) => void), title: 'A' | '*' }, visible: boolean }, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
+/** @typedef {{ enabled: boolean, metadata?: { effects: { [x in KittensNamedEffect]?: number }, isAutomationEnabled?: boolean, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }, name?: string, on: number, prices: KittensPrice[], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], toggleAutomationLink?: { enabled: boolean,  handler: ((...args: unknown[]) => void), title: 'A' | '*' }, visible: boolean }} KittensBtnModel */
+/** @template {{}} [E={}] @typedef {{ controller: { sellInternal: (model: KittensBtn<E>['model'], remain: number, check: boolean) => void }, domNode: HTMLElement, id: string, model?: KittensBtnModel, opts?: { loadout: { pinned: boolean }, name: string } } & E} KittensBtn */
 /** @template {{}} [E={}] @typedef {{ embassyButton: KittensBtn, race: { name: KittensNamedRace, unlocked: boolean }, tradeBtn: { tradeAllHref: { link: HTMLElement } } } & E} KittensDiplomacyRacePanel */
 /** @typedef {KittensDiplomacyRacePanel<{ buyBcoin: KittensBtn, sellBcoin: KittensBtn, feedBtn: KittensBtn }>} KittensDiplomacyRacePanelLeviathans */
 /** @typedef {{ name: KittensNamedRes, val: number }} KittensPrice */
 /** @typedef {{ craftable: boolean, isHidden: boolean, maxValue: number, name: KittensNamedRes, perTickCached: number, type: 'common' | 'exotic' | 'rare', unlocked: boolean, value: number }} KittensRes */
 /** @template {{}} [E={}] @typedef {{ render: () => void, tabId: string, tabName: string, visible: boolean } & E} KittensTab */
-/** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: KittensNamedBldgBld) => { meta: KittensBtn['model']['metadata'] } }, bldTab: KittensTab<{ children: KittensBtn[] }>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: KittensNamedChallenge) => { researched: boolean } }, diplomacy: { get: (name: KittensNamedRace) => KittensDiplomacyRacePanel['race'], unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: KittensNamedEffect) => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: { children: KittensBtn[] } }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: KittensNamedPerk) => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBtn['model']['metadata'], praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: { children: KittensBtn[] }[] }, ptPanel: { children: { children: KittensBtn[] }[] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: KittensBtn<{ model: { allLink: { handler: (...args: unknown[]) => void } } }>, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number, shatter: (amt: number) => void }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ controller: { doShatterAmt: (model: KittensBtn['model'], amt: number) => void }, model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: { children: KittensBtn[] }[] } }>, space: { getProgram: (name: KittensNamedBldgSpace) => { val: number } }, spaceTab: KittensTab<{ GCPanel: { children: KittensBtn[] }, planetPanels: { children: KittensBtn[] }[] }>, ui: { activeTabId: string }, village: { holdFestival: (amt: number) => void, huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], festivalBtn: KittensBtn<{ x100: { link: HTMLElement } }>, promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
+/** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: KittensNamedBldgBld) => { meta: KittensBtnModel['metadata'] } }, bldTab: KittensTab<{ children: KittensBtn[] }>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: KittensNamedChallenge) => { researched: boolean } }, diplomacy: { get: (name: KittensNamedRace) => KittensDiplomacyRacePanel['race'], unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: KittensNamedEffect) => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: { children: KittensBtn[] } }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: KittensNamedPerk) => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBtnModel['metadata'], praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: { children: KittensBtn[] }[] }, ptPanel: { children: { children: KittensBtn[] }[] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: KittensBtn<{ model: { allLink: { handler: (...args: unknown[]) => void } } }>, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number, shatter: (amt: number) => void }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ controller: { doShatterAmt: (model: KittensBtnModel, amt: number) => void }, model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: { children: KittensBtn[] }[] } }>, space: { getProgram: (name: KittensNamedBldgSpace) => { val: number } }, spaceTab: KittensTab<{ GCPanel: { children: KittensBtn[] }, planetPanels: { children: KittensBtn[] }[] }>, ui: { activeTabId: string }, village: { holdFestival: (amt: number) => void, huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], festivalBtn: KittensBtn<{ x100: { link: HTMLElement } }>, promoteKittensBtn: KittensBtn }>, workshop: {  craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
 
 // Kitty Cheat
 /** @template {{}} [E={}] @typedef {{ active?: boolean, btn: jQuery, danger?: boolean, delay?: number, do?: string[], end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => void, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
@@ -185,7 +186,7 @@
       all: {
         catnip: {
           fn: function fnCatnip () {
-            clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model.name === 'Gather catnip'));
+            clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model?.name === 'Gather catnip'));
           },
           active: true,
           delay: INTERVAL.CATNIP.GATHER,
@@ -193,7 +194,7 @@
         },
         refine: {
           fn: function fnRefine () {
-            clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model.name === 'Refine catnip'));
+            clickBtn(renderBgTab(game.bldTab)?.children.find((b) => b.model?.name === 'Refine catnip'));
           },
           active: true,
           delay: INTERVAL.CATNIP.REFINE,
@@ -407,7 +408,7 @@
    * @returns {string?=}
    **/
   function getBtnName (/** @type {KittensBtn?=} */ btn, /** @type {string?=} */ extra = null) {
-    const name = btn?.model.metadata?.label || btn?.opts?.name;
+    const name = btn?.model?.metadata?.label || btn?.opts?.name;
 
     return name && extra ? `${name} ${extra}` : name;
   }
@@ -510,7 +511,7 @@
   function checkBuilding (/** @type {KittensBtn} */ btn, /** @type {{ [x in KittensNamedRes]?: boolean }} */ invalids, /** @type {{ withCap?: boolean, withFill?: boolean }} */ opts = {}) {
     if (
       // visibility
-      !btn.model.visible ||
+      !btn.model?.visible ||
       // anything metadata related
       (btn.model.metadata && (
         // limit builds
@@ -642,7 +643,7 @@
       const building = validBuildings[i];
       const buildingImpl = game.religionTab.zgUpgradeButtons[i];
 
-      if (building && buildingImpl?.model.metadata?.unlocked) {
+      if (building && buildingImpl?.model?.metadata?.unlocked) {
         const unicornPrice = calcUnicornPrice(buildingImpl.model.prices, zigguratRatio);
         const buildingInfo = game.religion.getZU(building);
         const religionBonus = religionRatio + (buildingInfo?.effects?.unicornsRatioReligion || 0);
@@ -705,15 +706,15 @@
   function calcTheology () {
     return game.religionTab.ctPanel.children[0]?.children
       .filter((btn) => {
-        if (!btn.model.prices[0] || btn.model.prices[0].name !== 'relic' || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
+        if (!btn.model?.prices[0] || btn.model.prices[0].name !== 'relic' || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
           return false;
         }
 
         return !checkPrices(btn.model.prices, {}, 'relic').isInvalid;
       })
-      .sort((a, b) => /** @type {KittensPrice} */ (a.model.prices[0]).val - /** @type {KittensPrice} */ (b.model.prices[0]).val)
+      .sort((a, b) => /** @type {KittensPrice} */ (a.model?.prices[0]).val - /** @type {KittensPrice} */ (b.model?.prices[0]).val)
       .map((btn) => {
-        const percent = toPercent(game.resPool.get('relic').value / (/** @type {KittensPrice} */ (btn.model.prices[0]).val * (1 / RESOURCES.TYPE.exotic)));
+        const percent = toPercent(game.resPool.get('relic').value / (/** @type {KittensPrice} */ (btn.model?.prices[0]).val * (1 / RESOURCES.TYPE.exotic)));
 
         return {
           btn,
@@ -923,7 +924,7 @@
     return {
       btn,
       isBuildable: !!btn && checkBuilding(btn, invalids).isBuildable,
-      tears: btn?.model.prices.find((p) => p.name === 'tears')
+      tears: btn?.model?.prices.find((p) => p.name === 'tears')
     };
   }
 
@@ -998,13 +999,13 @@
    * @returns {boolean}
    **/
   function buyTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
-    if (!ctrl.dryRun && btn.model.enabled && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
+    if (!ctrl.dryRun && btn.model?.enabled && btn.model.stageLinks?.find((l) => l.enabled && l.handler.name === 'upgradeHandler')?.handler.call(noop, noop, noop)) {
       // return true;
     }
 
     const check = checkBuilding(btn, ctrl.invalids, { withCap: true, withFill: !ctrl.dryRun });
 
-    return check.isBuildable && (ctrl.dryRun || clickBtn(btn, !check.isUncapped && !!btn?.model.metadata && btn.model.metadata.on >= 1));
+    return check.isBuildable && (ctrl.dryRun || clickBtn(btn, !check.isUncapped && !!btn?.model?.metadata && btn.model.metadata.on >= 1));
   }
 
   /**
@@ -1016,7 +1017,7 @@
    * @returns {boolean}
    **/
   function sellTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn) {
-    if (!ctrl.dryRun && btn.model.metadata?.val && btn.model.metadata.name !== 'chronosphere') {
+    if (!ctrl.dryRun && btn.model?.metadata?.val && btn.model.metadata.name !== 'chronosphere') {
       btn.controller.sellInternal(btn.model, 0, false);
       return true;
     }
@@ -1032,7 +1033,7 @@
    *
    * @returns {boolean} */
   function unlockTabBtn (/** @type {CheatCtrl} */ ctrl, /** @type {KittensBtn} */ btn, /** @type {boolean} */ isAll) {
-    if (!ctrl.dryRun && btn.model.enabled && btn.model.toggleAutomationLink?.enabled && !btn.model.metadata?.isAutomationEnabled && btn.model.toggleAutomationLink.title === '*' && btn.model.toggleAutomationLink.handler.call(noop, noop, noop)) {
+    if (!ctrl.dryRun && btn.model?.enabled && btn.model.toggleAutomationLink?.enabled && !btn.model.metadata?.isAutomationEnabled && btn.model.toggleAutomationLink.title === '*' && btn.model.toggleAutomationLink.handler.call(noop, noop, noop)) {
       // return true;
     }
 
