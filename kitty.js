@@ -869,12 +869,12 @@
    *
    * @returns {boolean}
    **/
-  function loopChildren (/** @type {CheatCtrl} */ ctrl, /** @type {(ctrl: CheatCtrl, btn: KittensBtn, isAll: boolean) => boolean} */ buttonFn, /** @type {{ areas: { children: KittensBtn[] }[], check?: (btn: KittensBtn, children: KittensBtn[]) => boolean, withAll?: boolean, withIds?: string[], withMeta?: boolean }} */ { areas, check, withAll, withIds, withMeta  }) {
+  function loopChildren (/** @type {CheatCtrl} */ ctrl, /** @type {(ctrl: CheatCtrl, btn: KittensBtn, isAll: boolean) => boolean} */ buttonFn, /** @type {{ areas: { children: KittensBtn[] }[], check?: (btn: KittensBtn, children: KittensBtn[]) => boolean, withAll?: boolean, withIds?: string[], withMeta?: boolean }} */ { areas, withAll, withIds, withMeta  }) {
     let hasSome = false;
 
     for (const area of areas) {
       for (const btn of area.children) {
-        if (btn?.model?.visible && (!check || check(btn, area.children)) && (!withMeta || btn.model.metadata) && (!withIds || (btn.id && withIds.includes(btn.id))) && buttonFn(ctrl, btn, !!withAll)) {
+        if (btn?.model?.visible && (!withMeta || btn.model.metadata) && (!withIds || (btn.id && withIds.includes(btn.id))) && buttonFn(ctrl, btn, !!withAll)) {
           if (ctrl.dryRun) {
             return true;
           }
@@ -1074,7 +1074,6 @@
    * @returns {boolean}
    **/
   function unlockTab (/** @type {CheatCtrl} */ ctrl, /** @type {KittensTab} */ tab) {
-    const isVsPanel = !!(/** @type {KittensGame['timeTab']} */ (tab).vsPanel?.children[0]?.children?.length);
     let hasSome = loopChildren(ctrl, unlockTabBtn, {
       areas: [{
         children: (
@@ -1085,17 +1084,6 @@
           /** @type {KittensGame['workshopTab']} */ (tab).buttons
         )
       }],
-      check: (btn, children) => {
-        if (isVsPanel && btn.model?.enabled && btn.model.metadata?.limitBuild && btn.id === 'cryochambers') {
-          const used = children.find((b) => b.id === 'usedCryochambers');
-
-          if (used?.model?.enabled && used.model.on && (btn.model.metadata.val + used.model.on) >= btn.model.metadata.limitBuild) {
-            return false;
-          }
-        }
-
-        return true;
-      },
       withAll: !!((
         /** @type {KittensGame['diplomacyTab']} */ (tab).racePanels ||
         /** @type {KittensGame['religionTab']} */ (tab).rUpgradeButtons
