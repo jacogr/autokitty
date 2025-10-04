@@ -8,7 +8,7 @@
  */
 
 // jQuery
-/** @typedef {{ addClass: (classes: string) => jQuery, append: (elem: jQuery | string) => jQuery, click: (fn?: () => unknown) => jQuery, css: (style: { [x: string]: string | number } | string, val?: string | number) => jQuery, filter: (fn: (index: number, elem: HTMLElement) => boolean) => jQuery, html: (html: string) => jQuery, length: number, removeClass: (classes: string) => jQuery, text: () => string }} jQuery */
+/** @typedef {{ addClass: (classes: string) => jQuery, append: (elem: jQuery | string) => jQuery, click: (fn?: () => unknown) => jQuery, css: (style: { [x: string]: string | number } | string, val?: string | number) => jQuery, filter: (fn: (index: number, elem: HTMLElement) => boolean) => jQuery, html: (html: string) => jQuery, is: (t: ':hidden' | ':visible') => boolean, length: number, removeClass: (classes: string) => jQuery, text: () => string }} jQuery */
 /** @typedef {(elem: HTMLElement | string) => jQuery} JQuery */
 
 // Kittens Game
@@ -1292,67 +1292,84 @@
     setTimeout(() => execOpts(delay), delay);
   }
 
-  // Overall HTML structure and styling for the cheat controls
-  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; margin-bottom: 2px; margin-right: 2px; padding: 1px 4px; } #game .kittycheat-btn.active { background: darkgreen; color: white; } .kittycheat-btn.danger { background: lightblue; border-style: dashed; } #game .kittycheat-btn.danger.active { background: darkblue; } .kittycheat-btn.missing { background: lightpink; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { font-family: monospace; opacity: 0.33; } .kittycheat-btn-grp { display: inline-block; } #game .kittycheat-btn-grp.nobr { white-space: nowrap; }</style>');
+  function setup () {
+    // Overall HTML structure and styling for the cheat controls
+    $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; margin-bottom: 2px; margin-right: 2px; padding: 1px 4px; } #game .kittycheat-btn.active { background: darkgreen; color: white; } .kittycheat-btn.danger { background: lightblue; border-style: dashed; } #game .kittycheat-btn.danger.active { background: darkblue; } .kittycheat-btn.missing { background: lightpink; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { font-family: monospace; opacity: 0.33; } .kittycheat-btn-grp { display: inline-block; } #game .kittycheat-btn-grp.nobr { white-space: nowrap; }</style>');
 
-  const divAll = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
-  const divAct = jqAppend(divAll, $('<div id="kittycheat-act" class="kittycheat-div"></div>'));
-  const divTxt = jqAppend(divAll, $('<div id="kittycheat-txt" class="kittycheat-div"></div>'));
+    const divAll = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
+    const divAct = jqAppend(divAll, $('<div id="kittycheat-act" class="kittycheat-div"></div>'));
+    const divTxt = jqAppend(divAll, $('<div id="kittycheat-txt" class="kittycheat-div"></div>'));
 
-  // Loop through all options and create buttons in groups
-  for (const _group in cheatMap) {
-    const group = /** @type {keyof CheatMap} */ (_group);
-    const divGrp = cheatMap[group].div = jqAppend(divAct, $(`<div id="kittycheat-act-${group}" class="kittycheat-div"></div>`));
-    const hasEnd = Object.values(cheatMap[group].all).find((o) => /** @type {CheatOpt} */ (o).end);
-    let /** @type {jQuery | null} */ divBtnGrp = null;
+    // Loop through all options and create buttons in groups
+    for (const _group in cheatMap) {
+      const group = /** @type {keyof CheatMap} */ (_group);
+      const divGrp = cheatMap[group].div = jqAppend(divAct, $(`<div id="kittycheat-act-${group}" class="kittycheat-div"></div>`));
+      const hasEnd = Object.values(cheatMap[group].all).find((o) => /** @type {CheatOpt} */ (o).end);
+      let /** @type {jQuery | null} */ divBtnGrp = null;
 
-    if (group !== 'control') {
-      jqAppend(divGrp, $(`<div class="kittycheat-div small">${group}:</div>`));
+      if (group !== 'control') {
+        jqAppend(divGrp, $(`<div class="kittycheat-div small">${group}:</div>`));
+      }
+
+      activateGroup(group, cheatMap[group].active || cheatMap[group].noExec);
+
+      for (const name in cheatMap[group].all) {
+        const opts = /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (name)]);
+
+        if (opts.noShow) {
+          continue;
+        }
+
+        divBtnGrp = divBtnGrp || jqAppend(divGrp, $(`<div class="kittycheat-btn-grp ${hasEnd ? 'nobr' : ''}"></div>`));
+        opts.btn = jqAppend(divBtnGrp, $(`<button class="kittycheat-btn ${opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : ''} ${opts.danger ? 'danger' : ''}">${name}</button>`).click(() => {
+          activateBtn(group, name, opts, !opts.active);
+        }));
+
+        activateBtn(group, name, opts, opts.active);
+
+        if (opts.delay) {
+          execOptTimer(group, name, opts);
+        }
+
+        if (opts.end) {
+          divBtnGrp = null;
+        }
+      }
     }
 
-    activateGroup(group, cheatMap[group].active || cheatMap[group].noExec);
+    // Do the setup for out information panel, all game information
+    for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
+      jqAppend(divTxt, $(`<div id="kittycheat-txt-${id}" class="kittycheat-div small"></div>`));
+    }
 
-    for (const name in cheatMap[group].all) {
-      const opts = /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (name)]);
+    // Do the setup for the game options, slightly tweaking the messages, logging
+    // as well as confirmation and unneeded button displays
+    game.console.maxMessages = 100;
+    game.opts.hideSell = true;
+    game.opts.noConfirm = true;
 
-      if (opts.noShow) {
-        continue;
-      }
+    for (const f of ['craft', 'faith', 'hunt', 'trade']) {
+      game.console.filters[/** @type {keyof KittensGame['console']['filters']} */ (f)].enabled = false;
+    }
 
-      divBtnGrp = divBtnGrp || jqAppend(divGrp, $(`<div class="kittycheat-btn-grp ${hasEnd ? 'nobr' : ''}"></div>`));
-      opts.btn = jqAppend(divBtnGrp, $(`<button class="kittycheat-btn ${opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : ''} ${opts.danger ? 'danger' : ''}">${name}</button>`).click(() => {
-        activateBtn(group, name, opts, !opts.active);
-      }));
+    // Start! Do the setup and then start the execution loops. Done. Profit.
+    execOpts(INTERVAL.ALL.OPTION);
+    execTextInfo(INTERVAL.ALL.TEXT);
+    execBuildAll(INTERVAL.ALL.BUILD);
+  }
 
-      activateBtn(group, name, opts, opts.active);
+  function main () {
+    // don't allow double injection
+    if (document.getElementById('kittycheat')) {
+      return;
+    }
 
-      if (opts.delay) {
-        execOptTimer(group, name, opts);
-      }
-
-      if (opts.end) {
-        divBtnGrp = null;
-      }
+    if ($('div#loadingContainer').is(':visible')) {
+      setTimeout(main, 1000);
+    } else {
+      setup();
     }
   }
 
-  // Do the setup for out information panel, all game information
-  for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
-    jqAppend(divTxt, $(`<div id="kittycheat-txt-${id}" class="kittycheat-div small"></div>`));
-  }
-
-  // Do the setup for the game options, slightly tweaking the messages, logging
-  // as well as confirmation and unneeded button displays
-  game.console.maxMessages = 100;
-  game.opts.hideSell = true;
-  game.opts.noConfirm = true;
-
-  for (const f of ['craft', 'faith', 'hunt', 'trade']) {
-    game.console.filters[/** @type {keyof KittensGame['console']['filters']} */ (f)].enabled = false;
-  }
-
-  // Start! Do the setup and then start the execution loops. Done. Profit.
-  execOpts(INTERVAL.ALL.OPTION);
-  execTextInfo(INTERVAL.ALL.TEXT);
-  execBuildAll(INTERVAL.ALL.BUILD);
+  main();
 })(/** @type {WindowExt} */ (window).$, /** @type {WindowExt} */ (window).game);
