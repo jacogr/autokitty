@@ -1371,18 +1371,17 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
    * @returns {void}
    */
   function main () {
-    // no double injection
-    if (document.getElementById('kittycheat')) {
-      return;
-    }
-
     const $ = /** @type {WindowExt} */ (window).$;
     const game = /** @type {WindowExt} */ (window).game;
 
-    // ensure we have everything
-    if (!$ || !game || $('div#loadingContainer').is(':visible')) {
+    const isVisible = (/** @type {string} */ id) =>
+      $(`div#${id}`).is(':visible');
+
+    if (!$ || !game || isVisible('loadingContainer') || !isVisible('leftColumn')) {
+      // setup not completed
       setTimeout(main, 1000);
-    } else {
+    } else if (!isVisible('kittycheat')) {
+      // do our magic
       kittycheat($, game);
     }
   }
