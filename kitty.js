@@ -7,6 +7,8 @@
  * is what it is.
  */
 
+(() => {
+
 // jQuery
 /** @typedef {{ addClass: (classes: string) => jQuery, append: (elem: jQuery | string) => jQuery, click: (fn?: () => unknown) => jQuery, css: (style: { [x: string]: string | number } | string, val?: string | number) => jQuery, filter: (fn: (index: number, elem: HTMLElement) => boolean) => jQuery, html: (html: string) => jQuery, is: (t: ':hidden' | ':visible') => boolean, length: number, removeClass: (classes: string) => jQuery, text: () => string }} jQuery */
 /** @typedef {(elem: HTMLElement | string) => jQuery} JQuery */
@@ -1362,29 +1364,29 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
   execBuildAll(INTERVAL.ALL.BUILD);
 }
 
-(() => {
-  /**
-   * @description Our main entry point. Checks that the game is available and
-   * starts the cheat. If everything is not in place, wait a short while and
-   * retry.
-   *
-   * @returns {void}
-   */
-  function main () {
-    const $ = /** @type {WindowExt} */ (window).$;
-    const game = /** @type {WindowExt} */ (window).game;
+/**
+ * @description Our main entry point. Checks that the game is available and
+ * starts the cheat. If everything is not in place, wait a short while and
+ * retry.
+ *
+ * @returns {void}
+ */
+function main () {
+  const $ = /** @type {WindowExt} */ (window).$;
+  const game = /** @type {WindowExt} */ (window).game;
 
-    const isVisible = (/** @type {string} */ id) =>
-      $(`div#${id}`).is(':visible');
+  const isVisible = (/** @type {string} */ id) =>
+    $(`div#${id}`).is(':visible');
 
-    if (!$ || !game || isVisible('loadingContainer') || !isVisible('leftColumn')) {
-      // setup not completed
-      setTimeout(main, 1000);
-    } else if (!isVisible('kittycheat')) {
-      // do our magic
-      kittycheat($, game);
-    }
+  if (!$ || !game || isVisible('loadingContainer') || !isVisible('leftColumn')) {
+    // setup not completed
+    setTimeout(main, 1000);
+  } else if (!isVisible('kittycheat')) {
+    // do our magic
+    kittycheat($, game);
   }
+}
 
-  main();
+main();
+
 })();
