@@ -781,7 +781,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
    *
    * @returns {void}
    **/
-  function fnTradeBcoin (/** @type {keyof CheatMap} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
+  function fnTradeBcoin () {
     const info = calcBcoin();
 
     if (info.price && info.action !== 'hold') {
@@ -789,10 +789,6 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
 
       if (((info.action === 'sell' && bcoin > 0) || (info.action === 'buy' && bcoin === 0)) && renderBgTab(game.diplomacyTab)) {
         clickBtn(findLeviathans()?.[`${info.action}Bcoin`]);
-
-        if (info.action === 'sell') {
-          activateBtn(group, name, opts, false);
-        }
       }
     }
   }
