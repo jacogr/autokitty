@@ -1376,26 +1376,18 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
 /**
  * @description Our main entry point. Checks that the game is available and
  * starts the cheat. If everything is not in place, wait a short while and
- * retry.
- *
- * @returns {void}
+ * retry until all conditions are met.
  */
-function main () {
-  const $ = /** @type {WindowExt} */ (window).$;
-  const game = /** @type {WindowExt} */ (window).game;
+const we = /** @type {WindowExt} */ (window);
 
-  const isVisible = (/** @type {string} */ id) =>
-    $(`div#${id}`).is(':visible');
+const isVisible = (/** @type {string} */ id) =>
+  we.$(`div#${id}`).is(':visible');
 
-  if (!$ || !game || isVisible('loadingContainer') || !isVisible('leftColumn')) {
-    // setup not completed
-    setTimeout(main, 1000);
-  } else if (!isVisible('kittycheat')) {
-    // do our magic
-    kittycheat($, game);
+const initTimerId = setInterval(() => {
+  if (we.$ && we.game && !isVisible('loadingContainer') && isVisible('leftColumn') && !isVisible('kittycheat')) {
+    clearInterval(initTimerId);
+    kittycheat(we.$, we.game);
   }
-}
-
-main();
+}, 1000);
 
 })();
