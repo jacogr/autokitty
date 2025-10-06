@@ -1378,16 +1378,18 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
  * starts the cheat. If everything is not in place, wait a short while and
  * retry until all conditions are met.
  */
-const initTimerId = setInterval(() => {
+(() => {
   const we = /** @type {WindowExt} */ (window);
 
   const isVisible = (/** @type {string} */ id) =>
     we.$(`div#${id}`).is(':visible');
 
-  if (we.$ && we.game && !isVisible('loadingContainer') && isVisible('leftColumn') && !isVisible('kittycheat')) {
-    clearInterval(initTimerId);
-    kittycheat(we.$, we.game);
-  }
-}, 1000);
+  const initTimerId = setInterval(() => {
+    if (we.$ && we.game && !isVisible('loadingContainer') && isVisible('leftColumn') && !isVisible('kittycheat')) {
+      clearInterval(initTimerId);
+      kittycheat(we.$, we.game);
+    }
+  }, 1000);
+})();
 
 })();
