@@ -42,7 +42,7 @@
 // Kitty Cheat
 /** @template {{}} [E={}] @typedef {{ active?: boolean | (() => boolean), btn?: jQuery, danger?: boolean, delay?: number, do?: string[], end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => void, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
 /** @template {{ [x: string]: Partial<CheatOpt> }} T @template {{}} [E={}] @typedef {{ active?: boolean, all: T, div?: jQuery, noExec?: boolean } & E} CheatMapEntry */
-/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: string, name: string, opts: CheatOpt) => void }>, 'btn' | 'do' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'auto' | 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'co2' | 'store' | 'uncap' | 'iw' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
+/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: keyof CheatMap, name: string, opts: CheatOpt) => void }>, 'btn' | 'do' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'auto' | 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'co2' | 'store' | 'uncap' | 'iw' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
 /** @typedef {{ allowedTabs: string[], completed: string[], dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, stats: { [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact']?: string[] } }} CheatCtrl */
 
 // Window
@@ -380,7 +380,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
    *
    * @returns {void}
    **/
-  function activateGroup (/** @type {keyof CheatMap} */ group, /** @type {boolean=} */ active = false) {
+  function activateGroup (/** @type {keyof CheatMap} */ group, /** @type {boolean} */ active) {
     const opt = cheatMap[group];
 
     opt.active = active;
@@ -761,11 +761,11 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
    *
    * @returns {void}
    **/
-  function fnCombust40k (/** @type {string} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
+  function fnCombust40k (/** @type {keyof CheatMap} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
     if (game.calendar.year < 40000) {
       fnCombust();
     } else if (opts.active) {
-      activateBtn(/** @type {keyof CheatMap} */ (group), name, opts, false);
+      activateBtn(group, name, opts, false);
 
       // Start a festival with a 100 year duration (aligning with the x100
       // button). During festivals the kittens are happier and (most
@@ -781,7 +781,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
    *
    * @returns {void}
    **/
-  function fnTradeBcoin () {
+  function fnTradeBcoin (/** @type {keyof CheatMap} */ group, /** @type {string} */ name, /** @type {CheatOpt} */ opts) {
     const info = calcBcoin();
 
     if (info.price && info.action !== 'hold') {
@@ -789,6 +789,10 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
 
       if (((info.action === 'sell' && bcoin > 0) || (info.action === 'buy' && bcoin === 0)) && renderBgTab(game.diplomacyTab)) {
         clickBtn(findLeviathans()?.[`${info.action}Bcoin`]);
+
+        if (info.action === 'sell') {
+          activateBtn(group, name, opts, false);
+        }
       }
     }
   }
@@ -1319,7 +1323,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
       jqAppend(divGrp, $(`<div class="kittycheat-div small">${group}:</div>`));
     }
 
-    activateGroup(group, cheatMap[group].active || cheatMap[group].noExec);
+    activateGroup(group, cheatMap[group].active || cheatMap[group].noExec || false);
 
     for (const name in cheatMap[group].all) {
       const opts = /** @type {CheatOpt} */ (cheatMap[group].all[/** @type {keyof CheatMap[group]['all']} */ (name)]);
@@ -1330,7 +1334,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
 
       divBtnGrp = divBtnGrp || jqAppend(divGrp, $(`<div class="kittycheat-btn-grp ${hasEnd ? 'nobr' : ''}"></div>`));
 
-      opts.active = !!(typeof opts.active === 'function' ? opts.active() : opts.active);
+      opts.active = (typeof opts.active === 'function' ? opts.active() : opts.active) || false;
       opts.btn = jqAppend(divBtnGrp, $(`<button class="kittycheat-btn ${opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : ''} ${opts.danger ? 'danger' : ''}">${name}</button>`).click(() => {
         activateBtn(group, name, opts, !opts.active);
       }));
