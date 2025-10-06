@@ -350,7 +350,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
    *
    * @returns {void}
    **/
-  function activateBtn (/** @type {keyof CheatMap} */ group, /** @type {string} */ _name, /** @type {CheatOpt} */ opts, /** @type {boolean=} */ active = false) {
+  function activateBtn (/** @type {keyof CheatMap} */ group, /** @type {string} */ _name, /** @type {CheatOpt} */ opts, /** @type {boolean} */ active) {
     opts.active = active;
     opts.btn?.[active ? 'addClass' : 'removeClass']('active');
 
@@ -1330,7 +1330,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
 
       divBtnGrp = divBtnGrp || jqAppend(divGrp, $(`<div class="kittycheat-btn-grp ${hasEnd ? 'nobr' : ''}"></div>`));
 
-      opts.active = typeof opts.active === 'function' ? opts.active() : opts.active;
+      opts.active = !!(typeof opts.active === 'function' ? opts.active() : opts.active);
       opts.btn = jqAppend(divBtnGrp, $(`<button class="kittycheat-btn ${opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : ''} ${opts.danger ? 'danger' : ''}">${name}</button>`).click(() => {
         activateBtn(group, name, opts, !opts.active);
       }));
