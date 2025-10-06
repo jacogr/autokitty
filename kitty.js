@@ -1385,9 +1385,12 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
     we.$(`div#${id}`).is(':visible');
 
   const initTimerId = setInterval(() => {
-    if (we.$ && we.game && !isVisible('loadingContainer') && isVisible('leftColumn') && !isVisible('kittycheat')) {
+    if (we.$ && we.game && !isVisible('loadingContainer') && isVisible('leftColumn')) {
       clearInterval(initTimerId);
-      kittycheat(we.$, we.game);
+
+      if (!isVisible('kittycheat')) {
+        kittycheat(we.$, we.game);
+      }
     }
   }, 1000);
 })();
