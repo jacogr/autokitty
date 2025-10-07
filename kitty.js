@@ -1392,7 +1392,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
         kittycheat(we.$, we.game);
       }
     }
-  }, 1000);
+  }, 500);
 })();
 
 })();
