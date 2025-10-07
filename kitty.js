@@ -42,8 +42,8 @@
 // Kitty Cheat
 /** @template {{}} [E={}] @typedef {{ active?: boolean | (() => boolean), btn?: jQuery, danger?: boolean, delay?: number, do?: string[], end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => void, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
 /** @template {{ [x: string]: Partial<CheatOpt> }} T @template {{}} [E={}] @typedef {{ active?: boolean, all: T, div?: jQuery, noExec?: boolean } & E} CheatMapEntry */
-/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: keyof CheatMap, name: string, opts: CheatOpt) => void }>, 'btn' | 'do' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'auto' | 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'co2' | 'store' | 'uncap' | 'iw' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
-/** @typedef {{ allowedTabs: string[], completed: string[], dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, stats: { [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact']?: string[] } }} CheatCtrl */
+/** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: keyof CheatMap, name: string, opts: CheatOpt) => void }>, 'btn' | 'do' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'auto' | 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'policy' | 'co2' | 'store' | 'uncap' | 'iw' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
+/** @typedef {{ allowedTabs: string[], completed: string[], dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, stats: { [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact' | 'policy']?: string[] } }} CheatCtrl */
 
 // Window
 /** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
@@ -142,12 +142,13 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
         zig: {},
         crypto: {},
         pact: {},
+        policy: {},
         time: { end: true },
         store: { noShow: true, active: true },
         uncap: { active: true },
         co2: {},
         iw: { end: true },
-        auto: { danger: true, do: ['build', 'upgrade', 'craft', 'trade', 'exec', 'max10', 'zig', 'crypto', 'pact', 'time'], excl: ['sell'] },
+        auto: { danger: true, do: ['build', 'upgrade', 'craft', 'trade', 'exec', 'max10', 'zig', 'crypto', 'pact', 'policy', 'time'], excl: ['sell'] },
         sell: { danger: true, excl: ['auto', 'build'], end: true }
       },
       noExec: true
@@ -1238,7 +1239,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
       loopTabs(ctrl, 'sell', ['bldTab', 'spaceTab'], buildTab(sellTabBtn));
       loopTabs(ctrl, 'zig', ['religionTab'], buildZig);
       loopTabs(ctrl, 'crypto', ['religionTab'], buildTheology);
-      loopTabs(ctrl, 'upgrade', ['libraryTab'], unlockNamedTab, policies);
+      loopTabs(ctrl, 'policy', ['libraryTab'], unlockNamedTab, policies);
       loopTabs(ctrl, 'pact', ['religionTab'], unlockNamedTab, pacts);
       loopTabs(ctrl, 'time', ['timeTab'], unlockNamedTab, cfbldgs, () =>
         game.getEffect('heatMax') < (40000 * (game.challenges.getChallenge('1000Years').researched ? 5 : 10) * (1 - (1 - (1 / (1 + game.getEffect('heatCompression'))))))
