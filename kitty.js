@@ -342,7 +342,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
    * classes (optional)
    *
    * @template {HTMLElement} T
-   * @return {T}
+   * @returns {T}
    */
   function createNode (/** @type {HTMLElement} */ parent, /** @type {keyof HTMLElementTagNameMap} */ tag, /** @type {string?=} */ id, /** @type {(string | null)[]=}= */ classes = [], /** @type {string?=} */ txt = null) {
     const el = document.createElement(tag);
@@ -1403,16 +1403,21 @@ function kittycheat (/** @type {KittensGame} */ game) {
 (() => {
   const we = /** @type {WindowExt} */ (window);
 
-  const isVisible = (/** @type {string} */ id, /** @type {boolean} */ none) =>
-    /** @type {HTMLElement['checkVisibility'] | null} */ (document.head.checkVisibility)
-      ? document.getElementById(id)?.checkVisibility()
-      : none;
+  const isVisible = (/** @type {string} */ id) => {
+    const el = document.getElementById(id);
+
+    return !!el && (
+      /** @type {null | HTMLElement['checkVisibility']} */ (el.checkVisibility)
+        ? el.checkVisibility()
+        : el.style.display !== 'none' && el.style.visibility !== 'hidden'
+    );
+  }
 
   const initTimerId = setInterval(() => {
-    if (we.game && !isVisible('loadingContainer', false) && isVisible('leftColumn', true)) {
+    if (we.game && !isVisible('loadingContainer') && isVisible('leftColumn')) {
       clearInterval(initTimerId);
 
-      if (!isVisible('kittycheat', false)) {
+      if (!isVisible('kittycheat')) {
         kittycheat(we.game);
       }
     }
