@@ -1403,14 +1403,16 @@ function kittycheat (/** @type {KittensGame} */ game) {
 (() => {
   const we = /** @type {WindowExt} */ (window);
 
-  const isVisible = (/** @type {string} */ id) =>
-    document.getElementById(id)?.checkVisibility();
+  const isVisible = (/** @type {string} */ id, /** @type {boolean} */ none) =>
+    /** @type {HTMLElement['checkVisibility'] | null} */ (document.head.checkVisibility)
+      ? document.getElementById(id)?.checkVisibility()
+      : none;
 
   const initTimerId = setInterval(() => {
-    if (we.game && (!document.head.checkVisibility || (!isVisible('loadingContainer') && isVisible('leftColumn')))) {
+    if (we.game && !isVisible('loadingContainer', false) && isVisible('leftColumn', true)) {
       clearInterval(initTimerId);
 
-      if (!isVisible('kittycheat')) {
+      if (!isVisible('kittycheat', false)) {
         kittycheat(we.game);
       }
     }
