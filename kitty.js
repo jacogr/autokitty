@@ -1407,7 +1407,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
     document.getElementById(id)?.checkVisibility();
 
   const initTimerId = setInterval(() => {
-    if (we.game && !isVisible('loadingContainer') && isVisible('leftColumn')) {
+    if (we.game && (!document.head.checkVisibility || (!isVisible('loadingContainer') && isVisible('leftColumn')))) {
       clearInterval(initTimerId);
 
       if (!isVisible('kittycheat')) {
