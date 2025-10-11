@@ -9,10 +9,6 @@
 
 (() => {
 
-// jQuery
-/** @typedef {{ addClass: (classes: string) => jQuery, append: (elem: jQuery | string) => jQuery, click: (fn?: () => unknown) => jQuery, css: (style: { [x: string]: string | number } | string, val?: string | number) => jQuery, filter: (fn: (index: number, elem: HTMLElement) => boolean) => jQuery, html: (html: string) => jQuery, is: (t: ':hidden' | ':visible') => boolean, length: number, removeClass: (classes: string) => jQuery, text: () => string }} jQuery */
-/** @typedef {(elem: HTMLElement | string) => jQuery} JQuery */
-
 // Kittens Game
 /** @typedef {'chronosphere' | 'unicornPasture' | 'ziggurat'} KittensNamedBldgBld */
 /** @typedef {'blackCore' | 'blackLibrary' | 'blackNexus' | 'blackObelisk' | 'blackRadiance' | 'blazar' | 'darkNova' | 'holyGenocide' | 'mausoleum' | 'singularity'} KittensNamedBldgCrypto */
@@ -40,20 +36,20 @@
 /** @typedef {{ bld: { cathPollution: number, getBuildingExt: (name: KittensNamedBldgBld) => { meta: KittensBtnModel['metadata'] } }, bldTab: KittensTab<{ children: KittensBtn[] }>, calendar: { cryptoPrice: number, cycle: number,  cycles: { festivalEffects: { unicorns: number } }[], festivalDays: number, year: number }, console: { filters: { [x in 'craft' | 'faith' | 'hunt' | 'trade']: { enabled: boolean } }, maxMessages: number }, challenges: { getChallenge: (name: KittensNamedChallenge) => { researched: boolean } }, diplomacy: { get: (name: KittensNamedRace) => KittensDiplomacyRacePanel['race'], unlockElders: () => void }, diplomacyTab: KittensTab<{ exploreBtn: KittensBtn, racePanels: KittensDiplomacyRacePanel[], leviathansInfo: unknown }>, getEffect: (name: KittensNamedEffect) => number, getTicksPerSecondUI: () => number, libraryTab: KittensTab<{ policyPanel: { children: KittensBtn[] } }>, msg: (text?: string) => { span: HTMLElement }, opts: { hideSell: boolean; noConfirm: boolean }, prestige: { getParagonProductionRatio: () => number, getPerk: (name: KittensNamedPerk) => { researched: boolean } }, religion: { _getTranscendNextPrice: () => number, faithRatio: number, getSolarRevolutionRatio: () => number, getZU: (name: KittensNamedBldgZU) => KittensBtnModel['metadata'], praise: () => void, resetFaith: (n: number, b: boolean) => void }, religionTab: KittensTab<{ ctPanel: { children: { children: KittensBtn[] }[] }, ptPanel: { children: { children: KittensBtn[] }[] }, praiseBtn: KittensBtn, rUpgradeButtons: KittensBtn[], sacrificeBtn: KittensBtn<{ model: { allLink: { handler: (...args: unknown[]) => void } } }>, zgUpgradeButtons: KittensBtn[] }>, resPool: { get: (name: KittensNamedRes) => KittensRes, resources: KittensRes[] }, science: { hideResearched: boolean, policyToggleBlocked: boolean, policyToggleResearched: boolean }, time: { getCFU: (name: KittensNamedBldgTimeCF) => { heat: number }, heat: number, shatter: (amt: number) => void }, timeTab: KittensTab<{ cfPanel: { children: [{ children: KittensBtn<{ controller: { doShatterAmt: (model: KittensBtnModel, amt: number) => void }, model: { [x in KittensNamedCombustLink]: { handler: (...args: unknown[]) => unknown } } }>[] }] }, vsPanel: { children: { children: KittensBtn[] }[] } }>, space: { getProgram: (name: KittensNamedBldgSpace) => { val: number }, hideResearched: boolean }, spaceTab: KittensTab<{ GCPanel: { children: KittensBtn[] }, planetPanels: { children: KittensBtn[] }[] }>, ui: { activeTabId: string }, village: { holdFestival: (amt: number) => void, huntAll: () => void }, villageTab: KittensTab<{ buttons: KittensBtn[], festivalBtn: KittensBtn<{ x100: { link: HTMLElement } }>, promoteKittensBtn: KittensBtn }>, workshop: { craft: (name: KittensNamedResCraft, count: number) => void, craftAll: (name: KittensNamedResCraft) => void, getCraft: (name: KittensNamedResCraft) => { prices: KittensPrice[] }, getCraftAllCount: (name: KittensNamedResCraft) => number, hideResearched: boolean }, workshopTab: KittensTab<{ buttons: KittensBtn[] }> }} KittensGame */
 
 // Kitty Cheat
-/** @template {{}} [E={}] @typedef {{ active?: boolean | (() => boolean), btn?: jQuery, danger?: boolean, delay?: number, do?: string[], end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => void, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
-/** @template {{ [x: string]: Partial<CheatOpt> }} T @template {{}} [E={}] @typedef {{ active?: boolean, all: T, div?: jQuery, noExec?: boolean } & E} CheatMapEntry */
+/** @template {{}} [E={}] @typedef {{ active?: boolean | (() => boolean), btn?: HTMLElement | null, danger?: boolean, delay?: number, do?: string[], end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => void, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
+/** @template {{ [x: string]: Partial<CheatOpt> }} T @template {{}} [E={}] @typedef {{ active?: boolean, all: T, div?: HTMLElement | null, noExec?: boolean } & E} CheatMapEntry */
 /** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: keyof CheatMap, name: string, opts: CheatOpt) => void }>, 'btn' | 'do' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'auto' | 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'policy' | 'co2' | 'store' | 'uncap' | 'iw' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
 /** @typedef {{ allowedTabs: string[], completed: string[], dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, stats: { [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact' | 'policy']?: string[] } }} CheatCtrl */
 
 // Window
-/** @typedef {Window & typeof globalThis & { $: JQuery, game: KittensGame }} WindowExt */
+/** @typedef {Window & typeof globalThis & { game: KittensGame }} WindowExt */
 
 /**
  * @description Our cheat.
  *
  * @returns {void}
  */
-function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
+function kittycheat (/** @type {KittensGame} */ game) {
   /**
    * @description Contains a map of resource mappings for spend. It allows us
    * to control the spend on a per-type and per-name basis and also allows
@@ -211,7 +207,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
         },
         observe: {
           fn: function fnObserve () {
-            $('input#observeBtn').click();
+            document.getElementById('observeBtn')?.click();
           },
           active: true,
           noFill: true
@@ -330,17 +326,35 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
   function noop () {}
 
   /**
-   * @description Appends a child element to a parent, an unlike the normal
-   * jQuery.append(...) function, this returns the child, not the parent. This
-   * allows us to streamline usage, where we can append and then immediately
-   * assign the result.
+   * @description Sets the text form an HTML element (if availble)
    *
-   * @returns {jQuery}
-   **/
-  function jqAppend (/** @type {jQuery} */ parent, /** @type {jQuery} */ child) {
-     parent.append(child);
+   * @template {HTMLElement | null} T
+   * @returns {T}
+   */
+  function setNodeText (/** @type {T} */ el, /** @type {string} */ txt) {
+    el && (el.textContent = txt);
 
-     return child;
+    return el;
+  }
+
+  /**
+   * @description Creates an HTML node with the specified id (optional) and
+   * classes (optional)
+   *
+   * @template {HTMLElement} T
+   * @return {T}
+   */
+  function createNode (/** @type {HTMLElement} */ parent, /** @type {keyof HTMLElementTagNameMap} */ tag, /** @type {string?=} */ id, /** @type {(string | null)[]=}= */ classes = [], /** @type {string?=} */ txt = null) {
+    const el = document.createElement(tag);
+
+    id && (el.id = id);
+    txt && (el.textContent = txt);
+
+    for (const c of classes) {
+      c && el.classList.add(c);
+    }
+
+    return /** @type {T} */ (parent.appendChild(el));
   }
 
   /**
@@ -353,7 +367,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
    **/
   function activateBtn (/** @type {keyof CheatMap} */ group, /** @type {string} */ _name, /** @type {CheatOpt} */ opts, /** @type {boolean} */ active) {
     opts.active = active;
-    opts.btn?.[active ? 'addClass' : 'removeClass']('active');
+    opts.btn?.classList[active ? 'add' : 'remove']('active');
 
     if (active) {
       if (opts.excl) {
@@ -385,7 +399,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
     const opt = cheatMap[group];
 
     opt.active = active;
-    opt.div?.[active ? 'removeClass' : 'addClass']('disabled');
+    opt.div?.classList[active ? 'remove' : 'add']('disabled');
   }
 
   /**
@@ -1195,7 +1209,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
 
       if (missing !== opts.missing) {
         opts.missing = missing;
-        opts.btn?.[missing ? 'addClass' : 'removeClass']('missing');
+        opts.btn?.classList[missing ? 'add' : 'remove']('missing');
       }
 
       if (cheatMap.control.all.craft.active && !opts.noMinCraft && !opts.active) {
@@ -1249,7 +1263,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
       fillResources();
 
       if (delay > 0) {
-        ctrl.completed.length && $(game.msg(ctrl.completed.join(', ')).span).addClass('kittycheat-log');
+        ctrl.completed.length && game.msg(ctrl.completed.join(', ')).span?.classList.add('kittycheat-log');
         setTimeout(() => execBuildAll(delay), delay);
       }
     }
@@ -1266,12 +1280,12 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
   function execTextInfo (/** @type {number} */ delay) {
     const bld = execBuildAll(0, true);
 
-    $('div#kittycheat-txt-drybld').html(`Buildings: ${bld.build?.join(', ') || '-'}`);
-    $('div#kittycheat-txt-dryupg').html(`Upgrades : ${bld.upgrade?.join(', ') || '-'}`);
-    $('div#kittycheat-txt-relzig').html(`Ziggurat : ${calcZiggurats().text || '-'}`);
-    $('div#kittycheat-txt-relcry').html(`Theology : ${calcTheology()?.[0]?.text || '-'}`);
-    $('div#kittycheat-txt-rellvl').html(`Transcend: ${calcTranscend().text || '-'}`);
-    $('div#kittycheat-txt-bcoins').html(`Blackcoin: ${calcBcoin().text || '-'}`);
+    setNodeText(document.getElementById('kittycheat-txt-drybld'), `Buildings: ${bld.build?.join(', ') || '-'}`);
+    setNodeText(document.getElementById('kittycheat-txt-dryupg'), `Upgrades : ${bld.upgrade?.join(', ') || '-'}`);
+    setNodeText(document.getElementById('kittycheat-txt-relzig'), `Ziggurat : ${calcZiggurats().text || '-'}`);
+    setNodeText(document.getElementById('kittycheat-txt-relcry'), `Theology : ${calcTheology()?.[0]?.text || '-'}`);
+    setNodeText(document.getElementById('kittycheat-txt-rellvl'), `Transcend: ${calcTranscend().text || '-'}`);
+    setNodeText(document.getElementById('kittycheat-txt-bcoins'), `Blackcoin: ${calcBcoin().text || '-'}`);
 
     setTimeout(() => execTextInfo(delay), delay);
   }
@@ -1303,21 +1317,27 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
   }
 
   // Overall HTML structure and styling for the cheat controls
-  $('head').append('<style type="text/css">#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; margin-bottom: 2px; margin-right: 2px; padding: 1px 4px; } #game .kittycheat-btn.active { background: darkgreen; color: white; } .kittycheat-btn.danger { background: lightblue; border-style: dashed; } #game .kittycheat-btn.danger.active { background: darkblue; } .kittycheat-btn.missing { background: lightpink; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { font-family: monospace; opacity: 0.33; } .kittycheat-btn-grp { display: inline-block; } #game .kittycheat-btn-grp.nobr { white-space: nowrap; }</style>');
+  document.head.appendChild(setNodeText(document.createElement('style'), '#kittycheat { font-family: monospace; font-size: small; padding-bottom: 30px; } .kittycheat-btn { background: white; border-radius: 2px; border-width: 1px; font-family: monospace; font-size: small; margin-bottom: 2px; margin-right: 2px; padding: 1px 4px; } #game .kittycheat-btn.active { background: darkgreen; color: white; } .kittycheat-btn.danger { background: lightblue; border-style: dashed; } #game .kittycheat-btn.danger.active { background: darkblue; } .kittycheat-btn.missing { background: lightpink; } .kittycheat-btn.end { margin-right: 5px; } .kittycheat-btn.excl { margin-right: -2px; } .kittycheat-div { margin-bottom: 20px; } .kittycheat-div.small { margin-bottom: 5px; } .kittycheat-div.disabled { opacity: 0.33; } .kittycheat-log { font-family: monospace; opacity: 0.33; } .kittycheat-btn-grp { display: inline-block; } #game .kittycheat-btn-grp.nobr { white-space: nowrap; }'));
 
-  const divAll = jqAppend($('div#leftColumn'), $('<div id="kittycheat"></div>'));
-  const divAct = jqAppend(divAll, $('<div id="kittycheat-act" class="kittycheat-div"></div>'));
-  const divTxt = jqAppend(divAll, $('<div id="kittycheat-txt" class="kittycheat-div"></div>'));
+  const divLeft = document.getElementById('leftColumn');
+
+  if (!divLeft) {
+    throw new Error('Unable to find kittygame');
+  }
+
+  const divAll = createNode(divLeft, 'div', 'kittycheat');
+  const divAct = createNode(divAll, 'div', 'kittycheat-act', ['kittycheat-div']);
+  const divTxt = createNode(divAll, 'div', 'kittycheat-txt', ['kittycheat-div']);
 
   // Loop through all options and create buttons in groups
   for (const _group in cheatMap) {
     const group = /** @type {keyof CheatMap} */ (_group);
-    const divGrp = cheatMap[group].div = jqAppend(divAct, $(`<div id="kittycheat-act-${group}" class="kittycheat-div"></div>`));
+    const divGrp = cheatMap[group].div = createNode(divAct, 'div', `kittycheat-act-${group}`, ['kittycheat-div']);
     const hasEnd = Object.values(cheatMap[group].all).find((o) => /** @type {CheatOpt} */ (o).end);
-    let /** @type {jQuery | null} */ divBtnGrp = null;
+    let /** @type {HTMLElement | undefined | null} */ divBtnGrp = null;
 
     if (group !== 'control') {
-      jqAppend(divGrp, $(`<div class="kittycheat-div small">${group}:</div>`));
+      createNode(divGrp, 'div', null, ['kittycheat-div', 'small'], `${group}:`);
     }
 
     activateGroup(group, cheatMap[group].active || cheatMap[group].noExec || false);
@@ -1329,12 +1349,13 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
         continue;
       }
 
-      divBtnGrp = divBtnGrp || jqAppend(divGrp, $(`<div class="kittycheat-btn-grp ${hasEnd ? 'nobr' : ''}"></div>`));
+      divBtnGrp = divBtnGrp || createNode(divGrp, 'div', null, ['kittycheat-btn-grp', hasEnd ? 'nobr' : null]);
 
       opts.active = (typeof opts.active === 'function' ? opts.active() : opts.active) || false;
-      opts.btn = jqAppend(divBtnGrp, $(`<button class="kittycheat-btn ${opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : ''} ${opts.danger ? 'danger' : ''}">${name}</button>`).click(() => {
+      opts.btn = createNode(divBtnGrp, 'button', null, ['kittycheat-btn', opts.end ? 'end' : (opts.excl && !opts.excl.includes('sell')) ? 'excl' : null, opts.danger ? 'danger' : null], name);
+      opts.btn.onclick = () => {
         activateBtn(group, name, opts, !opts.active);
-      }));
+      };
 
       activateBtn(group, name, opts, opts.active);
 
@@ -1350,7 +1371,7 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
 
   // Do the setup for out information panel, all game information
   for (const id of ['drybld', 'dryupg', 'relzig', 'relcry', 'rellvl', 'bcoins']) {
-    jqAppend(divTxt, $(`<div id="kittycheat-txt-${id}" class="kittycheat-div small"></div>`));
+    createNode(divTxt, 'div', `kittycheat-txt-${id}`, ['kittycheat-div', 'small']);
   }
 
   // Do the setup for the game options, slightly tweaking the messages, logging
@@ -1383,14 +1404,14 @@ function kittycheat (/** @type {JQuery} */ $, /** @type {KittensGame} */ game) {
   const we = /** @type {WindowExt} */ (window);
 
   const isVisible = (/** @type {string} */ id) =>
-    we.$(`div#${id}`).is(':visible');
+    document.getElementById(id)?.checkVisibility();
 
   const initTimerId = setInterval(() => {
-    if (we.$ && we.game && !isVisible('loadingContainer') && isVisible('leftColumn')) {
+    if (we.game && !isVisible('loadingContainer') && isVisible('leftColumn')) {
       clearInterval(initTimerId);
 
       if (!isVisible('kittycheat')) {
-        kittycheat(we.$, we.game);
+        kittycheat(we.game);
       }
     }
   }, 250);
