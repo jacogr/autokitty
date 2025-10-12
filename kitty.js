@@ -1245,7 +1245,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
     }
 
     loopTabs(ctrl, 'build', ['bldTab', 'spaceTab'], buildTab(buyTabBtn));
-    loopTabs(ctrl, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab, [], null, 2);
+    loopTabs(ctrl, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
 
     if (!dryRun) {
       const /** @type {KittensNamedPolicy[]} */ policies = ['authocracy', 'diplomacy', 'dragonRelationsAstrologers', 'epicurianism', 'extravagance', 'fascism', 'fullIndustrialization', 'griffinRelationsScouts', 'knowledgeSharing', 'lizardRelationsPriests', 'militarizeSpace', 'mysticism', 'nagaRelationsCultists', 'sharkRelationsScribes', 'siphoning', 'socialism', 'spiderRelationsPaleontologists', 'stripMining', 'technocracy', 'tradition', 'transkittenism', 'zebraRelationsBellicosity'];
