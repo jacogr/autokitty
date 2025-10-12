@@ -39,7 +39,7 @@
 /** @template {{}} [E={}] @typedef {{ active?: boolean | (() => boolean), btn?: HTMLElement | null, danger?: boolean, delay?: number, do?: string[], end?: boolean, excl?: string[], fn?: (group: keyof CheatMap, name: string, opts: CheatOpt) => void, group?: Exclude<keyof CheatMap, 'control' | 'tabs'>, missing?: boolean; noFill?: boolean, noMinCraft?: boolean, noShow?: boolean } & E} CheatOpt */
 /** @template {{ [x: string]: Partial<CheatOpt> }} T @template {{}} [E={}] @typedef {{ active?: boolean, all: T, div?: HTMLElement | null, noExec?: boolean } & E} CheatMapEntry */
 /** @typedef {{ actions: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ fn: (group: keyof CheatMap, name: string, opts: CheatOpt) => void }>, 'btn' | 'do' | 'group' | 'missing'> }>, control: CheatMapEntry<{ [x in 'auto' | 'build' | 'upgrade' | 'craft' | 'trade' | 'exec' | 'zig' | 'crypto' | 'time' | 'pact' | 'policy' | 'co2' | 'store' | 'uncap' | 'iw' | 'max' | 'max10' | 'sell']: Omit<CheatOpt, 'btn' | 'delay' | 'fn' | 'missing' | 'noFill'> }, { noExec: true }>, crafting: CheatMapEntry<{ [x in KittensNamedResCraft]?: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group'> }>, tabs: CheatMapEntry<{ [x: string]: Omit<CheatOpt<{ tab: KittensNamedTab }>, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing' | 'noFill'> }, { noExec: true }>, trading: CheatMapEntry<{ [x in KittensNamedRace]: Omit<CheatOpt, 'btn' | 'delay' | 'do' | 'fn' | 'excl' | 'group' | 'end' | 'missing'> }> }} CheatMap */
-/** @typedef {{ allowedTabs: string[], completed: string[], dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, stats: { [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact' | 'policy']?: string[] } }} CheatCtrl */
+/** @typedef {{ allowedTabs: string[], completed: { [x in string]: number }, dryRun: boolean, invalids: { [x in KittensNamedRes]?: boolean }, stats: { [x in 'build' | 'crypto' | 'sell' | 'upgrade' | 'zig' | 'time' | 'pact' | 'policy']?: string[] } }} CheatCtrl */
 
 // Window
 /** @typedef {Window & typeof globalThis & { game: KittensGame }} WindowExt */
@@ -444,10 +444,10 @@ function kittycheat (/** @type {KittensGame} */ game) {
    *
    * @returns {boolean}
    **/
-  function pushBtnName (/** @type {string[]} */ arr, /** @type {KittensBtn} */ btn, /** @type {string?=} */ extra = null) {
+  function pushBtnName (/** @type {CheatCtrl['completed']} */ names, /** @type {KittensBtn} */ btn, /** @type {string?=} */ extra = null) {
     const n = getBtnName(btn, extra);
 
-    return !!(n && arr.push(n));
+    return !!(n && (names[n] = ((names[n] || 0) + 1)));
   }
 
   /**
@@ -918,18 +918,20 @@ function kittycheat (/** @type {KittensGame} */ game) {
    *
    * @returns {void}
    **/
-  function loopTabs (/** @type {CheatCtrl} */ ctrl, /** @type {keyof CheatCtrl['stats']} */ type, /** @type {KittensNamedTab[]} */ tabIds, /** @type {(ctrl: CheatCtrl, tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowedIds = [], /** @type {() => boolean} */ checkFn = () => true) {
-    if (checkFn()) {
-      for (const tabId of tabIds) {
-        if (ctrl.dryRun || (cheatMap.control.all[type].active && ctrl.allowedTabs.includes(tabId))) {
-          try {
-            !ctrl.dryRun && fillResources();
+  function loopTabs (/** @type {CheatCtrl} */ ctrl, /** @type {keyof CheatCtrl['stats']} */ type, /** @type {KittensNamedTab[]} */ tabIds, /** @type {(ctrl: CheatCtrl, tab: KittensTab, allowed: string[]) => boolean} */ execFn, /** @type {string[]} */ allowedIds = [], /** @type {(() => boolean)?=} */ checkFn = null, /** @type {number} */ count = 1) {
+    for (let i = 0; i < count; i++) {
+      if (!checkFn || checkFn()) {
+        for (const tabId of tabIds) {
+          if (ctrl.dryRun || (cheatMap.control.all[type].active && ctrl.allowedTabs.includes(tabId))) {
+            try {
+              !ctrl.dryRun && fillResources();
 
-            if (renderBgTab(game[tabId]) && execFn(ctrl, game[tabId], allowedIds)) {
-              ctrl.stats[type] = (ctrl.stats[type] || []).concat(game[tabId].tabId);
+              if (renderBgTab(game[tabId]) && execFn(ctrl, game[tabId], allowedIds)) {
+                ctrl.stats[type] = (ctrl.stats[type] || []).concat(game[tabId].tabId);
+              }
+            } catch (e) {
+              console.error('loopTabs', type, tabId, e);
             }
-          } catch (e) {
-            console.error('loopTabs', type, tabId, e);
           }
         }
       }
@@ -979,7 +981,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
 
     let zig = calcZiggurats();
 
-    while (zig.bestBuilding && ctrl.completed.length < 7) {
+    while (zig.bestBuilding && Object.keys(ctrl.completed).length < 7) {
       const mark = getZigInfo('marker', ctrl.invalids);
       const best = getZigInfo(zig.bestBuilding, ctrl.invalids, zig.btn);
       const next = (best.isBuildable && mark.tears) && (mark.isBuildable && best.tears)
@@ -1236,14 +1238,14 @@ function kittycheat (/** @type {KittensGame} */ game) {
    * @returns {CheatCtrl['stats']}
    **/
   function execBuildAll (/** @type {number} */ delay, /** @type {boolean=} */ dryRun = false) {
-    const /** @type {CheatCtrl} */ ctrl = { allowedTabs: [], completed: [], invalids: {}, dryRun, stats: {} };
+    const /** @type {CheatCtrl} */ ctrl = { allowedTabs: [], completed: {}, invalids: {}, dryRun, stats: {} };
 
     for (const t in cheatMap.tabs.all) {
       cheatMap.tabs.all[t]?.active && ctrl.allowedTabs.push(cheatMap.tabs.all[t].tab);
     }
 
     loopTabs(ctrl, 'build', ['bldTab', 'spaceTab'], buildTab(buyTabBtn));
-    loopTabs(ctrl, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab);
+    loopTabs(ctrl, 'upgrade', ['diplomacyTab', 'libraryTab', 'religionTab', 'spaceTab', 'timeTab', 'workshopTab'], unlockTab, [], null, 2);
 
     if (!dryRun) {
       const /** @type {KittensNamedPolicy[]} */ policies = ['authocracy', 'diplomacy', 'dragonRelationsAstrologers', 'epicurianism', 'extravagance', 'fascism', 'fullIndustrialization', 'griffinRelationsScouts', 'knowledgeSharing', 'lizardRelationsPriests', 'militarizeSpace', 'mysticism', 'nagaRelationsCultists', 'sharkRelationsScribes', 'siphoning', 'socialism', 'spiderRelationsPaleontologists', 'stripMining', 'technocracy', 'tradition', 'transkittenism', 'zebraRelationsBellicosity'];
@@ -1263,7 +1265,13 @@ function kittycheat (/** @type {KittensGame} */ game) {
       fillResources();
 
       if (delay > 0) {
-        ctrl.completed.length && game.msg(ctrl.completed.join(', ')).span?.classList.add('kittycheat-log');
+        const completed = Object
+          .entries(ctrl.completed)
+          .map(([k, v]) => k + (v === 1 ? '' : ` x${v}`))
+          .join(', ');
+
+        completed && game.msg(completed).span?.classList.add('kittycheat-log');
+
         setTimeout(() => execBuildAll(delay), delay);
       }
     }
