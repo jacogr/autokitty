@@ -577,7 +577,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
     if (cheatMap.control.all.max.active || cheatMap.control.all.max10.active) {
       for (const r of game.resPool.resources) {
         if (r.maxValue && r.unlocked && !r.isHidden && !RESOURCES.SKIP[r.name]) {
-          const max = r.maxValue * (cheatMap.control.all.max10.active ? 10 : 1);
+          const max = r.maxValue * (cheatMap.control.all.max10.active ? 100 : 1);
 
           if (r.value < max) {
             r.value = max;
