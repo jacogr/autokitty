@@ -55,12 +55,13 @@ function kittycheat (/** @type {KittensGame} */ game) {
    * to control the spend on a per-type and per-name basis and also allows
    * exclusion of certain type for resource maxing.
    *
-   * @type {Readonly<{ CRAFT: number; LEAST: Readonly<{ [x in KittensNamedRes]?: number }>, NAME: Readonly<{ [x in KittensNamedRes]?: number }>, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>}
+   * @type {Readonly<{ CRAFT: number, LEAST: Readonly<{ [x in KittensNamedRes]?: number }>, NAME: Readonly<{ [x in KittensNamedRes]?: number }>, REFILL: number, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>}
    **/
   const RESOURCES = {
     CRAFT: 0.925, // use this via SPEND.CRAFT.MAXIMUM
     LEAST: { alicorn: 1, necrocorn: 1 }, // have at least this left
     NAME: { karma: 0.5, tears: 1 }, // fractions for name spend
+    REFILL: 1000, // for x10 refills
     SKIP: { kittens: true, zebras: true }, // skip these when maxing
     TYPE: {
       get exotic () {
@@ -95,11 +96,10 @@ function kittycheat (/** @type {KittensGame} */ game) {
    * For builds, 25 HGs are optimal for maximum paragon. Impedance it set to
    * a low value (even 1 should be enough with a large number of challenges)
    *
-   * @type {Readonly<{ BCOIN: Readonly<{ [x in 'BUY' | 'SELL']: number }>, BUILD: Readonly<{ [x in KittensNamedBldg]?: number }>, RESOURCES: number }>} */
+   * @type {Readonly<{ BCOIN: Readonly<{ [x in 'BUY' | 'SELL']: number }>, BUILD: Readonly<{ [x in KittensNamedBldg]?: number }> }>} */
   const MAXVAL = {
     BCOIN: { BUY: 899, SELL: 1089 },
-    BUILD: { holyGenocide: 25, temporalImpedance: 2 },
-    RESOURCES: 1000 // for x10
+    BUILD: { holyGenocide: 25, temporalImpedance: 2 }
   };
 
   /**
@@ -578,7 +578,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
     if (cheatMap.control.all.max.active || cheatMap.control.all.max10.active) {
       for (const r of game.resPool.resources) {
         if (r.maxValue && r.unlocked && !r.isHidden && !RESOURCES.SKIP[r.name]) {
-          const max = r.maxValue * (cheatMap.control.all.max10.active ? MAXVAL.RESOURCES : 1);
+          const max = r.maxValue * (cheatMap.control.all.max10.active ? RESOURCES.REFILL : 1);
 
           if (r.value < max) {
             r.value = max;
