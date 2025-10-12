@@ -99,7 +99,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
   const MAXVAL = {
     BCOIN: { BUY: 899, SELL: 1089 },
     BUILD: { holyGenocide: 25, temporalImpedance: 2 },
-    RESOURCES: 100 // for x10
+    RESOURCES: 1000 // for x10
   };
 
   /**
