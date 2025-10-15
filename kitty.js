@@ -14,8 +14,9 @@
 /** @typedef {'blackCore' | 'blackLibrary' | 'blackNexus' | 'blackObelisk' | 'blackRadiance' | 'blazar' | 'darkNova' | 'holyGenocide' | 'mausoleum' | 'singularity'} KittensNamedBldgCrypto */
 /** @typedef {'blackPyramid' | 'unicornGraveyard' | 'unicornNecropolis' | 'unicornTomb' | 'ivoryTower' | 'ivoryCitadel' | 'skyPalace' | 'unicornUtopia' | 'sunspire'} KittensNamedBldgZU */
 /** @typedef {'blastFurnace' | 'temporalAccelerator' | 'temporalImpedance' | 'timeBoiler' | 'ressourceRetrieval'} KittensNamedBldgTimeCF */
+/** @typedef {'cryochambers' | 'usedCryochambers'} KittensNamedBldgTimeVS */
 /** @typedef {'orbitalLaunch'} KittensNamedBldgSpace */
-/** @typedef {KittensNamedBldgBld | KittensNamedBldgCrypto | KittensNamedBldgSpace | KittensNamedBldgTimeCF | KittensNamedBldgZU} KittensNamedBldg */
+/** @typedef {KittensNamedBldgBld | KittensNamedBldgCrypto | KittensNamedBldgSpace | KittensNamedBldgTimeCF | KittensNamedBldgTimeVS | KittensNamedBldgZU} KittensNamedBldg */
 /** @typedef {'1000Years'} KittensNamedChallenge */
 /** @typedef {'tenErasLink' | 'previousCycleLink' | 'nextCycleLink'} KittensNamedCombustLink */
 /** @typedef {'cathPollutionPerTickProd' | 'heatCompression' | 'heatEfficiency' | 'heatMax' | 'riftChance' | 'unicornsGlobalRatio' | 'unicornsPerTickBase' | 'unicornsRatioReligion' | 'catnipMax' | 'coalMax' | 'goldMax' | 'ironMax' | 'mineralsMax' | 'titaniumMax' | 'woodMax' | 'manpowerMax' | 'maxKittens'} KittensNamedEffect */
@@ -55,7 +56,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
    * to control the spend on a per-type and per-name basis and also allows
    * exclusion of certain type for resource maxing.
    *
-   * @type {Readonly<{ CRAFT: number, LEAST: Readonly<{ [x in KittensNamedRes]?: number }>, NAME: Readonly<{ [x in KittensNamedRes]?: number }>, REFILL: number, SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>}
+   * @type {Readonly<{ [x in 'CRAFT' | 'REFILL']: number } & { [x in 'LEAST' | 'NAME']: Readonly<{ [x in KittensNamedRes]?: number }> } & { SKIP: Readonly<{ [x in KittensNamedRes]?: boolean }>, TRADE: Readonly<{ [x in 'blackcoin']: Readonly<{ [x in 'buy' | 'sell']: number }> }>, TYPE: Readonly<{ [x in KittensRes['type']]: number }> }>}
    **/
   const RESOURCES = {
     CRAFT: 0.925, // use this via SPEND.CRAFT.MAXIMUM
@@ -63,6 +64,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
     NAME: { karma: 0.5, tears: 1 }, // fractions for name spend
     REFILL: 1000, // for x10 refills
     SKIP: { kittens: true, zebras: true }, // skip these when maxing
+    TRADE: { blackcoin: { buy: 899, sell: 1089 } },
     TYPE: {
       get exotic () {
         return Math.max(0.01, (game.bld.getBuildingExt('chronosphere').meta?.on || 1) * 0.00015);
@@ -96,9 +98,8 @@ function kittycheat (/** @type {KittensGame} */ game) {
    * For builds, 25 HGs are optimal for maximum paragon. Impedance it set to
    * a low value (even 1 should be enough with a large number of challenges)
    *
-   * @type {Readonly<{ BCOIN: Readonly<{ [x in 'BUY' | 'SELL']: number }>, BUILD: Readonly<{ [x in KittensNamedBldg]?: number }> }>} */
-  const MAXVAL = {
-    BCOIN: { BUY: 899, SELL: 1089 },
+   * @type {Readonly<{ BUILD: Readonly<{ [x in KittensNamedBldg]?: number }> }>} */
+  const BUILDINGS = {
     BUILD: { holyGenocide: 25, temporalImpedance: 2 }
   };
 
@@ -554,7 +555,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
         ))
        )) ||
       // max builds
-      (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))
+      (btn.model.on >= (BUILDINGS.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))
     ) {
       return { isBuildable: false };
     }
@@ -699,9 +700,9 @@ function kittycheat (/** @type {KittensGame} */ game) {
    **/
   function calcBcoin () {
     const price = game.calendar.cryptoPrice;
-    const action = price >= MAXVAL.BCOIN.SELL
+    const action = price >= RESOURCES.TRADE.blackcoin.sell
       ? 'sell'
-      : price <= MAXVAL.BCOIN.BUY
+      : price <= RESOURCES.TRADE.blackcoin.buy
         ? 'buy'
         : 'hold';
 
@@ -731,7 +732,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
   function calcTheology () {
     return game.religionTab.ctPanel.children[0]?.children
       .filter((btn) => {
-        if (!btn.model?.prices[0] || btn.model.prices[0].name !== 'relic' || (btn.model.on >= (MAXVAL.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
+        if (!btn.model?.prices[0] || btn.model.prices[0].name !== 'relic' || (btn.model.on >= (BUILDINGS.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
           return false;
         }
 
