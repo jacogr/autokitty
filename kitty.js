@@ -50,7 +50,7 @@
  *
  * @returns {void}
  */
-function kittycheat (/** @type {KittensGame} */ game) {
+function kittycheat (/** @type {Document} */ document, /** @type {KittensGame} */ game) {
   /**
    * @description Contains a map of resource mappings for spend. It allows us
    * to control the spend on a per-type and per-name basis and also allows
@@ -1414,7 +1414,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
   const we = /** @type {WindowExt} */ (window);
 
   const isVisible = (/** @type {string} */ id) => {
-    const el = document.getElementById(id);
+    const el = we.document.getElementById(id);
 
     return !!el && (
       /** @type {null | HTMLElement['checkVisibility']} */ (el.checkVisibility)
@@ -1428,7 +1428,7 @@ function kittycheat (/** @type {KittensGame} */ game) {
       clearInterval(initTimerId);
 
       if (!isVisible('kittycheat')) {
-        kittycheat(we.game);
+        kittycheat(we.document, we.game);
       }
     }
   }, 250);
