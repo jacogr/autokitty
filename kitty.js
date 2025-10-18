@@ -1411,7 +1411,9 @@ function kittycheat (/** @type {Document} */ document, /** @type {KittensGame} *
  * retry until all conditions are met.
  */
 (() => {
-  const isVisible = (/** @type {WindowExt} */ we, /** @type {string} */ id) => {
+  const we = /** @type {WindowExt} */ (window);
+
+  const isVisible = (/** @type {string} */ id) => {
     const el = we.document.getElementById(id);
 
     return !!el && (
@@ -1422,12 +1424,10 @@ function kittycheat (/** @type {Document} */ document, /** @type {KittensGame} *
   }
 
   const initTimerId = setInterval(() => {
-    const we = /** @type {WindowExt} */ (/** @type {HTMLIFrameElement | null} */ (document.getElementById('gameFrame'))?.contentWindow || window);
-
-    if (we.game && !isVisible(we, 'loadingContainer') && isVisible(we, 'leftColumn')) {
+    if (we.game && !isVisible('loadingContainer') && isVisible('leftColumn')) {
       clearInterval(initTimerId);
 
-      if (!isVisible(we, 'kittycheat')) {
+      if (!isVisible('kittycheat')) {
         kittycheat(we.document, we.game);
       }
     }
