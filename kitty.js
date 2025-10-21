@@ -89,17 +89,15 @@ function kittycheat (/** @type {Document} */ document, /** @type {KittensGame} *
 
   /**
    * @description Maximum value constants for various operations. Sets the
-   * ranges for vlackcoin as well as the maximum number of buildings (with a
-   * specific name/id) that can be constructed.
+   * maximum number of buildings (with a specific name/id) that can be
+   * constructed.
    *
-   * For blackcoin, resets are at 1100, dropping to between 780 and 880, set
-   * the buy/sell limits around these with some room to spare.
-   *
-   * For builds, 25 HGs are optimal for maximum paragon. Impedance it set to
+   * For builds, 25 HGs are optimal for maximum paragon. Impedance is set to
    * a low value (even 1 should be enough with a large number of challenges)
    *
-   * @type {Readonly<{ BUILD: Readonly<{ [x in KittensNamedBldg]?: number }> }>} */
+   * @type {Readonly<{ ALL: Readonly<{ id?: KittensNamedBldg; name?: string; disabled: KittensNamedBldg }[]>, BUILD: Readonly<{ [x in KittensNamedBldg]?: number }> }>} */
   const BUILDINGS = {
+    ALL: [{ name: 'Fix Cryochamber', disabled: 'cryochambers' }],
     BUILD: { holyGenocide: 25, temporalImpedance: 2 }
   };
 
@@ -900,7 +898,18 @@ function kittycheat (/** @type {Document} */ document, /** @type {KittensGame} *
 
     for (const area of areas) {
       for (const btn of area.children) {
-        if (btn?.model?.visible && (!withMeta || btn.model.metadata) && (!withIds || (btn.id && withIds.includes(btn.id))) && buttonFn(ctrl, btn, !!withAll)) {
+        const allMatch = BUILDINGS.ALL.find((b) => btn && ((!!b.id && b.id === btn.id) || (!!b.name && b.name === btn.model?.name)));
+        let isAll = !!withAll;
+
+        if (allMatch && !isAll) {
+          const other = area.children.find((b) => b.id === allMatch.disabled && !!b.model && !b.model.enabled);
+
+          if (other) {
+            isAll = true;
+          }
+        }
+
+        if (btn?.model?.visible && (!withMeta || btn.model.metadata) && (!withIds || (btn.id && withIds.includes(btn.id))) && buttonFn(ctrl, btn, isAll)) {
           if (ctrl.dryRun) {
             return true;
           }
