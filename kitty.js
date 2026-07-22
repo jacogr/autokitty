@@ -732,7 +732,7 @@ function kittycheat (/** @type {Document} */ document, /** @type {KittensGame} *
   function calcTheology () {
     return game.religionTab.ctPanel.children[0]?.children
       .filter((btn) => {
-        if (!btn.model?.prices[0] || btn.model.prices[0].name !== 'relic' || (btn.model.on >= (BUILDINGS.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
+        if (!btn.model?.prices[0] || !btn.model.visible || btn.model.prices[0].name !== 'relic' || (btn.model.on >= (BUILDINGS.BUILD[/** @type {KittensNamedBldg} */ (btn.id)] || Number.MAX_SAFE_INTEGER))) {
           return false;
         }
 
