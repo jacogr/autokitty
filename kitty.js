@@ -24,7 +24,7 @@
 /** @typedef {'numeromancy' | 'unicornmancy'} KittensNamedPerk */
 /** @typedef {'authocracy' | 'bigStickPolicy' | 'carnivale' | 'cityOnAHill' | 'clearCutting' | 'communism' | 'conservation' | 'cryochamberExtraction' | 'culturalExchange' | 'diplomacy' | 'dragonRelationsAstrologers' | 'dragonRelationsDynamicists' | 'dragonRelationsPhysicists' | 'environmentalism' | 'epicurianism' | 'expansionism' | 'extravagance' | 'fascism' | 'frugality' | 'fullIndustrialization' | 'griffinRelationsMachinists' | 'griffinRelationsMetallurgists' | 'griffinRelationsScouts' | 'isolationism' | 'knowledgeSharing' | 'liberalism' | 'liberty' | 'lizardRelationsDiplomats' | 'lizardRelationsEcologists' | 'lizardRelationsPriests' | 'militarizeSpace' | 'monarchy' | 'mysticism' | 'nagaRelationsArchitects' | 'nagaRelationsCultists' | 'nagaRelationsMasons' | 'necrocracy' | 'openWoodlands' | 'outerSpaceTreaty' | 'radicalXenophobia' | 'rationality' | 'rationing' | 'republic' | 'scientificCommunism' | 'sharkRelationsBotanists' | 'sharkRelationsMerchants' | 'sharkRelationsScribes' | 'siphoning' | 'socialism' | 'spiderRelationsChemists' | 'spiderRelationsGeologists' | 'spiderRelationsPaleontologists' | 'stoicism' | 'stripMining' | 'sustainability' | 'technocracy' | 'terraformingInsight' | 'theocracy' | 'tradition' | 'transkittenism' | 'zebraRelationsAppeasement' | 'zebraRelationsBellicosity'} KittensNamedPolicy */
 /** @typedef {'dragons' | 'griffins' | 'leviathans' | 'lizards' |'nagas' | 'sharks' | 'spiders' | 'zebras'} KittensNamedRace */
-/** @typedef {'alloy' | 'beam' | 'bloodstone' | 'blueprint' | 'compedium' | 'concrate' | 'eludium' | 'gear' | 'kerosene' | 'manuscript' | 'megalith' |'parchment' | 'plate' | 'scaffold' |  'ship' | 'slab' | 'steel' | 'tMythril' | 'tanker' | 'thorium' | 'wood'} KittensNamedResCraft */
+/** @typedef {'alloy' | 'beam' | 'bloodstone' | 'blueprint' | 'compedium' | 'concrate' | 'eludium' | 'gear' | 'kerosene' | 'manuscript' | 'megalith' | 'microchip' | 'parchment' | 'plastic' | 'plate' | 'scaffold' |  'ship' | 'slab' | 'steel' | 'tMythril' | 'tanker' | 'thorium' | 'wood'} KittensNamedResCraft */
 /** @typedef {'alicorn' | 'blackcoin' | 'coal' | 'culture' | 'furs' | 'iron' | 'ivory' | 'karma' | 'kittens' |  'minerals' | 'necrocorn' | 'oil' | 'relic' | 'science' | 'starchart' | 'sorrow' | 'tears' | 'timeCrystal' | 'titanium' | 'unicorns' | 'unobtainium' | 'uranium' | 'zebras' | KittensNamedResCraft} KittensNamedRes */
 /** @typedef {'bldTab' | 'diplomacyTab' | 'libraryTab' | 'religionTab' | 'spaceTab' | 'timeTab' | 'villageTab' | 'workshopTab'} KittensNamedTab */
 /** @typedef {{ enabled: boolean, metadata?: { effects: { [x in KittensNamedEffect]?: number }, isAutomationEnabled?: boolean, label: string, limitBuild?: number, name: string, on: number, unlocked: boolean, val: number }, name?: string, on: number, prices: KittensPrice[], stageLinks?: { title: '^' | 'v', enabled: boolean, handler: ((...args: unknown[]) => void) & { name: 'downgradeHandler' | 'upgradeHandler' } }[], toggleAutomationLink?: { enabled: boolean,  handler: ((...args: unknown[]) => void), title: 'A' | '*' }, visible: boolean }} KittensBtnModel */
@@ -160,7 +160,9 @@ function kittycheat (/** @type {Document} */ document, /** @type {KittensGame} *
         concrate: {},
         alloy: {},
         parchment: { active: true },
+        plastic: { active: true },
         manuscript: {},
+        microchip: {},
         compedium: {},
         blueprint: {},
         kerosene: { active: true },
@@ -1299,12 +1301,15 @@ function kittycheat (/** @type {Document} */ document, /** @type {KittensGame} *
   function execTextInfo (/** @type {number} */ delay) {
     const bld = execBuildAll(0, true);
 
-    setNodeText(document.getElementById('kittycheat-txt-drybld'), `Buildings: ${bld.build?.join(', ') || '-'}`);
-    setNodeText(document.getElementById('kittycheat-txt-dryupg'), `Upgrades : ${bld.upgrade?.join(', ') || '-'}`);
-    setNodeText(document.getElementById('kittycheat-txt-relzig'), `Ziggurat : ${calcZiggurats().text || '-'}`);
-    setNodeText(document.getElementById('kittycheat-txt-relcry'), `Theology : ${calcTheology()?.[0]?.text || '-'}`);
-    setNodeText(document.getElementById('kittycheat-txt-rellvl'), `Transcend: ${calcTranscend().text || '-'}`);
-    setNodeText(document.getElementById('kittycheat-txt-bcoins'), `Blackcoin: ${calcBcoin().text || '-'}`);
+    const setInfo = (/** @type {string} */ node, /** @type {string} */ text, /** @type {string?=} */ info) =>
+      setNodeText(document.getElementById(`kittycheat-txt-${node}`), `${text.padEnd(9)}: ${info || '-'}`);
+
+    setInfo('drybld', 'Buildings', bld.build?.join(', '));
+    setInfo('dryupg', 'Upgrades', bld.upgrade?.join(', '));
+    setInfo('relzig', 'Ziggurat', calcZiggurats().text);
+    setInfo('relcry', 'Theology', calcTheology()?.[0]?.text);
+    setInfo('rellvl', 'Transcend', calcTranscend().text);
+    setInfo('bcoins', 'Blackcoin', calcBcoin().text);
 
     setTimeout(() => execTextInfo(delay), delay);
   }
